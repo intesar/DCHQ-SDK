@@ -1,13 +1,12 @@
-buildscript {
-    repositories {
-        maven { url "http://repo.spring.io/libs-release" }
-        maven { url "https://oss.sonatype.org/" }
-        maven { url "https://oss.sonatype.org/content/groups/public" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        mavenLocal()
-        mavenCentral()
-    }
+repositories {
+    maven { url "http://repo.spring.io/libs-release" }
+    maven { url "https://oss.sonatype.org/" }
+    maven { url "https://oss.sonatype.org/content/groups/public" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    mavenLocal()
+    mavenCentral()
 }
+
 
 apply plugin: 'java'
 apply plugin: 'maven'
