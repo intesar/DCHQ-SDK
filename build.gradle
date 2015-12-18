@@ -1,0 +1,88 @@
+buildscript {
+    repositories {
+        maven { url "http://repo.spring.io/libs-release" }
+        maven { url "https://oss.sonatype.org/" }
+        maven { url "https://oss.sonatype.org/content/groups/public" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'DCHQ SDK'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Contains DCHQ SDK.'
+                url 'http://www.dchq.co'
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'Intesar'
+                        name 'Intesar Mohammed'
+                        email 'intesar@dchq.io'
+                    }
+                }
+            }
+        }
+    }
+}
+
+group = dchqGroup
+version = dchqVersion
+jar {
+    baseName = dchqName + '-' + 'SDK'
+    version = dchqVersion + '-' + System.currentTimeMillis();
+}
+
+dependencies {
+    compile("joda-time:joda-time:2.3")
+    compile("io.dchq:DCHQ-dto-base:3.0-SNAPSHOT")
+    compile("io.dchq:DCHQ-dto-one:3.0-SNAPSHOT")
+    compile("commons-codec:commons-codec:1.9")
+    compile("commons-collections:commons-collections:3.2.1")
+}
+
