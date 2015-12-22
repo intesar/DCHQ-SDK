@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.dchq.sdk.core;
 
-import org.springframework.core.ParameterizedTypeReference;
-
 /**
- * Abstracts and provides infrastructure to all API calls.
- *
- * @author Intesar Mohammed
- * @since 1.0
+ * Need this for packaging
  */
-interface GenericService<RL, RO> {
+public class Main {
+    public static void main(String[] args) {
 
-    /**
-     * Executes GET request.
-     *
-     * @param requestParams - Optional URI request-params
-     * @param typeReference - Return type
-     * @return - Response
-     */
-    public RL get(String requestParams, ParameterizedTypeReference<RL> typeReference);
+    }
 }

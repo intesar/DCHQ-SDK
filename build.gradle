@@ -91,14 +91,14 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.springframework:spring-web")
     compile("com.fasterxml.jackson.core:jackson-databind")
-    compile("joda-time:joda-time:2.3")
+    compile("joda-time:joda-time")
     compile("io.dchq:DCHQ-dto-base:3.0-SNAPSHOT")
     compile("io.dchq:DCHQ-dto-one:3.0-SNAPSHOT") {
         exclude module: 'DTOResponseBase'
     }
-    compile("commons-codec:commons-codec:1.9")
-    compile("commons-collections:commons-collections:3.2.1")
+    //compile("commons-codec:commons-codec:1.9")
+    //compile("commons-collections:commons-collections:3.2.1")
 
-    testCompile ("junit:junit:4.12")
+    testCompile("junit:junit")
 }
 
