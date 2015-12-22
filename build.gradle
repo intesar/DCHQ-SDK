@@ -38,7 +38,8 @@ artifacts {
 }
 
 signing {
-    sign configurations.archives
+    // TODO - uncomment to upload
+    //sign configurations.archives
 }
 
 uploadArchives {
