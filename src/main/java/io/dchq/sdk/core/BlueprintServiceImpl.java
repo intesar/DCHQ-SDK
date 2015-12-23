@@ -48,8 +48,19 @@ class BlueprintServiceImpl extends GenericServiceImpl<ResponseEntity<List<Bluepr
         super(baseURI, ENDPOINT, username, password);
     }
 
+
     @Override
     public ResponseEntity<List<Blueprint>> get() {
         return get("", listTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<Blueprint> findById(String id) {
+        return getOne(id, singleTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<List<Blueprint>> getManaged() {
+        return get("manage", listTypeReference);
     }
 }

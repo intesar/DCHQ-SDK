@@ -34,4 +34,13 @@ interface GenericService<RL, RO> {
      * @return - Response
      */
     public RL get(String requestParams, ParameterizedTypeReference<RL> typeReference);
+
+    /**
+     * Executes GET request.
+     *
+     * @param requestParams - Optional URI request-params
+     * @param typeReference - Return type
+     * @return - Response
+     */
+    public RO getOne(String requestParams, ParameterizedTypeReference<RO> typeReference);
 }

@@ -77,6 +77,8 @@ abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
 
 
     /**
+     * Executes GET request
+     *
      * @param requestParams
      * @param typeReference
      * @return
@@ -87,17 +89,9 @@ abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
         String authHeader = buildAuth();
 
         String url = baseURI + endpoint + requestParams;
-        URI uri = null;
-        try {
-            uri = new URI(url);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        URI uri = getUri(url);
 
-        RequestEntity request = RequestEntity.get(uri)
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", authHeader)
-                .build();
+        RequestEntity request = getBasicRequestEntity(authHeader, uri);
 
         org.springframework.http.ResponseEntity<RL> res =
                 template.exchange(
@@ -109,6 +103,55 @@ abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
 
         return res.getBody();
     }
+
+
+    /**
+     * Executes GET request
+     *
+     * @param requestParams
+     * @param typeReference
+     * @return
+     */
+    @Override
+    public RO getOne(String requestParams, ParameterizedTypeReference<RO> typeReference) {
+
+        String authHeader = buildAuth();
+
+        String url = baseURI + endpoint + requestParams;
+        URI uri = getUri(url);
+
+        RequestEntity request = getBasicRequestEntity(authHeader, uri);
+
+        org.springframework.http.ResponseEntity<RO> res =
+                template.exchange(
+                        url,
+                        HttpMethod.GET,
+                        request,
+                        typeReference
+                );
+
+        return res.getBody();
+    }
+
+
+    private RequestEntity getBasicRequestEntity(String authHeader, URI uri) {
+        return RequestEntity.get(uri)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", authHeader)
+                .build();
+    }
+
+
+    private URI getUri(String url) {
+        URI uri = null;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        return uri;
+    }
+
 
     private String buildAuth() {
         String auth = username + ":" + password;

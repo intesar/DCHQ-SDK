@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractServiceTest {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected String rootUrl = "http://localhost:9090/api/1.0/";
-    protected String username = "mdshannan@gmail.com";
-    protected String password = "apple123";
+    protected String rootUrl = "http://104.130.163.208:33901/api/1.0/";
+    protected String username = "admin@dchq.io";
+    protected String password = "admin123";
 }

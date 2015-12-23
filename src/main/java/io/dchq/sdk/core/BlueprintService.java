@@ -23,12 +23,29 @@ import com.dchq.schema.beans.one.blueprint.Blueprint;
 import java.util.List;
 
 /**
- * Abstracts and provides infrastructure to all API calls.
+ * <code>Blueprint</code> endpoint API calls.
  *
  * @author Intesar Mohammed
  * @since 1.0
  */
 public interface BlueprintService extends GenericService<ResponseEntity<List<Blueprint>>, ResponseEntity<Blueprint>> {
 
+    /**
+     * Get library page entitled <code>Blueprint</code>
+     * @return
+     */
     ResponseEntity<List<Blueprint>> get();
+
+    /**
+     * Find <code>Blueprint</code> by id.
+     * @return
+     */
+    ResponseEntity<Blueprint> findById(String id);
+
+    /**
+     * Get managed/authored <code>Blueprint</code>.
+     *
+     * @return Blueprints response
+     */
+    ResponseEntity<List<Blueprint>> getManaged();
 }
