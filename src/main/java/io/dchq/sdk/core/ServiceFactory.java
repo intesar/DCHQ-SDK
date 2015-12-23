@@ -16,6 +16,10 @@
 
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.one.build.Build;
+import com.dchq.schema.beans.one.plugin.Plugin;
+import com.dchq.schema.beans.one.provision.App;
+
 /**
  * Factory class
  *
@@ -28,4 +32,30 @@ public class ServiceFactory {
         // validate inputs
         return new BlueprintServiceImpl(baseURI, username, password);
     }
+
+    public static final DockerServerService buildDockerServerService(String baseURI, String username, String password) {
+        return new DockerServerServiceImpl(baseURI, username, password);
+    }
+
+    public static final BuildService buildBuildService(String baseURI, String username, String password) {
+        return new BuildServiceImpl(baseURI, username, password);
+    }
+
+    public static final DataCenterService buildDataCenterService(String baseURI, String username, String password) {
+        return new DataCenterServiceImpl(baseURI, username, password);
+    }
+
+    public static final AppService buildAppService(String baseURI, String username, String password) {
+        return new AppServiceImpl(baseURI, username, password);
+    }
+
+    public static final PluginService buildPluginService(String baseURI, String username, String password) {
+        return new PluginServiceImpl(baseURI, username, password);
+    }
+
+    public static final RegistryAccountService buildRegistryAccountService(String baseURI, String username, String password) {
+        return new RegistryAccountServiceImpl(baseURI, username, password);
+    }
+
+
 }
