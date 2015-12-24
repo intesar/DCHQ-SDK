@@ -32,15 +32,21 @@ public interface BlueprintService extends GenericService<ResponseEntity<List<Blu
 
     /**
      * Get library page entitled <code>Blueprint</code>
-     * @return
+     * @return List of ResponseEntity of type Blueprint
      */
     ResponseEntity<List<Blueprint>> get();
 
     /**
      * Find <code>Blueprint</code> by id.
-     * @return
+     * @return Specific Blueprint response (by ID)
      */
     ResponseEntity<Blueprint> findById(String id);
+
+    /**
+     * Find <code>Blueprint</code> by id.
+     * @return Managed Blueprint response (by ID)
+     */
+    ResponseEntity<Blueprint> findManagedById(String id);
 
     /**
      * Get managed/authored <code>Blueprint</code>.
@@ -48,4 +54,5 @@ public interface BlueprintService extends GenericService<ResponseEntity<List<Blu
      * @return Blueprints response
      */
     ResponseEntity<List<Blueprint>> getManaged();
+
 }

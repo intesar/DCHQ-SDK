@@ -41,8 +41,8 @@ class BlueprintServiceImpl extends GenericServiceImpl<ResponseEntity<List<Bluepr
 
     /**
      * @param baseURI  - e.g. https://dchq.io/api/1.0/
-     * @param username
-     * @param password
+     * @param username - registered username with DCHQ.io
+     * @param password - password used with the username
      */
     public BlueprintServiceImpl(String baseURI, String username, String password) {
         super(baseURI, ENDPOINT, username, password);
@@ -63,4 +63,9 @@ class BlueprintServiceImpl extends GenericServiceImpl<ResponseEntity<List<Bluepr
     public ResponseEntity<List<Blueprint>> getManaged() {
         return get("manage", listTypeReference);
     }
+    @Override
+    public ResponseEntity<Blueprint> findManagedById(String id){
+        return getOne(id, singleTypeReference);
+    }
+
 }
