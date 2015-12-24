@@ -49,7 +49,6 @@ public class BlueprintServiceTest extends AbstractServiceTest {
     @org.junit.Test
     public void testFindById() throws Exception {
         ResponseEntity<Blueprint> responseEntity = blueprintService.findById("4028818650d4aca10150d4bf63470003");
-        Assert.assertNotNull(responseEntity.getTotalElements());
         Assert.assertNotNull(responseEntity.getResults());
         Assert.assertNotNull(responseEntity.getResults().getId());
     }
