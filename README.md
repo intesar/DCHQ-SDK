@@ -1,5 +1,5 @@
-# DCHQ-SDK
-Java SDK simplifies using DCHQ REST API's. 
+# DCHQ-Java-SDK
+DCHQ-Java-SDK simplifies using DCHQ REST API's. Providers high-level java abstraction for REST API's.
 
 This is a community driven project, feel free to submit pull requests.
 
