@@ -14,7 +14,8 @@ import java.util.List;
 public interface UserGroupService extends GenericService<ResponseEntity<List<UserGroup>>, ResponseEntity<UserGroup>> {
 
     /**
-     * Get user's <code>UserGroup</code>
+     * Get user's <code>UserGroup</code>.
+     *
      * @return UserGroup response
      */
     ResponseEntity<List<UserGroup>> get();

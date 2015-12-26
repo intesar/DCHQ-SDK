@@ -54,13 +54,6 @@ public class BlueprintServiceTest extends AbstractServiceTest {
     }
 
     @org.junit.Test
-    public void testFindManagedById() throws Exception {
-        ResponseEntity<Blueprint> responseEntity = blueprintService.findManagedById("402881864e1a36cc014e1a399cf90102");
-        Assert.assertNotNull(responseEntity.getResults());
-        Assert.assertNotNull(responseEntity.getResults().getId());
-    }
-
-    @org.junit.Test
     public void testGetManaged() throws Exception {
         ResponseEntity<List<Blueprint>> responseEntity = blueprintService.getManaged();
         Assert.assertNotNull(responseEntity.getTotalElements());
@@ -68,6 +61,27 @@ public class BlueprintServiceTest extends AbstractServiceTest {
             logger.info("Managed Blueprint type [{}] name [{}] author [{}]", bl.getBlueprintType(), bl.getName(), bl.getCreatedBy());
         }
     }
+
+    @org.junit.Test
+    public void testFindManagedById() throws Exception {
+        ResponseEntity<Blueprint> responseEntity = blueprintService.findManagedById("402881864e1a36cc014e1a399cf90102");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
+
+    @org.junit.Test
+    public void testFindStarred() throws Exception {
+        ResponseEntity<List<Blueprint>> responseEntity = blueprintService.findByStarred();
+        Assert.assertNotNull(responseEntity.getResults());
+    }
+
+//    @org.junit.Test
+//    public void testFindYamlById() throws Exception {
+//        ResponseEntity<Blueprint> responseEntity = blueprintService.findYamlById("");
+//        Assert.assertNotNull(responseEntity.getResults());
+//        Assert.assertNotNull(responseEntity.getResults().getId());
+//    }
+
 
 
 

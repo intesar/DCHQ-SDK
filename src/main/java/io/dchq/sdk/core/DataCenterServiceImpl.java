@@ -7,7 +7,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import java.util.List;
 
 /**
- * Created by atefahmed on 12/23/15.
+ * Encapsulates DCHQ DataCenter related methods.
+ *
+ * @author Atef Ahmed
+ * @see <a href="https://dchq.readme.io/docs/datacenters">DataCenter endpoint</a>
+ * @since 1.0
  */
 public class DataCenterServiceImpl extends GenericServiceImpl<ResponseEntity<List<DataCenter>>, ResponseEntity<DataCenter>>
         implements DataCenterService{
@@ -21,8 +25,8 @@ public class DataCenterServiceImpl extends GenericServiceImpl<ResponseEntity<Lis
 
     /**
      * @param baseURI  - e.g. https://dchq.io/api/1.0/
-     * @param username
-     * @param password
+     * @param username - registered username with DCHQ.io
+     * @param password - password used with the username
      */
     public DataCenterServiceImpl(String baseURI, String username, String password) {
         super(baseURI, ENDPOINT, username, password);
@@ -32,5 +36,16 @@ public class DataCenterServiceImpl extends GenericServiceImpl<ResponseEntity<Lis
     public ResponseEntity<List<DataCenter>> get() {
         return get("", listTypeReference);
     }
-    
+
+    @Override
+    public ResponseEntity<DataCenter> findById(String id) {
+        return getOne(id, singleTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<List<DataCenter>> getManaged() {
+        return get("manage", listTypeReference);
+    }
+
+
 }

@@ -26,4 +26,29 @@ public class BuildServiceTest extends AbstractServiceTest{
             logger.info("Build repository [{}] buildType [{}] author [{}]", bl.getRepository() ,bl.getBuildType(), bl.getCreatedBy());
         }
     }
+
+
+
+//    @org.junit.Test
+//    public void testFindById() throws Exception {
+//        ResponseEntity<Build> responseEntity = buildService.findById("");
+//        Assert.assertNotNull(responseEntity.getResults());
+//        Assert.assertNotNull(responseEntity.getResults().getId());
+//    }
+
+    @org.junit.Test
+    public void testGetManaged() throws Exception {
+        ResponseEntity<List<Build>> responseEntity = buildService.getManaged();
+        Assert.assertNotNull(responseEntity.getTotalElements());
+        for (Build bl : responseEntity.getResults()) {
+//            logger.info("Managed Build type [{}] name [{}] author [{}]", bl.getBuildType(), bl.getName(), bl.getCreatedBy());
+        }
+    }
+
+//    @org.junit.Test
+//    public void testFindManagedById() throws Exception {
+//        ResponseEntity<Build> responseEntity = buildService.findManagedById("");
+//        Assert.assertNotNull(responseEntity.getResults());
+//        Assert.assertNotNull(responseEntity.getResults().getId());
+//    }
 }

@@ -63,9 +63,20 @@ class BlueprintServiceImpl extends GenericServiceImpl<ResponseEntity<List<Bluepr
     public ResponseEntity<List<Blueprint>> getManaged() {
         return get("manage", listTypeReference);
     }
+
     @Override
     public ResponseEntity<Blueprint> findManagedById(String id){
-        return getOne(id, singleTypeReference);
+        return getOne("manage/" + id, singleTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<List<Blueprint>> findByStarred() {
+        return get("starred", listTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<Blueprint> findYamlById(String id){
+        return getOne(id + "/yaml", singleTypeReference);
     }
 
 }

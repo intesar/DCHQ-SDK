@@ -7,7 +7,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import java.util.List;
 
 /**
- * Created by atefahmed on 12/23/15.
+ * Encapsulates DCHQ Plugin endpoint calls.
+ *
+ * @author Atef Ahmed
+ * @see <a href="https://dchq.readme.io/docs/plugins-3">Plugin endpoint</a>
+ * @since 1.0
  */
 public class PluginServiceImpl extends GenericServiceImpl<ResponseEntity<List<Plugin>>, ResponseEntity<Plugin>>
         implements PluginService{
@@ -21,8 +25,8 @@ public class PluginServiceImpl extends GenericServiceImpl<ResponseEntity<List<Pl
 
     /**
      * @param baseURI  - e.g. https://dchq.io/api/1.0/
-     * @param username
-     * @param password
+     * @param username - registered username with DCHQ.io
+     * @param password - password used with the username
      */
     public PluginServiceImpl(String baseURI, String username, String password) {
         super(baseURI, ENDPOINT, username, password);
@@ -31,6 +35,26 @@ public class PluginServiceImpl extends GenericServiceImpl<ResponseEntity<List<Pl
     @Override
     public ResponseEntity<List<Plugin>> get() {
         return get("", listTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<Plugin> findById(String id) {
+        return getOne(id, singleTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<Plugin> findManagedById(String id) {
+        return getOne("manage/"+id, singleTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<List<Plugin>> getManaged() {
+        return get("manage", listTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<List<Plugin>> findByStarred() {
+        return get("starred", listTypeReference);
     }
 
 }

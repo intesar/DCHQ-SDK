@@ -28,4 +28,27 @@ public class RegistryAccountServiceTest extends AbstractServiceTest {
         }
     }
 
+    @org.junit.Test
+    public void testFindById() throws Exception {
+        ResponseEntity<RegistryAccount> responseEntity = registryAccountService.findById("2c91808651a95c4d0151d96a012f71ba");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
+
+    @org.junit.Test
+    public void testGetManaged() throws Exception {
+        ResponseEntity<List<RegistryAccount>> responseEntity = registryAccountService.getManaged();
+        Assert.assertNotNull(responseEntity.getTotalElements());
+        for (RegistryAccount bl : responseEntity.getResults()) {
+            logger.info("Managed RegistryAccount type [{}] name [{}] author [{}]", bl.getBlueprintEntitlementType(), bl.getName(), bl.getCreatedBy());
+        }
+    }
+
+    //TODO: need to figure out
+//    @org.junit.Test
+//    public void testFindRegistryAccountTypeById() throws Exception {
+//        ResponseEntity<RegistryAccount> responseEntity = registryAccountService.findRegistryAccountTypeById("2c91808651a95c4d0151d96a012f71ba");
+//        Assert.assertNotNull(responseEntity.getResults());
+//    }
+
 }

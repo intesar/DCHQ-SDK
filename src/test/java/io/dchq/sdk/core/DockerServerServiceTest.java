@@ -29,6 +29,47 @@ public class DockerServerServiceTest extends AbstractServiceTest{
         }
     }
 
+    @org.junit.Test
+    public void testFindById() throws Exception {
+        ResponseEntity<DockerServer> responseEntity = dockerServerService.findById("2c91808651a95c4d0151c416b1491a33");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
 
+    @org.junit.Test
+    public void testGetManaged() throws Exception {
+        ResponseEntity<List<DockerServer>> responseEntity = dockerServerService.getManaged();
+        Assert.assertNotNull(responseEntity.getTotalElements());
+        for (DockerServer bl : responseEntity.getResults()) {
+            logger.info("Managed DockerServer datacenter [{}] name [{}] author [{}]", bl.getDataCenter(), bl.getName(), bl.getCreatedBy());
+        }
+    }
 
+    @org.junit.Test
+    public void testFindStatusById() throws Exception {
+        ResponseEntity<DockerServer> responseEntity = dockerServerService.findById("2c91808651a95c4d0151c416b1491a33");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
+
+    @org.junit.Test
+    public void testPingServerById() throws Exception {
+        ResponseEntity<DockerServer> responseEntity = dockerServerService.findById("2c91808651a95c4d0151c416b1491a33");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
+
+    @org.junit.Test
+    public void testFindManagedById() throws Exception {
+        ResponseEntity<DockerServer> responseEntity = dockerServerService.findById("2c91808651a95c4d0151c416b1491a33");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
+
+    @org.junit.Test
+    public void testFindMonitoredDataById() throws Exception {
+        ResponseEntity<DockerServer> responseEntity = dockerServerService.findById("2c91808651a95c4d0151c416b1491a33");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
 }

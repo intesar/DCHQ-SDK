@@ -14,7 +14,8 @@ import java.util.List;
 public interface ProfileService extends GenericService<ResponseEntity<List<Profile>>, ResponseEntity<Profile>> {
 
     /**
-     * Get user <code>Profile</code>
+     * Get user <code>Profile</code>.
+     *
      * @return Profile response
      */
     ResponseEntity<List<Profile>> get();

@@ -6,10 +6,39 @@ import com.dchq.schema.beans.one.build.Build;
 import java.util.List;
 
 /**
- * Created by atefahmed on 12/22/15.
+ * <code>Build</code> endpoint API calls.
+ *
+ * @author Atef Ahmed
+ * @since 1.0
  */
 public interface BuildService extends GenericService<ResponseEntity<List<Build>>, ResponseEntity<Build>> {
 
+    /**
+     * Get <code>Build</code> page builds
+     *
+     * @return List of ResponseEntity of type Build
+     */
     ResponseEntity<List<Build>> get();
+
+    /**
+     * Find <code>Build</code> by id.
+     *
+     * @return Specific Build response
+     */
+    ResponseEntity<Build> findById(String id);
+
+    /**
+     * Find managed <code>Build</code> by id.
+     *
+     * @return Managed Build response
+     */
+    ResponseEntity<Build> findManagedById(String id);
+
+    /**
+     * Get a list of managed/authored <code>Build</code>.
+     *
+     * @return Build response
+     */
+    ResponseEntity<List<Build>> getManaged();
 
 }

@@ -28,4 +28,16 @@ public class DataCenterServiceTest extends AbstractServiceTest{
         }
     }
 
+    @org.junit.Test
+    public void testFindById() throws Exception {
+        ResponseEntity<DataCenter> responseEntity = dataCenterService.findById("2c91808651a95c4d0151ae98d9d1004b");
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+    }
+
+    @org.junit.Test
+    public void testGetManaged() throws Exception {
+        ResponseEntity<List<DataCenter>> responseEntity = dataCenterService.getManaged();
+        Assert.assertNotNull(responseEntity.getTotalElements());
+    }
 }

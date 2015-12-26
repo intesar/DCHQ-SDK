@@ -7,7 +7,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import java.util.List;
 
 /**
- * Created by atefahmed on 12/23/15.
+ * Encapsulates DCHQ RegistryAccount related methods.
+ *
+ * @author Atef Ahmed
+ * @see <a href="https://dchq.readme.io/docs/registryaccounts">RegistryAccount endpoint</a>
+ * @since 1.0
  */
 public class RegistryAccountServiceImpl extends GenericServiceImpl<ResponseEntity<List<RegistryAccount>>, ResponseEntity<RegistryAccount>>
         implements RegistryAccountService{
@@ -21,8 +25,8 @@ public class RegistryAccountServiceImpl extends GenericServiceImpl<ResponseEntit
 
     /**
      * @param baseURI  - e.g. https://dchq.io/api/1.0/
-     * @param username
-     * @param password
+     * @param username - registered username with DCHQ.io
+     * @param password - password used with the username
      */
     public RegistryAccountServiceImpl(String baseURI, String username, String password) {
         super(baseURI, ENDPOINT, username, password);
@@ -31,6 +35,21 @@ public class RegistryAccountServiceImpl extends GenericServiceImpl<ResponseEntit
     @Override
     public ResponseEntity<List<RegistryAccount>> get() {
         return get("", listTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<RegistryAccount> findById(String id) {
+        return getOne(id, singleTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<List<RegistryAccount>> getManaged() {
+        return get("", listTypeReference);
+    }
+
+    @Override
+    public ResponseEntity<RegistryAccount> findRegistryAccountTypeById(String id) {
+        return getOne("accounttype/" + id, singleTypeReference);
     }
 
 }
