@@ -13,7 +13,7 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/usergroups-1">UserGroup endpoint</a>
  * @since 1.0
  */
-public class UserGroupServiceImpl extends GenericServiceImpl<ResponseEntity<List<UserGroup>>, ResponseEntity<UserGroup>>
+public class UserGroupServiceImpl extends GenericServiceImpl<UserGroup, ResponseEntity<List<UserGroup>>, ResponseEntity<UserGroup>>
         implements UserGroupService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<UserGroup>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<UserGroup>>>() {
@@ -29,12 +29,17 @@ public class UserGroupServiceImpl extends GenericServiceImpl<ResponseEntity<List
      * @param password - password used with the username
      */
     public UserGroupServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<UserGroup>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<UserGroup>>() {
+                }
+        );
     }
 
 
     @Override
     public ResponseEntity<List<UserGroup>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 }

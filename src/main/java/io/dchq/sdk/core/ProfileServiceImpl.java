@@ -13,7 +13,7 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/profiles-1">Profile endpoint</a>
  * @since 1.0
  */
-public class ProfileServiceImpl extends GenericServiceImpl<ResponseEntity<List<Profile>>, ResponseEntity<Profile>>
+public class ProfileServiceImpl extends GenericServiceImpl<Profile, ResponseEntity<List<Profile>>, ResponseEntity<Profile>>
         implements ProfileService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<Profile>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<Profile>>>() {
@@ -29,12 +29,17 @@ public class ProfileServiceImpl extends GenericServiceImpl<ResponseEntity<List<P
      * @param password - password used with the username
      */
     public ProfileServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<Profile>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<Profile>>() {
+                }
+        );
     }
 
 
     @Override
     public ResponseEntity<List<Profile>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 }

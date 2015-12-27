@@ -11,7 +11,7 @@ import java.util.List;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface PluginService extends GenericService<ResponseEntity<List<Plugin>>, ResponseEntity<Plugin>> {
+public interface PluginService extends GenericService<Plugin, ResponseEntity<List<Plugin>>, ResponseEntity<Plugin>> {
 
     /**
      * Get plugins page entitled <code>Plugins</code>

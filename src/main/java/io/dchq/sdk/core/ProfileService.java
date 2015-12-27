@@ -11,7 +11,7 @@ import java.util.List;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface ProfileService extends GenericService<ResponseEntity<List<Profile>>, ResponseEntity<Profile>> {
+public interface ProfileService extends GenericService<Profile, ResponseEntity<List<Profile>>, ResponseEntity<Profile>> {
 
     /**
      * Get user <code>Profile</code>.

@@ -1,8 +1,9 @@
 package io.dchq.sdk.core;
 
-import com.dchq.schema.beans.one.provider.DockerServer;
-import java.util.List;
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.provider.DockerServer;
+
+import java.util.List;
 
 /**
  * <code>DockerServer</code> endpoint API calls.
@@ -10,7 +11,7 @@ import com.dchq.schema.beans.base.ResponseEntity;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface DockerServerService extends GenericService<ResponseEntity<List<DockerServer>>, ResponseEntity<DockerServer>> {
+public interface DockerServerService extends GenericService<DockerServer, ResponseEntity<List<DockerServer>>, ResponseEntity<DockerServer>> {
 
     /**
      * Get hosts page all <code>DockerServer</code> owned by the logged in user

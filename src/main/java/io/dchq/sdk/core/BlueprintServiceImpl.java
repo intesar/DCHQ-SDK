@@ -29,13 +29,8 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/blueprints-1">Blueprint endpoint</a>
  * @since 1.0
  */
-class BlueprintServiceImpl extends GenericServiceImpl<ResponseEntity<List<Blueprint>>, ResponseEntity<Blueprint>>
+class BlueprintServiceImpl extends GenericServiceImpl<Blueprint, ResponseEntity<List<Blueprint>>, ResponseEntity<Blueprint>>
         implements BlueprintService {
-
-    public static final ParameterizedTypeReference<ResponseEntity<List<Blueprint>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<Blueprint>>>() {
-    };
-    public static final ParameterizedTypeReference<ResponseEntity<Blueprint>> singleTypeReference = new ParameterizedTypeReference<ResponseEntity<Blueprint>>() {
-    };
 
     public static final String ENDPOINT = "blueprints/";
 
@@ -45,38 +40,22 @@ class BlueprintServiceImpl extends GenericServiceImpl<ResponseEntity<List<Bluepr
      * @param password - password used with the username
      */
     public BlueprintServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<Blueprint>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<Blueprint>>() {
+                }
+        );
     }
 
-
-    @Override
-    public ResponseEntity<List<Blueprint>> get() {
-        return get("", listTypeReference);
-    }
-
-    @Override
-    public ResponseEntity<Blueprint> findById(String id) {
-        return getOne(id, singleTypeReference);
-    }
-
-    @Override
-    public ResponseEntity<List<Blueprint>> getManaged() {
-        return get("manage", listTypeReference);
-    }
-
-    @Override
-    public ResponseEntity<Blueprint> findManagedById(String id){
-        return getOne("manage/" + id, singleTypeReference);
-    }
 
     @Override
     public ResponseEntity<List<Blueprint>> findByStarred() {
-        return get("starred", listTypeReference);
+        return findAll();
     }
 
     @Override
-    public ResponseEntity<Blueprint> findYamlById(String id){
-        return getOne(id + "/yaml", singleTypeReference);
+    public ResponseEntity<Blueprint> findYamlById(String id) {
+        return findById(id + "/yaml");
     }
-
 }

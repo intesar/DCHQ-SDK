@@ -13,8 +13,8 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/plugins-3">Plugin endpoint</a>
  * @since 1.0
  */
-public class PluginServiceImpl extends GenericServiceImpl<ResponseEntity<List<Plugin>>, ResponseEntity<Plugin>>
-        implements PluginService{
+public class PluginServiceImpl extends GenericServiceImpl<Plugin, ResponseEntity<List<Plugin>>, ResponseEntity<Plugin>>
+        implements PluginService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<Plugin>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<Plugin>>>() {
     };
@@ -29,32 +29,37 @@ public class PluginServiceImpl extends GenericServiceImpl<ResponseEntity<List<Pl
      * @param password - password used with the username
      */
     public PluginServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<Plugin>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<Plugin>>() {
+                }
+        );
     }
 
     @Override
     public ResponseEntity<List<Plugin>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<Plugin> findById(String id) {
-        return getOne(id, singleTypeReference);
+        return findById(id);
     }
 
     @Override
     public ResponseEntity<Plugin> findManagedById(String id) {
-        return getOne("manage/"+id, singleTypeReference);
+        return findById("manage/" + id);
     }
 
     @Override
     public ResponseEntity<List<Plugin>> getManaged() {
-        return get("manage", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<List<Plugin>> findByStarred() {
-        return get("starred", listTypeReference);
+        return findAll();
     }
 
 }

@@ -18,6 +18,7 @@ package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
+import com.dchq.schema.beans.one.blueprint.BlueprintType;
 import org.junit.Assert;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class BlueprintServiceTest extends AbstractServiceTest {
 
     @org.junit.Test
     public void testGet() throws Exception {
-        ResponseEntity<List<Blueprint>> responseEntity = blueprintService.get();
+        ResponseEntity<List<Blueprint>> responseEntity = blueprintService.findAll();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Blueprint bl : responseEntity.getResults()) {
             logger.info("Blueprint type [{}] name [{}] author [{}]", bl.getBlueprintType(), bl.getName(), bl.getCreatedBy());
@@ -55,7 +56,7 @@ public class BlueprintServiceTest extends AbstractServiceTest {
 
     @org.junit.Test
     public void testGetManaged() throws Exception {
-        ResponseEntity<List<Blueprint>> responseEntity = blueprintService.getManaged();
+        ResponseEntity<List<Blueprint>> responseEntity = blueprintService.findAllManaged();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Blueprint bl : responseEntity.getResults()) {
             logger.info("Managed Blueprint type [{}] name [{}] author [{}]", bl.getBlueprintType(), bl.getName(), bl.getCreatedBy());
@@ -83,6 +84,35 @@ public class BlueprintServiceTest extends AbstractServiceTest {
 //    }
 
 
+    @org.junit.Test
+    public void testCreate() throws Exception {
+        Blueprint bl = new Blueprint()
+                .withName("IT-Test1")
+                .withBlueprintType(BlueprintType.DOCKER_COMPOSE)
+                .withVersion("2.0");
+
+        bl.setYml("LB:\n image: nginx:latest\n");
+
+        //TODO - Missing with attributes yml, short-description, features, visibility, external-links, active, entitlement.
+
+        ResponseEntity<Blueprint> responseEntity = blueprintService.create(bl);
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+
+        bl = responseEntity.getResults();
+
+        bl.setVersion("3.0");
+        responseEntity = blueprintService.update(bl);
+
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+        Assert.assertEquals(responseEntity.getResults().getVersion(), "3.0");
+
+        // Delete
+        responseEntity = blueprintService.delete(bl.getId());
+        Assert.assertFalse(responseEntity.isErrors());
+
+    }
 
 
 }

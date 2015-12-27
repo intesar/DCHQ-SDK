@@ -13,7 +13,7 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/messagesid">Message endpoint</a>
  * @since 1.0
  */
-public class MessageServiceImpl extends GenericServiceImpl<ResponseEntity<List<Message>>, ResponseEntity<Message>>
+public class MessageServiceImpl extends GenericServiceImpl<Message, ResponseEntity<List<Message>>, ResponseEntity<Message>>
         implements MessageService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<Message>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<Message>>>() {
@@ -29,12 +29,17 @@ public class MessageServiceImpl extends GenericServiceImpl<ResponseEntity<List<M
      * @param password - password used with the username
      */
     public MessageServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<Message>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<Message>>() {
+                }
+        );
     }
 
 
     @Override
     public ResponseEntity<Message> findById(String id) {
-        return getOne(id, singleTypeReference);
+        return findById(id);
     }
 }

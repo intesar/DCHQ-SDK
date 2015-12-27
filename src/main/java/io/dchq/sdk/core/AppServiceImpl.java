@@ -13,8 +13,8 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/applications">App endpoint</a>
  * @since 1.0
  */
-public class AppServiceImpl extends GenericServiceImpl<ResponseEntity<List<App>>, ResponseEntity<App>>
-        implements AppService{
+public class AppServiceImpl extends GenericServiceImpl<App, ResponseEntity<List<App>>, ResponseEntity<App>>
+        implements AppService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<App>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<App>>>() {
     };
@@ -29,62 +29,67 @@ public class AppServiceImpl extends GenericServiceImpl<ResponseEntity<List<App>>
      * @param password - password used with the username
      */
     public AppServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<App>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<App>>() {
+                }
+        );
     }
 
     @Override
     public ResponseEntity<List<App>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<App> findById(String id) {
-        return getOne(id, singleTypeReference);
+        return findById(id);
     }
 
     @Override
     public ResponseEntity<List<App>> findActive() {
-        return get("active", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<List<App>> findDestroyed() {
-        return get("destroyed", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<List<App>> findDeployed() {
-        return get("deploy", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<App> findBackedupById(String id) {
-        return getOne(id + "/backup", singleTypeReference);
+        return findById(id + "/backup");
     }
 
     @Override
     public ResponseEntity<App> findPluginById(String id) {
-        return getOne(id + "/plugin", singleTypeReference);
+        return findById(id + "/plugin");
     }
 
     @Override
     public ResponseEntity<App> findRolledback(String id) {
-        return getOne(id + "/rollback", singleTypeReference);
+        return findById(id + "/rollback");
     }
 
     @Override
     public ResponseEntity<App> findScaleOutCreate(String id) {
-        return getOne(id + "/scale-out-create", singleTypeReference);
+        return findById(id + "/scale-out-create");
     }
 
     @Override
     public ResponseEntity<App> findScaleIn(String id) {
-        return getOne(id + "/scale-in", singleTypeReference);
+        return findById(id + "/scale-in");
     }
 
     @Override
     public ResponseEntity<List<App>> findMonitored(String id) {
-        return get(id + "/monitor?start=2015-08-19T03%3A58%3A57.138Z&end=2015-08-19T03%3A58%3A57.138Z", listTypeReference);
+        return findAll();
     }
 
 }

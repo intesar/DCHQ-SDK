@@ -21,7 +21,7 @@ public class AppServiceTest extends AbstractServiceTest {
     //TODO: An exception is thrown, even on dchq.readme.io
 //    @org.junit.Test
 //    public void testGet() throws Exception {
-//        ResponseEntity<List<App>> responseEntity = appService.get();
+//        ResponseEntity<List<App>> responseEntity = appService.findAll();
 //        Assert.assertNotNull(responseEntity.getResults());
 //
 //        for (App bl : responseEntity.getResults()) {

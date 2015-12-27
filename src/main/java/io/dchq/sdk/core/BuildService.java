@@ -11,7 +11,7 @@ import java.util.List;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface BuildService extends GenericService<ResponseEntity<List<Build>>, ResponseEntity<Build>> {
+public interface BuildService extends GenericService<Build, ResponseEntity<List<Build>>, ResponseEntity<Build>> {
 
     /**
      * Get <code>Build</code> page builds

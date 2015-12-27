@@ -28,35 +28,8 @@ import java.util.List;
  * @author Intesar Mohammed
  * @since 1.0
  */
-public interface BlueprintService extends GenericService<ResponseEntity<List<Blueprint>>, ResponseEntity<Blueprint>> {
+public interface BlueprintService extends GenericService<Blueprint, ResponseEntity<List<Blueprint>>, ResponseEntity<Blueprint>> {
 
-    /**
-     * Get library page entitled <code>Blueprint</code>
-     *
-     * @return ResponseEntity, list of blueprints.
-     */
-    ResponseEntity<List<Blueprint>> get();
-
-    /**
-     * Find <code>Blueprint</code> by id.
-     *
-     * @return Specific Blueprint response
-     */
-    ResponseEntity<Blueprint> findById(String id);
-
-    /**
-     * Find <code>Blueprint</code> by id.
-     *
-     * @return Managed Blueprint response
-     */
-    ResponseEntity<Blueprint> findManagedById(String id);
-
-    /**
-     * Get managed/authored <code>Blueprint</code>.
-     *
-     * @return Blueprints response
-     */
-    ResponseEntity<List<Blueprint>> getManaged();
 
     /**
      * Find starred <code>Blueprint</code>.

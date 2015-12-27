@@ -11,7 +11,7 @@ import java.util.List;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface MessageService extends GenericService<ResponseEntity<List<Message>>, ResponseEntity<Message>>{
+public interface MessageService extends GenericService<Message, ResponseEntity<List<Message>>, ResponseEntity<Message>> {
 
     /**
      * Find <code>Message</code> by id.

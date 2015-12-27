@@ -16,31 +16,67 @@
 
 package io.dchq.sdk.core;
 
-import org.springframework.core.ParameterizedTypeReference;
-
 /**
  * Abstracts and provides infrastructure to all API calls.
  *
  * @author Intesar Mohammed
  * @since 1.0
  */
-interface GenericService<RL, RO> {
+interface GenericService<E, RL, RO> {
 
     /**
-     * Executes GET request.
+     * Finds all <code>E</code>.
      *
-     * @param requestParams - Optional URI request-params
-     * @param typeReference - Return type
      * @return - Response
      */
-    public RL get(String requestParams, ParameterizedTypeReference<RL> typeReference);
+    RL findAll();
 
     /**
-     * Executes GET request.
+     * Find <code>E</code> by id.
      *
-     * @param requestParams - Optional URI request-params
-     * @param typeReference - Return type
+     * @param id - id to look for
      * @return - Response
      */
-    public RO getOne(String requestParams, ParameterizedTypeReference<RO> typeReference);
+    RO findById(String id);
+
+    /**
+     * Finds all managed <code>E</code>.
+     *
+     * @return - Response
+     */
+    RL findAllManaged();
+
+    /**
+     * Find managed <code>E</code> by id.
+     *
+     * @param id - id to look for
+     * @return - Response
+     */
+    RO findManagedById(String id);
+
+    /**
+     * Create <code>E</code>.
+     *
+     * @param entity - Object
+     * @return
+     */
+    RO create(E entity);
+
+    /**
+     * Delete <code>E</code> by id.
+     *
+     * @param id - Entity id
+     * @return
+     */
+    RO delete(String id);
+
+    /**
+     * Update <code>E</code>
+     *
+     * @param entity - Entity
+     * @return
+     */
+    RO update(E entity);
+
+    // TODO - search
 }

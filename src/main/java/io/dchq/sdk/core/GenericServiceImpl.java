@@ -19,9 +19,7 @@ package io.dchq.sdk.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -34,7 +32,7 @@ import java.nio.charset.Charset;
  * @author Intesar Mohammed
  * @since 1.0
  */
-abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
+abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO> {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -67,28 +65,42 @@ abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
      */
     private RestTemplate template;
 
-    public GenericServiceImpl(String baseURI, String endpoint, String username, String password) {
+    /**
+     *
+     */
+    private ParameterizedTypeReference<RL> listTypeReference;
+
+    /**
+     *
+     */
+    private ParameterizedTypeReference<RO> singleTypeReference;
+
+    protected GenericServiceImpl(String baseURI, String endpoint, String username, String password, ParameterizedTypeReference<RL> listTypeReference, ParameterizedTypeReference<RO> singleTypeReference) {
         this.baseURI = baseURI;
         this.endpoint = endpoint;
         this.username = username;
         this.password = password;
         this.template = new RestTemplate();
+        this.listTypeReference = listTypeReference;
+        this.singleTypeReference = singleTypeReference;
     }
 
+
+    protected String getManagedEndpoint() {
+        return "manage/";
+    }
 
     /**
      * Executes GET request
      *
-     * @param requestParams
-     * @param typeReference
      * @return
      */
     @Override
-    public RL get(String requestParams, ParameterizedTypeReference<RL> typeReference) {
+    public RL findAll() {
 
         String authHeader = buildAuth();
 
-        String url = baseURI + endpoint + requestParams;
+        String url = baseURI + endpoint;
         URI uri = getUri(url);
 
         RequestEntity request = getBasicRequestEntity(authHeader, uri);
@@ -98,7 +110,7 @@ abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
                         url,
                         HttpMethod.GET,
                         request,
-                        typeReference
+                        listTypeReference
                 );
 
         return res.getBody();
@@ -108,12 +120,11 @@ abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
     /**
      * Executes GET request
      *
-     * @param requestParams
-     * @param typeReference
+     * @param requestParams - not null
      * @return
      */
     @Override
-    public RO getOne(String requestParams, ParameterizedTypeReference<RO> typeReference) {
+    public RO findById(String requestParams) {
 
         String authHeader = buildAuth();
 
@@ -127,12 +138,162 @@ abstract class GenericServiceImpl<RL, RO> implements GenericService<RL, RO> {
                         url,
                         HttpMethod.GET,
                         request,
-                        typeReference
+                        singleTypeReference
                 );
 
         return res.getBody();
     }
 
+    /**
+     * Executes GET request
+     *
+     * @return
+     */
+    @Override
+    public RL findAllManaged() {
+
+        String authHeader = buildAuth();
+
+        String url = baseURI + endpoint + getManagedEndpoint();
+        URI uri = getUri(url);
+
+        RequestEntity request = getBasicRequestEntity(authHeader, uri);
+
+        org.springframework.http.ResponseEntity<RL> res =
+                template.exchange(
+                        url,
+                        HttpMethod.GET,
+                        request,
+                        listTypeReference
+                );
+
+        return res.getBody();
+    }
+
+
+    /**
+     * Executes GET request
+     *
+     * @param requestParams - not null
+     * @return
+     */
+    @Override
+    public RO findManagedById(String requestParams) {
+
+        String authHeader = buildAuth();
+
+        String url = baseURI + endpoint + getManagedEndpoint() + requestParams;
+        URI uri = getUri(url);
+
+        RequestEntity request = getBasicRequestEntity(authHeader, uri);
+
+        org.springframework.http.ResponseEntity<RO> res =
+                template.exchange(
+                        url,
+                        HttpMethod.GET,
+                        request,
+                        singleTypeReference
+                );
+
+        return res.getBody();
+    }
+
+    /**
+     * Executes POST request
+     *
+     * @param entity - not null
+     * @return
+     */
+    @Override
+    public RO create(E entity) {
+
+        String url = baseURI + endpoint;
+        URI uri = getUri(url);
+
+        HttpHeaders map = getHttpHeaders();
+
+        //set your entity to send
+        HttpEntity<E> requestEntity = new HttpEntity<>(entity, map);
+
+
+        org.springframework.http.ResponseEntity<RO> res =
+                template.exchange(
+                        url,
+                        HttpMethod.POST,
+                        requestEntity,
+                        singleTypeReference
+                );
+
+        return res.getBody();
+    }
+
+
+    /**
+     * Executes PUT request
+     *
+     * @param entity - not null
+     * @return
+     */
+    @Override
+    public RO update(E entity) {
+
+        String url = baseURI + endpoint + "id";
+        URI uri = getUri(url);
+
+        HttpHeaders map = getHttpHeaders();
+
+        //set your entity to send
+        HttpEntity<E> requestEntity = new HttpEntity<>(entity, map);
+
+
+        org.springframework.http.ResponseEntity<RO> res =
+                template.exchange(
+                        url,
+                        HttpMethod.PUT,
+                        requestEntity,
+                        singleTypeReference
+                );
+
+        return res.getBody();
+    }
+
+    /**
+     * Executes DELETE request
+     *
+     * @param id - not null
+     * @return
+     */
+    @Override
+    public RO delete(String id) {
+
+        String url = baseURI + endpoint + id;
+        URI uri = getUri(url);
+
+        HttpHeaders map = getHttpHeaders();
+
+        //set your entity to send
+        HttpEntity<E> requestEntity = new HttpEntity<>(map);
+
+
+        org.springframework.http.ResponseEntity<RO> res =
+                template.exchange(
+                        url,
+                        HttpMethod.DELETE,
+                        requestEntity,
+                        singleTypeReference
+                );
+
+        return res.getBody();
+    }
+
+
+    private HttpHeaders getHttpHeaders() {
+        HttpHeaders map = new HttpHeaders();
+        map.add(HttpHeaders.AUTHORIZATION, buildAuth());
+        map.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        map.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        return map;
+    }
 
     private RequestEntity getBasicRequestEntity(String authHeader, URI uri) {
         return RequestEntity.get(uri)

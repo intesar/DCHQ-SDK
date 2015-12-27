@@ -11,7 +11,7 @@ import java.util.List;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface AppService extends GenericService<ResponseEntity<List<App>>, ResponseEntity<App>> {
+public interface AppService extends GenericService<App, ResponseEntity<List<App>>, ResponseEntity<App>> {
 
     /**
      * Get live apps page entitled <code>App</code>

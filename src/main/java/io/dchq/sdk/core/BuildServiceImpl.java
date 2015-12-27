@@ -13,8 +13,8 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/builds">Build endpoint</a>
  * @since 1.0
  */
-public class BuildServiceImpl extends GenericServiceImpl<ResponseEntity<List<Build>>, ResponseEntity<Build>>
-        implements BuildService{
+public class BuildServiceImpl extends GenericServiceImpl<Build, ResponseEntity<List<Build>>, ResponseEntity<Build>>
+        implements BuildService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<Build>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<Build>>>() {
     };
@@ -29,27 +29,32 @@ public class BuildServiceImpl extends GenericServiceImpl<ResponseEntity<List<Bui
      * @param password - password used with the username
      */
     public BuildServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<Build>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<Build>>() {
+                }
+        );
     }
 
     @Override
     public ResponseEntity<List<Build>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<Build> findById(String id) {
-        return getOne(id, singleTypeReference);
+        return findById(id);
     }
 
     @Override
     public ResponseEntity<List<Build>> getManaged() {
-        return get("manage", listTypeReference);
+        return findAll();
     }
 
     @Override
-    public ResponseEntity<Build> findManagedById(String id){
-        return getOne("manage/" + id, singleTypeReference);
+    public ResponseEntity<Build> findManagedById(String id) {
+        return findById("manage/" + id);
     }
 
 }

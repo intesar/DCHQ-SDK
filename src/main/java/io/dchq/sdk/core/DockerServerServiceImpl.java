@@ -13,8 +13,8 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/dockerservers">DockerServer endpoint</a>
  * @since 1.0
  */
-public class DockerServerServiceImpl extends GenericServiceImpl<ResponseEntity<List<DockerServer>>, ResponseEntity<DockerServer>>
-        implements DockerServerService{
+public class DockerServerServiceImpl extends GenericServiceImpl<DockerServer, ResponseEntity<List<DockerServer>>, ResponseEntity<DockerServer>>
+        implements DockerServerService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<DockerServer>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<DockerServer>>>() {
     };
@@ -29,42 +29,47 @@ public class DockerServerServiceImpl extends GenericServiceImpl<ResponseEntity<L
      * @param password - password used with the username
      */
     public DockerServerServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<DockerServer>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<DockerServer>>() {
+                }
+        );
     }
 
     @Override
     public ResponseEntity<List<DockerServer>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<DockerServer> findById(String id) {
-        return getOne(id, singleTypeReference);
+        return findById(id);
     }
 
     @Override
     public ResponseEntity<List<DockerServer>> getManaged() {
-        return get("manage", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<DockerServer> findStatusById(String id) {
-        return getOne(id + "/status", singleTypeReference);
+        return findById(id + "/status");
     }
 
     @Override
     public ResponseEntity<DockerServer> pingServerById(String id) {
-        return getOne(id + "/ping", singleTypeReference);
+        return findById(id + "/ping");
     }
 
     @Override
     public ResponseEntity<DockerServer> findManagedById(String id) {
-        return getOne("manage/" + id, singleTypeReference);
+        return findById("manage/" + id);
     }
 
     @Override
     public ResponseEntity<DockerServer> findMonitoredDataById(String id) {
-        return getOne(id + "/monitor", singleTypeReference);
+        return findById(id + "/monitor");
     }
 
 

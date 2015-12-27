@@ -13,8 +13,8 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/registryaccounts">RegistryAccount endpoint</a>
  * @since 1.0
  */
-public class RegistryAccountServiceImpl extends GenericServiceImpl<ResponseEntity<List<RegistryAccount>>, ResponseEntity<RegistryAccount>>
-        implements RegistryAccountService{
+public class RegistryAccountServiceImpl extends GenericServiceImpl<RegistryAccount, ResponseEntity<List<RegistryAccount>>, ResponseEntity<RegistryAccount>>
+        implements RegistryAccountService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<RegistryAccount>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<RegistryAccount>>>() {
     };
@@ -29,27 +29,32 @@ public class RegistryAccountServiceImpl extends GenericServiceImpl<ResponseEntit
      * @param password - password used with the username
      */
     public RegistryAccountServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<RegistryAccount>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<RegistryAccount>>() {
+                }
+        );
     }
 
     @Override
     public ResponseEntity<List<RegistryAccount>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<RegistryAccount> findById(String id) {
-        return getOne(id, singleTypeReference);
+        return findById(id);
     }
 
     @Override
     public ResponseEntity<List<RegistryAccount>> getManaged() {
-        return get("", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<RegistryAccount> findRegistryAccountTypeById(String id) {
-        return getOne("accounttype/" + id, singleTypeReference);
+        return findById("accounttype/" + id);
     }
 
 }

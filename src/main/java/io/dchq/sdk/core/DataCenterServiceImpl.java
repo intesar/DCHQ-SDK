@@ -13,8 +13,8 @@ import java.util.List;
  * @see <a href="https://dchq.readme.io/docs/datacenters">DataCenter endpoint</a>
  * @since 1.0
  */
-public class DataCenterServiceImpl extends GenericServiceImpl<ResponseEntity<List<DataCenter>>, ResponseEntity<DataCenter>>
-        implements DataCenterService{
+public class DataCenterServiceImpl extends GenericServiceImpl<DataCenter, ResponseEntity<List<DataCenter>>, ResponseEntity<DataCenter>>
+        implements DataCenterService {
 
     public static final ParameterizedTypeReference<ResponseEntity<List<DataCenter>>> listTypeReference = new ParameterizedTypeReference<ResponseEntity<List<DataCenter>>>() {
     };
@@ -29,22 +29,27 @@ public class DataCenterServiceImpl extends GenericServiceImpl<ResponseEntity<Lis
      * @param password - password used with the username
      */
     public DataCenterServiceImpl(String baseURI, String username, String password) {
-        super(baseURI, ENDPOINT, username, password);
+        super(baseURI, ENDPOINT, username, password,
+                new ParameterizedTypeReference<ResponseEntity<List<DataCenter>>>() {
+                },
+                new ParameterizedTypeReference<ResponseEntity<DataCenter>>() {
+                }
+        );
     }
 
     @Override
     public ResponseEntity<List<DataCenter>> get() {
-        return get("", listTypeReference);
+        return findAll();
     }
 
     @Override
     public ResponseEntity<DataCenter> findById(String id) {
-        return getOne(id, singleTypeReference);
+        return findById(id);
     }
 
     @Override
     public ResponseEntity<List<DataCenter>> getManaged() {
-        return get("manage", listTypeReference);
+        return findAll();
     }
 
 

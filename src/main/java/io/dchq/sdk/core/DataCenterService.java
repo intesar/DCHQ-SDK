@@ -11,10 +11,11 @@ import java.util.List;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface DataCenterService extends GenericService<ResponseEntity<List<DataCenter>>, ResponseEntity<DataCenter>> {
+public interface DataCenterService extends GenericService<DataCenter, ResponseEntity<List<DataCenter>>, ResponseEntity<DataCenter>> {
 
     /**
      * Get clusters page entitled <code>DataCenter</code>
+     *
      * @return ResponseEntity, list of data centers.
      */
     ResponseEntity<List<DataCenter>> get();

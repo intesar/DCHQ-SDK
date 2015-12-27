@@ -11,7 +11,7 @@ import java.util.List;
  * @author Atef Ahmed
  * @since 1.0
  */
-public interface RegistryAccountService extends GenericService<ResponseEntity<List<RegistryAccount>>, ResponseEntity<RegistryAccount>> {
+public interface RegistryAccountService extends GenericService<RegistryAccount, ResponseEntity<List<RegistryAccount>>, ResponseEntity<RegistryAccount>> {
 
     ResponseEntity<List<RegistryAccount>> get();
 
