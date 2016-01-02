@@ -14,27 +14,6 @@ import java.util.List;
 public interface DockerServerService extends GenericService<DockerServer, ResponseEntity<List<DockerServer>>, ResponseEntity<DockerServer>> {
 
     /**
-     * Get hosts page all <code>DockerServer</code> owned by the logged in user
-     *
-     * @return List of ResponseEntity of type DockerServer
-     */
-    ResponseEntity<List<DockerServer>> get();
-
-    /**
-     * Get managed/authored <code>DockerServer</code>.
-     *
-     * @return DockerServers response
-     */
-    ResponseEntity<List<DockerServer>> getManaged();
-
-    /**
-     * Find <code>DockerServer</code> by id.
-     *
-     * @return Specific DockerServer response
-     */
-    ResponseEntity<DockerServer> findById(String id);
-
-    /**
      * Find the status of a <code>DockerServer</code> by id.
      *
      * @return Specific DockerServer response
@@ -49,17 +28,9 @@ public interface DockerServerService extends GenericService<DockerServer, Respon
     ResponseEntity<DockerServer> pingServerById(String id);
 
     /**
-     * Find a managed <code>DockerServer</code> by id.
-     *
-     * @return Specific DockerServer response
-     */
-    ResponseEntity<DockerServer> findManagedById(String id);
-
-    /**
      * Find historical CPU, memory utilization, monitoring data of a <code>DockerServer</code> by id.
      *
      * @return Specific DockerServer response
      */
     ResponseEntity<DockerServer> findMonitoredDataById(String id);
-
 }

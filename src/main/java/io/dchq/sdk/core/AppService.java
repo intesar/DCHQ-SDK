@@ -14,20 +14,6 @@ import java.util.List;
 public interface AppService extends GenericService<App, ResponseEntity<List<App>>, ResponseEntity<App>> {
 
     /**
-     * Get live apps page entitled <code>App</code>
-     *
-     * @return ResponseEntity, list of live apps.
-     */
-    ResponseEntity<List<App>> get();
-
-    /**
-     * Find an <code>App</code> by id.
-     *
-     * @return Specific App response by ID.
-     */
-    ResponseEntity<App> findById(String id);
-
-    /**
      * Find active apps entitled <code>App</code>
      *
      * @return ResponseEntity, list of live and active apps by the logged in user.

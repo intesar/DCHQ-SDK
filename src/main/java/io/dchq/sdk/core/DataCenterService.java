@@ -13,24 +13,4 @@ import java.util.List;
  */
 public interface DataCenterService extends GenericService<DataCenter, ResponseEntity<List<DataCenter>>, ResponseEntity<DataCenter>> {
 
-    /**
-     * Get clusters page entitled <code>DataCenter</code>
-     *
-     * @return ResponseEntity, list of data centers.
-     */
-    ResponseEntity<List<DataCenter>> get();
-
-    /**
-     * Find <code>DataCenter</code> by id.
-     *
-     * @return Specific DataCenter response
-     */
-    ResponseEntity<DataCenter> findById(String id);
-
-    /**
-     * Get managed/authored <code>DataCenter</code>.
-     *
-     * @return DataCenter response
-     */
-    ResponseEntity<List<DataCenter>> getManaged();
 }

@@ -20,8 +20,8 @@ public class PluginServiceTest extends AbstractServiceTest {
 
 
     @org.junit.Test
-    public void testGet() throws Exception {
-        ResponseEntity<List<Plugin>> responseEntity = appService.get();
+    public void testFindAll() throws Exception {
+        ResponseEntity<List<Plugin>> responseEntity = appService.findAll();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Plugin bl : responseEntity.getResults()) {
             logger.info("Plugin name [{}] author [{}]", bl.getName(), bl.getCreatedBy());
@@ -36,11 +36,11 @@ public class PluginServiceTest extends AbstractServiceTest {
     }
 
     @org.junit.Test
-    public void testGetManaged() throws Exception {
-        ResponseEntity<List<Plugin>> responseEntity = appService.getManaged();
+    public void testFindAllManaged() throws Exception {
+        ResponseEntity<List<Plugin>> responseEntity = appService.findAllManaged();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Plugin bl : responseEntity.getResults()) {
-            logger.info("Managed Plugin type [{}] name [{}] author [{}]", bl.getInactive(), bl.getName(), bl.getCreatedBy());
+            logger.info("aaaa Managed Plugin name [{}] author [{}]",  bl.getName(), bl.getCreatedBy());
         }
     }
 

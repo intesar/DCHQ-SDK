@@ -38,21 +38,6 @@ public class DockerServerServiceImpl extends GenericServiceImpl<DockerServer, Re
     }
 
     @Override
-    public ResponseEntity<List<DockerServer>> get() {
-        return findAll();
-    }
-
-    @Override
-    public ResponseEntity<DockerServer> findById(String id) {
-        return findById(id);
-    }
-
-    @Override
-    public ResponseEntity<List<DockerServer>> getManaged() {
-        return findAll();
-    }
-
-    @Override
     public ResponseEntity<DockerServer> findStatusById(String id) {
         return findById(id + "/status");
     }
@@ -63,14 +48,11 @@ public class DockerServerServiceImpl extends GenericServiceImpl<DockerServer, Re
     }
 
     @Override
-    public ResponseEntity<DockerServer> findManagedById(String id) {
-        return findById("manage/" + id);
-    }
-
-    @Override
     public ResponseEntity<DockerServer> findMonitoredDataById(String id) {
-        return findById(id + "/monitor");
+        String startDate = "2015-08-19T03:58:57.138Z";
+        String endDate = "2015-08-19T04:58:57.138Z";
+
+//        return findById(id + "/monitor?{'start' : '"+startDate+"', 'end':'"+endDate+"'}");
+        return findById(id + "/monitor?start=2015-08-19T03:58:57.138Z&end=2015-08-19T04:58:57.138Z");
     }
-
-
 }

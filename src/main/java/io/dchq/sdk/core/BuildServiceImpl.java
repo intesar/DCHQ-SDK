@@ -36,25 +36,4 @@ public class BuildServiceImpl extends GenericServiceImpl<Build, ResponseEntity<L
                 }
         );
     }
-
-    @Override
-    public ResponseEntity<List<Build>> get() {
-        return findAll();
-    }
-
-    @Override
-    public ResponseEntity<Build> findById(String id) {
-        return findById(id);
-    }
-
-    @Override
-    public ResponseEntity<List<Build>> getManaged() {
-        return findAll();
-    }
-
-    @Override
-    public ResponseEntity<Build> findManagedById(String id) {
-        return findById("manage/" + id);
-    }
-
 }

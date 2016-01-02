@@ -36,21 +36,4 @@ public class DataCenterServiceImpl extends GenericServiceImpl<DataCenter, Respon
                 }
         );
     }
-
-    @Override
-    public ResponseEntity<List<DataCenter>> get() {
-        return findAll();
-    }
-
-    @Override
-    public ResponseEntity<DataCenter> findById(String id) {
-        return findById(id);
-    }
-
-    @Override
-    public ResponseEntity<List<DataCenter>> getManaged() {
-        return findAll();
-    }
-
-
 }

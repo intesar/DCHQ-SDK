@@ -38,21 +38,6 @@ public class RegistryAccountServiceImpl extends GenericServiceImpl<RegistryAccou
     }
 
     @Override
-    public ResponseEntity<List<RegistryAccount>> get() {
-        return findAll();
-    }
-
-    @Override
-    public ResponseEntity<RegistryAccount> findById(String id) {
-        return findById(id);
-    }
-
-    @Override
-    public ResponseEntity<List<RegistryAccount>> getManaged() {
-        return findAll();
-    }
-
-    @Override
     public ResponseEntity<RegistryAccount> findRegistryAccountTypeById(String id) {
         return findById("accounttype/" + id);
     }

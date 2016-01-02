@@ -38,28 +38,7 @@ public class PluginServiceImpl extends GenericServiceImpl<Plugin, ResponseEntity
     }
 
     @Override
-    public ResponseEntity<List<Plugin>> get() {
-        return findAll();
-    }
-
-    @Override
-    public ResponseEntity<Plugin> findById(String id) {
-        return findById(id);
-    }
-
-    @Override
-    public ResponseEntity<Plugin> findManagedById(String id) {
-        return findById("manage/" + id);
-    }
-
-    @Override
-    public ResponseEntity<List<Plugin>> getManaged() {
-        return findAll();
-    }
-
-    @Override
     public ResponseEntity<List<Plugin>> findByStarred() {
         return findAll();
     }
-
 }

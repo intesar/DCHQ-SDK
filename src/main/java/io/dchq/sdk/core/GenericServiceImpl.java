@@ -90,6 +90,18 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
         return "manage/";
     }
 
+    protected String getActiveEndpoint() {
+        return "active/";
+    }
+
+    protected String getDestroyedEndpoint() {
+        return "destroyed/";
+    }
+
+
+    // external code
+
+
     /**
      * Executes GET request
      *
@@ -111,6 +123,25 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
                         HttpMethod.GET,
                         request,
                         listTypeReference
+                );
+
+        return res.getBody();
+    }
+
+    protected RL findAll(String requestParams, ParameterizedTypeReference<RL> typeReference) {
+
+        String authHeader = buildAuth();
+        String url = baseURI + endpoint + requestParams;
+
+        URI uri = getUri(url);
+        RequestEntity request = getBasicRequestEntity(authHeader, uri);
+
+        org.springframework.http.ResponseEntity<RL> res =
+                template.exchange(
+                        url,
+                        HttpMethod.GET,
+                        request,
+                        typeReference
                 );
 
         return res.getBody();

@@ -38,23 +38,13 @@ public class AppServiceImpl extends GenericServiceImpl<App, ResponseEntity<List<
     }
 
     @Override
-    public ResponseEntity<List<App>> get() {
-        return findAll();
-    }
-
-    @Override
-    public ResponseEntity<App> findById(String id) {
-        return findById(id);
-    }
-
-    @Override
     public ResponseEntity<List<App>> findActive() {
-        return findAll();
+        return findAll("active", listTypeReference);
     }
 
     @Override
     public ResponseEntity<List<App>> findDestroyed() {
-        return findAll();
+        return findAll("destroyed", listTypeReference);
     }
 
     @Override

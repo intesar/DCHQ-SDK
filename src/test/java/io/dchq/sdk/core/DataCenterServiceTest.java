@@ -18,26 +18,22 @@ public class DataCenterServiceTest extends AbstractServiceTest{
         dataCenterService = ServiceFactory.buildDataCenterService(rootUrl, username, password);
     }
 
-
     @org.junit.Test
-    public void testGet() throws Exception {
-        ResponseEntity<List<DataCenter>> responseEntity = dataCenterService.get();
+    public void testFindAll() throws Exception {
+        ResponseEntity<List<DataCenter>> responseEntity = dataCenterService.findAll();
         Assert.assertNotNull(responseEntity.getTotalElements());
-        for (DataCenter bl : responseEntity.getResults()) {
-            logger.info("DataCenter name [{}] author [{}]", bl.getName(), bl.getCreatedBy());
-        }
     }
 
     @org.junit.Test
     public void testFindById() throws Exception {
-        ResponseEntity<DataCenter> responseEntity = dataCenterService.findById("2c91808651a95c4d0151ae98d9d1004b");
+        ResponseEntity<DataCenter> responseEntity = dataCenterService.findById("2c91808651a95c4d0151e6a6720e3e81");
         Assert.assertNotNull(responseEntity.getResults());
         Assert.assertNotNull(responseEntity.getResults().getId());
     }
 
     @org.junit.Test
-    public void testGetManaged() throws Exception {
-        ResponseEntity<List<DataCenter>> responseEntity = dataCenterService.getManaged();
+    public void testFindAllManaged() throws Exception {
+        ResponseEntity<List<DataCenter>> responseEntity = dataCenterService.findAllManaged();
         Assert.assertNotNull(responseEntity.getTotalElements());
     }
 }
