@@ -88,7 +88,7 @@ public class BlueprintServiceTest extends AbstractServiceTest {
     @org.junit.Test
     public void testCreate() throws Exception {
         Blueprint bl = new Blueprint()
-                .withName("IT-Test1")
+                .withName("IT-Test2")
                 .withBlueprintType(BlueprintType.DOCKER_COMPOSE)
                 .withVersion("2.0");
 
@@ -98,22 +98,22 @@ public class BlueprintServiceTest extends AbstractServiceTest {
 
         //TODO - Missing with attributes yml, short-description, features, visibility, external-links, active, entitlement.
 
-//        ResponseEntity<Blueprint> responseEntity = blueprintService.create(bl);
-//        Assert.assertNotNull(responseEntity.getResults());
-//        Assert.assertNotNull(responseEntity.getResults().getId());
-//
-//        bl = responseEntity.getResults();
-//
-//        bl.setVersion("3.0");
-//        responseEntity = blueprintService.update(bl);
-//
-//        Assert.assertNotNull(responseEntity.getResults());
-//        Assert.assertNotNull(responseEntity.getResults().getId());
-//        Assert.assertEquals(responseEntity.getResults().getVersion(), "3.0");
-//
-//        // Delete
-//        responseEntity = blueprintService.delete(bl.getId());
-//        Assert.assertFalse(responseEntity.isErrors());
+        ResponseEntity<Blueprint> responseEntity = blueprintService.create(bl);
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+
+        bl = responseEntity.getResults();
+
+        bl.setVersion("3.0");
+        responseEntity = blueprintService.update(bl);
+
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+        Assert.assertEquals(responseEntity.getResults().getVersion(), "3.0");
+
+        // Delete
+        responseEntity = blueprintService.delete(bl.getId());
+        Assert.assertFalse(responseEntity.isErrors());
 
     }
 
