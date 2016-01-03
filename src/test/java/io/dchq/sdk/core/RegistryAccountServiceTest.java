@@ -51,4 +51,42 @@ public class RegistryAccountServiceTest extends AbstractServiceTest {
 //        Assert.assertNotNull(responseEntity.getResults());
 //    }
 
+    // Create - Update - Delete
+    
+    @org.junit.Test
+    public void testCreate() throws Exception {
+        RegistryAccount registryAccount = new RegistryAccount()
+                .withName("Test RegistryAccount - AA1");
+
+        // Create
+
+        registryAccount.setId("2c91808651a95c4d0151fc332bff991");
+        registryAccount.setInactive(Boolean.FALSE);
+        registryAccount.setUrl("https://registry.hub.docker.com/");
+        registryAccount.setEmail("atefahmed@gmail.com");
+        registryAccount.setUsername("atefahmed");
+        registryAccount.setPassword("Best=one9");
+
+        ResponseEntity<RegistryAccount> responseEntity = registryAccountService.create(registryAccount);
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+
+        // Update
+
+        registryAccount = responseEntity.getResults();
+        registryAccount.setInactive(Boolean.TRUE);
+
+        responseEntity = registryAccountService.update(registryAccount);
+
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertEquals(responseEntity.getResults().isInactive(), Boolean.TRUE);
+
+        Assert.assertNotNull(responseEntity.getResults().getId());
+
+        // Delete
+
+        responseEntity = registryAccountService.delete(registryAccount.getId());
+        Assert.assertFalse(responseEntity.isErrors());
+    }
+
 }
