@@ -87,6 +87,7 @@ public class BlueprintServiceTest extends AbstractServiceTest {
 
     @org.junit.Test
     public void testCreate() throws Exception {
+
         Blueprint bl = new Blueprint()
                 .withName("IT-Test2")
                 .withBlueprintType(BlueprintType.DOCKER_COMPOSE)
@@ -98,11 +99,15 @@ public class BlueprintServiceTest extends AbstractServiceTest {
 
         //TODO - Missing with attributes yml, short-description, features, visibility, external-links, active, entitlement.
 
+        // Create
+
         ResponseEntity<Blueprint> responseEntity = blueprintService.create(bl);
         Assert.assertNotNull(responseEntity.getResults());
         Assert.assertNotNull(responseEntity.getResults().getId());
 
         bl = responseEntity.getResults();
+
+        // Update
 
         bl.setVersion("3.0");
         responseEntity = blueprintService.update(bl);
@@ -112,10 +117,8 @@ public class BlueprintServiceTest extends AbstractServiceTest {
         Assert.assertEquals(responseEntity.getResults().getVersion(), "3.0");
 
         // Delete
+
         responseEntity = blueprintService.delete(bl.getId());
         Assert.assertFalse(responseEntity.isErrors());
-
     }
-
-
 }

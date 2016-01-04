@@ -1,7 +1,9 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.blueprint.AccountType;
 import com.dchq.schema.beans.one.blueprint.RegistryAccount;
+import com.dchq.schema.beans.one.security.EntitlementType;
 import org.junit.Assert;
 
 import java.util.List;
@@ -52,20 +54,20 @@ public class RegistryAccountServiceTest extends AbstractServiceTest {
 //    }
 
     // Create - Update - Delete
-    
+
     @org.junit.Test
     public void testCreate() throws Exception {
         RegistryAccount registryAccount = new RegistryAccount()
-                .withName("Test RegistryAccount - AA1");
+                .withName("Test RegistryAccount - AA6");
 
         // Create
 
-        registryAccount.setId("2c91808651a95c4d0151fc332bff991");
+        registryAccount.setId("2c91808651a95c4d0151fc332bffa96");
         registryAccount.setInactive(Boolean.FALSE);
         registryAccount.setUrl("https://registry.hub.docker.com/");
         registryAccount.setEmail("atefahmed@gmail.com");
-        registryAccount.setUsername("atefahmed");
-        registryAccount.setPassword("Best=one9");
+        registryAccount.setAccountType(AccountType.DOCKER_REGISTRY);
+        registryAccount.setBlueprintEntitlementType(EntitlementType.MY_BLUEPRINTS);
 
         ResponseEntity<RegistryAccount> responseEntity = registryAccountService.create(registryAccount);
         Assert.assertNotNull(responseEntity.getResults());
@@ -74,19 +76,19 @@ public class RegistryAccountServiceTest extends AbstractServiceTest {
         // Update
 
         registryAccount = responseEntity.getResults();
+
+        registryAccount.setBlueprintEntitlementType(EntitlementType.ALL_TENANT_USERS);
         registryAccount.setInactive(Boolean.TRUE);
 
         responseEntity = registryAccountService.update(registryAccount);
 
         Assert.assertNotNull(responseEntity.getResults());
         Assert.assertEquals(responseEntity.getResults().isInactive(), Boolean.TRUE);
-
-        Assert.assertNotNull(responseEntity.getResults().getId());
+        Assert.assertEquals(responseEntity.getResults().getBlueprintEntitlementType(),EntitlementType.ALL_TENANT_USERS);
 
         // Delete
 
         responseEntity = registryAccountService.delete(registryAccount.getId());
         Assert.assertFalse(responseEntity.isErrors());
     }
-
 }

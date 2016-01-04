@@ -22,7 +22,7 @@ public class DockerServerServiceTest extends AbstractServiceTest{
 
 
     @org.junit.Test
-    public void testGet() throws Exception {
+    public void testFindAll() throws Exception {
         ResponseEntity<List<DockerServer>> responseEntity = dockerServerService.findAll();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (DockerServer bl : responseEntity.getResults()) {
@@ -105,7 +105,7 @@ public class DockerServerServiceTest extends AbstractServiceTest{
         responseEntity = dockerServerService.update(dockerServer);
         Assert.assertNotNull(responseEntity.getResults());
         Assert.assertNotNull(responseEntity.getResults().getName(), "Test Docker Server - AA6");
-        
+
         // Delete
 
         responseEntity = dockerServerService.delete(dockerServer.getId());
