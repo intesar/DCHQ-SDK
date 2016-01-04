@@ -1,6 +1,7 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.provider.DataCenter;
 import com.dchq.schema.beans.one.provider.DockerServer;
 import org.junit.Assert;
 
@@ -72,4 +73,42 @@ public class DockerServerServiceTest extends AbstractServiceTest{
 //        ResponseEntity<DockerServer> responseEntity = dockerServerService.findMonitoredDataById("2c91808651a95c4d0151c416b1491a33");
 //        Assert.assertNotNull(responseEntity.getResults());
 //    }
+
+    // Create - Update - Delete
+    @org.junit.Test
+    public void testCreate() throws Exception {
+
+        DataCenter dc = new DataCenter();
+        dc.setId("2c91808651a95c4d0151e6a6720e3e81");
+
+        DockerServer dockerServer = new DockerServer()
+                .withName("Test Docker Server - AA5")
+                .withDataCenter(dc);
+
+        // Create
+
+        dockerServer.setInactive(Boolean.FALSE);
+        dockerServer.setRegion("IAD");
+        dockerServer.setImageId("IAD/5ed162cc-b4eb-4371-b24a-a0ae73376c73");
+        dockerServer.setSize(1);
+
+        ResponseEntity<DockerServer> responseEntity = dockerServerService.create(dockerServer);
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getId());
+
+        // Update
+
+        dockerServer = responseEntity.getResults();
+
+        dockerServer.setName("Test Docker Server - AA6");
+
+        responseEntity = dockerServerService.update(dockerServer);
+        Assert.assertNotNull(responseEntity.getResults());
+        Assert.assertNotNull(responseEntity.getResults().getName(), "Test Docker Server - AA6");
+        
+        // Delete
+
+        responseEntity = dockerServerService.delete(dockerServer.getId());
+        Assert.assertFalse(responseEntity.isErrors());
+    }
 }
