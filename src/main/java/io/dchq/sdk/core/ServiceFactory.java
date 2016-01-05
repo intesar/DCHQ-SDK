@@ -56,6 +56,11 @@ public class ServiceFactory {
     public static final RegistryAccountService buildRegistryAccountService(String baseURI, String username, String password) {
         return new RegistryAccountServiceImpl(baseURI, username, password);
     }
+    public static final UserGroupService builduserGroupService(String baseURI, String username, String password) {
+        // validate inputs
+        return new UserGroupServiceImpl(baseURI, username, password);
+    }
+
 
 
 }
