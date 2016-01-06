@@ -16,10 +16,6 @@
 
 package io.dchq.sdk.core;
 
-import com.dchq.schema.beans.one.build.Build;
-import com.dchq.schema.beans.one.plugin.Plugin;
-import com.dchq.schema.beans.one.provision.App;
-
 /**
  * Factory class
  *
@@ -62,5 +58,7 @@ public class ServiceFactory {
     }
 
 
-
+    public static final ProfileService buildProfileService(String baseURI, String username, String password) {
+        return new ProfileServiceImpl(baseURI, username, password);
+    }
 }
