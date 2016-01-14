@@ -1,7 +1,14 @@
+<figure>
+<img src="http://ww1.prweb.com/prfiles/2015/07/21/12907174/gI_146921_dchq-logo.png" alt="" />
+</figure>
+
+
+
 # DCHQ-Java-SDK
 DCHQ-Java-SDK simplifies using DCHQ REST API's. Providers high-level java abstraction for REST API's.
 
-This is a community driven project, feel free to submit pull requests.
+# OpenSource and Community-Led
+ The SDK is open-source and community driven effort. If you want to contribute please reach out to us founders@dchq.io
 
 You can interact with live REST API here:
 ```
