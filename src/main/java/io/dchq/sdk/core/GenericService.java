@@ -31,6 +31,8 @@ interface GenericService<E, RL, RO> {
      */
     RL findAll();
 
+    RL findAll(int page, int size);
+
     /**
      * Find <code>E</code> by id.
      *

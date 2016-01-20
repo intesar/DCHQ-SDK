@@ -52,13 +52,17 @@ public class ServiceFactory {
     public static final RegistryAccountService buildRegistryAccountService(String baseURI, String username, String password) {
         return new RegistryAccountServiceImpl(baseURI, username, password);
     }
+
     public static final UserGroupService builduserGroupService(String baseURI, String username, String password) {
         // validate inputs
         return new UserGroupServiceImpl(baseURI, username, password);
     }
 
-
     public static final ProfileService buildProfileService(String baseURI, String username, String password) {
         return new ProfileServiceImpl(baseURI, username, password);
+    }
+
+    public static final UserService buildUserService(String baseURI, String username, String password) {
+        return new UserServiceImpl(baseURI, username, password);
     }
 }
