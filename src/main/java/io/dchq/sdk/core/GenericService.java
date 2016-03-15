@@ -16,6 +16,12 @@
 
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.build.BuildTask;
+import org.springframework.core.ParameterizedTypeReference;
+
+import java.io.Serializable;
+
 /**
  * Abstracts and provides infrastructure to all API calls.
  *
@@ -63,6 +69,21 @@ interface GenericService<E, RL, RO> {
      * @return
      */
     RO create(E entity);
+
+    /**
+     * Creates a post request with url postfix
+     * @param entity
+     * @param urlPostfix
+     * @return
+     */
+    Object post(E entity, String urlPostfix, ParameterizedTypeReference responseType);
+
+    /**
+     * Creates a get request with url postfix
+     * @param urlPostfix
+     * @return
+     */
+    Object find(String urlPostfix, ParameterizedTypeReference responseType);
 
     /**
      * Delete <code>E</code> by id.

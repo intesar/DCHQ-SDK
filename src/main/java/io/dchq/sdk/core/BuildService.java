@@ -2,6 +2,7 @@ package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.build.Build;
+import com.dchq.schema.beans.one.build.BuildTask;
 
 import java.util.List;
 
@@ -13,4 +14,9 @@ import java.util.List;
  */
 public interface BuildService extends GenericService<Build, ResponseEntity<List<Build>>, ResponseEntity<Build>> {
 
+    ResponseEntity<BuildTask> buildNow(String buildId);
+
+    ResponseEntity<BuildTask> buildNow(Build build);
+
+    public ResponseEntity<BuildTask> findBuildTaskById(String taskId);
 }
