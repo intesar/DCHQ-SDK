@@ -101,7 +101,7 @@ public class BuildServiceTest extends AbstractServiceTest {
 
     @Test
     public void testBuildNow() {
-        String buildId = "402881845376d64e0153770930e8006c";
+        String buildId = "2c9180875379854401537b8aa9175fd7";
         ResponseEntity<BuildTask> taskResponseEntity = buildService.buildNow(buildId);
 
         if (taskResponseEntity != null && taskResponseEntity.getResults() != null) {
@@ -122,17 +122,18 @@ public class BuildServiceTest extends AbstractServiceTest {
 
     @Test
     public void testBuildNowWithCustomizations() {
-        String buildId = "402881845376d64e0153770930e8006c";
+        String buildId = "2c9180875379854401537b8aa9175fd7";
         Build build = buildService.findById(buildId).getResults();
 
-        build.setTag("latest");
+        build.setTag("latest-im");
+        build.setGitBranch("im-branch1");
 
         ResponseEntity<BuildTask> taskResponseEntity = buildService.buildNow(build);
 
         if (taskResponseEntity != null && taskResponseEntity.getResults() != null) {
             BuildTask task = buildService.findBuildTaskById(taskResponseEntity.getResults().getId()).getResults();
             while (task.getBuildTaskStatus() == BuildTaskStatus.PROCESSING) {
-                logger.info("Found task [{}] with status [{}]", task.getBuildNumber(), task.getBuildTaskStatus());
+                logger.info("Found task [{}] with status [{}]", task.getId(), task.getBuildTaskStatus());
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
@@ -140,7 +141,7 @@ public class BuildServiceTest extends AbstractServiceTest {
                 }
                 task = buildService.findBuildTaskById(taskResponseEntity.getResults().getId()).getResults();
             }
-            logger.info("End task [{}] with status [{}]", task.getBuildNumber(), task.getBuildTaskStatus());
+            logger.info("End task [{}] with status [{}]", task.getId(), task.getBuildTaskStatus());
         }
 
     }
