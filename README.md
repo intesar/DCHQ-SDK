@@ -21,6 +21,8 @@ gradle build
 # build without test
 gradle build -x test
 
+# build without test
+gradle build --refresh-dependencies -x test
 
 # test
 gradle test

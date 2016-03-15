@@ -5,29 +5,32 @@ import com.dchq.schema.beans.base.ResponseEntity;
 //import com.dchq.schema.beans.one.blueprint.BlueprintType;
 import com.dchq.schema.beans.one.base.NameEntityBase;
 import com.dchq.schema.beans.one.build.Build;
+import com.dchq.schema.beans.one.build.BuildTask;
+import com.dchq.schema.beans.one.build.BuildTaskStatus;
 import com.dchq.schema.beans.one.build.BuildType;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.List;
 
 /**
  * Created by atefahmed on 12/22/15.
  */
-public class BuildServiceTest extends AbstractServiceTest{
+public class BuildServiceTest extends AbstractServiceTest {
 
     private BuildService buildService;
 
     @org.junit.Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         buildService = ServiceFactory.buildBuildService(rootUrl, username, password);
     }
 
     @org.junit.Test
-    public void testFindAll() throws Exception{
+    public void testFindAll() throws Exception {
         ResponseEntity<List<Build>> responseEntity = buildService.findAll();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Build bl : responseEntity.getResults()) {
-            logger.info("Build repository [{}] buildType [{}] author [{}]", bl.getRepository() ,bl.getBuildType(), bl.getCreatedBy());
+            logger.info("Build repository [{}] buildType [{}] author [{}]", bl.getRepository(), bl.getBuildType(), bl.getCreatedBy());
         }
     }
 
@@ -94,5 +97,52 @@ public class BuildServiceTest extends AbstractServiceTest{
         // TODO: Unable to delete. Request failed - null.
         responseEntity = buildService.delete(build.getId());
 //        Assert.assertFalse(responseEntity.isErrors());
+    }
+
+    @Test
+    public void testBuildNow() {
+        String buildId = "2c9180875379854401537b8aa9175fd7";
+        ResponseEntity<BuildTask> taskResponseEntity = buildService.buildNow(buildId);
+
+        if (taskResponseEntity != null && taskResponseEntity.getResults() != null) {
+            BuildTask task = buildService.findBuildTaskById(taskResponseEntity.getResults().getId()).getResults();
+            while (task.getBuildTaskStatus() == BuildTaskStatus.PROCESSING) {
+                logger.info("Found task [{}] with status [{}]", task.getBuildNumber(), task.getBuildTaskStatus());
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    logger.warn(e.getLocalizedMessage(), e);
+                }
+                task = buildService.findBuildTaskById(taskResponseEntity.getResults().getId()).getResults();
+            }
+            logger.info("End task [{}] with status [{}]", task.getBuildNumber(), task.getBuildTaskStatus());
+        }
+
+    }
+
+    @Test
+    public void testBuildNowWithCustomizations() {
+        String buildId = "2c9180875379854401537b8aa9175fd7";
+        Build build = buildService.findById(buildId).getResults();
+
+        build.setTag("latest-im");
+        build.setGitBranch("im-branch1");
+
+        ResponseEntity<BuildTask> taskResponseEntity = buildService.buildNow(build);
+
+        if (taskResponseEntity != null && taskResponseEntity.getResults() != null) {
+            BuildTask task = buildService.findBuildTaskById(taskResponseEntity.getResults().getId()).getResults();
+            while (task.getBuildTaskStatus() == BuildTaskStatus.PROCESSING) {
+                logger.info("Found task [{}] with status [{}]", task.getId(), task.getBuildTaskStatus());
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    logger.warn(e.getLocalizedMessage(), e);
+                }
+                task = buildService.findBuildTaskById(taskResponseEntity.getResults().getId()).getResults();
+            }
+            logger.info("End task [{}] with status [{}]", task.getId(), task.getBuildTaskStatus());
+        }
+
     }
 }

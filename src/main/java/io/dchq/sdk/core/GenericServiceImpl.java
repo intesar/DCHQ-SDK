@@ -16,16 +16,20 @@
 
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.base.*;
+import com.dchq.schema.beans.one.build.BuildTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -290,6 +294,59 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
                         HttpMethod.POST,
                         requestEntity,
                         singleTypeReference
+                );
+
+        return res.getBody();
+    }
+
+    /**
+     * Executes POST request
+     *
+     * @param entity     - not null
+     * @param urlPostfix - url
+     * @return
+     */
+    @Override
+    public Object post(E entity, String urlPostfix, ParameterizedTypeReference referenceType) {
+
+        String url = baseURI + endpoint + urlPostfix;
+        URI uri = getUri(url);
+
+        HttpHeaders map = getHttpHeaders();
+
+        //set your entity to send
+        HttpEntity<E> requestEntity = new HttpEntity<>(entity, map);
+
+
+        org.springframework.http.ResponseEntity<?> res =
+                template.exchange(
+                        url,
+                        HttpMethod.POST,
+                        requestEntity,
+                        referenceType
+                );
+
+        return res.getBody();
+    }
+
+    @Override
+    public Object find(String urlPostfix, ParameterizedTypeReference responseType) {
+        String url = baseURI + endpoint + urlPostfix;
+        URI uri = getUri(url);
+
+        HttpHeaders map = getHttpHeaders();
+
+        String authHeader = buildAuth();
+        //set your entity to send
+        RequestEntity request = getBasicRequestEntity(authHeader, uri);
+
+
+        org.springframework.http.ResponseEntity<?> res =
+                template.exchange(
+                        url,
+                        HttpMethod.GET,
+                        request,
+                        responseType
                 );
 
         return res.getBody();
