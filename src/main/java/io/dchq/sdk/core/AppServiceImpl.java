@@ -5,6 +5,7 @@ import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.provision.App;
 import org.springframework.core.ParameterizedTypeReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -92,6 +93,11 @@ public class AppServiceImpl extends GenericServiceImpl<App, ResponseEntity<List<
     @Override
     public ResponseEntity<App> deploy(Blueprint blueprint) {
         return super.doPost(blueprint, "/deploy");
+    }
+
+    @Override
+    public ResponseEntity<App> destroy(String appId) {
+        return super.doPost(new ArrayList<>(), "/" + appId + "/destroy");
     }
 
 }

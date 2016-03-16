@@ -1,8 +1,10 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.base.PkEntityBase;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.provision.App;
+import com.dchq.schema.beans.one.provision.ProvisionState;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,7 +19,7 @@ public class AppServiceTest extends AbstractServiceTest {
     private BlueprintService blueprintService;
 
     @org.junit.Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         appService = ServiceFactory.buildAppService(rootUrl, username, password);
         blueprintService = ServiceFactory.buildBlueprintService(rootUrl, username, password);
     }
@@ -105,8 +107,38 @@ public class AppServiceTest extends AbstractServiceTest {
         ResponseEntity<Blueprint> blueprintResponseEntity = blueprintService.findById("40288184537c9f6d01537ca663850018");
         Blueprint blueprint = blueprintResponseEntity.getResults();
 
-        ResponseEntity<App> appResponseEntity = appService.deploy("40288184537c9f6d01537ca663850018");
+        blueprint.setName("Deployed from SDK");
+        blueprint.setReason("Tests");
+        blueprint.setTags("DEV");
+        //blueprint.setDatacenter(new PkEntityBase().setId(""););
+
+        // Deploy based on blueprintId
+        //ResponseEntity<App> appResponseEntity = appService.deploy("40288184537c9f6d01537ca663850018");
+
+        // Deploying using blueprint object
+        ResponseEntity<App> appResponseEntity = appService.deploy(blueprint);
         App app = appResponseEntity.getResults();
+
+        if (app != null) {
+            while ( (app.getProvisionState() != ProvisionState.RUNNING) && (app.getProvisionState() != ProvisionState.PROVISIONING_FAILED)) {
+                logger.info("Found app [{}] with status [{}]", app.getName(), app.getProvisionState());
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    logger.warn(e.getLocalizedMessage(), e);
+                }
+                app = appService.findById(app.getId()).getResults();
+            }
+            logger.info("Fished provisioning app [{}] with status [{}]", app.getName(), app.getProvisionState());
+        }
+
+        // Destroy app
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            logger.warn(e.getLocalizedMessage(), e);
+        }
+        appService.destroy(app.getId());
     }
 
 }

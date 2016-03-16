@@ -95,4 +95,11 @@ public interface AppService extends GenericService<App, ResponseEntity<List<App>
      */
     ResponseEntity<App> deploy(Blueprint blueprintId);
 
+    /**
+     * Destroy's App.
+     * @param appId
+     * @return
+     */
+    ResponseEntity<App> destroy(String appId);
+
 }
