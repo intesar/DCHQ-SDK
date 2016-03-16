@@ -8,7 +8,9 @@ import com.dchq.schema.beans.one.provision.ProvisionState;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by atefahmed on 12/23/15.
@@ -104,12 +106,18 @@ public class AppServiceTest extends AbstractServiceTest {
     @Test
     public void testDeploy() {
         // run blueprint post build/push
-        ResponseEntity<Blueprint> blueprintResponseEntity = blueprintService.findById("40288184537c9f6d01537ca663850018");
+        ResponseEntity<Blueprint> blueprintResponseEntity = blueprintService.findById("2c9180875380891901538106ad851650");
         Blueprint blueprint = blueprintResponseEntity.getResults();
 
         blueprint.setName("Deployed from SDK");
         blueprint.setReason("Tests");
         blueprint.setTags("DEV");
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("MyApp.image", "intesar/apache:latest-im");
+        blueprint.setCustomizationsMap(map);
+
+
         //blueprint.setDatacenter(new PkEntityBase().setId(""););
 
         // Deploy based on blueprintId
