@@ -1,6 +1,7 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.provision.App;
 import org.springframework.core.ParameterizedTypeReference;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * Encapsulates DCHQ Apps related methods.
  *
  * @author Atef Ahmed
+ * @author Intesar Mohammed
  * @see <a href="https://dchq.readme.io/docs/applications">App endpoint</a>
  * @since 1.0
  */
@@ -80,6 +82,16 @@ public class AppServiceImpl extends GenericServiceImpl<App, ResponseEntity<List<
     @Override
     public ResponseEntity<List<App>> findMonitored(String id) {
         return findAll();
+    }
+
+    @Override
+    public ResponseEntity<App> deploy(String blueprintId) {
+        return super.doPost("", "/deploy/" + blueprintId);
+    }
+
+    @Override
+    public ResponseEntity<App> deploy(Blueprint blueprint) {
+        return super.doPost(blueprint, "/deploy");
     }
 
 }

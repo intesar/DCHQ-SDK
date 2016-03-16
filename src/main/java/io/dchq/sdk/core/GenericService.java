@@ -72,6 +72,7 @@ interface GenericService<E, RL, RO> {
 
     /**
      * Creates a post request with url postfix
+     *
      * @param entity
      * @param urlPostfix
      * @return
@@ -79,7 +80,18 @@ interface GenericService<E, RL, RO> {
     Object post(E entity, String urlPostfix, ParameterizedTypeReference responseType);
 
     /**
+     * Creates a post request with url postfix
+     *
+     * @param entity
+     * @param urlPostfix
+     * @return
+     */
+    RO doPost(Object entity, String urlPostfix);
+
+
+    /**
      * Creates a get request with url postfix
+     *
      * @param urlPostfix
      * @return
      */

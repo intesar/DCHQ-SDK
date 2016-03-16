@@ -1,6 +1,7 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.provision.App;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * <code>App</code> endpoint API calls.
  *
  * @author Atef Ahmed
+ * @author Intesar Mohammed
  * @since 1.0
  */
 public interface AppService extends GenericService<App, ResponseEntity<List<App>>, ResponseEntity<App>> {
@@ -76,5 +78,21 @@ public interface AppService extends GenericService<App, ResponseEntity<List<App>
      * @return ResponseEntity, specific statistics for an app.
      */
     ResponseEntity<List<App>> findMonitored(String id);
+
+    /**
+     * Deploy's blueprint by id into user default cluster.
+     *
+     * @param blueprintId
+     * @return
+     */
+    ResponseEntity<App> deploy(String blueprintId);
+
+    /**
+     * Deploy's blueprint. Customize name, env, reason, cluster and compose properties.
+     *
+     * @param blueprintId
+     * @return
+     */
+    ResponseEntity<App> deploy(Blueprint blueprintId);
 
 }

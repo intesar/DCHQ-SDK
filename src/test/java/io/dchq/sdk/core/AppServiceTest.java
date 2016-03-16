@@ -1,8 +1,10 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.provision.App;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -12,10 +14,12 @@ import java.util.List;
 public class AppServiceTest extends AbstractServiceTest {
 
     private AppService appService;
+    private BlueprintService blueprintService;
 
     @org.junit.Before
     public void setUp() throws Exception{
         appService = ServiceFactory.buildAppService(rootUrl, username, password);
+        blueprintService = ServiceFactory.buildBlueprintService(rootUrl, username, password);
     }
 
     //TODO: An exception is thrown, even on dchq.readme.io
@@ -95,5 +99,14 @@ public class AppServiceTest extends AbstractServiceTest {
 //        Assert.assertNotNull(responseEntity.getResults());
 //    }
 
+    @Test
+    public void testDeploy() {
+        // run blueprint post build/push
+        ResponseEntity<Blueprint> blueprintResponseEntity = blueprintService.findById("40288184537c9f6d01537ca663850018");
+        Blueprint blueprint = blueprintResponseEntity.getResults();
+
+        ResponseEntity<App> appResponseEntity = appService.deploy("40288184537c9f6d01537ca663850018");
+        App app = appResponseEntity.getResults();
+    }
 
 }
