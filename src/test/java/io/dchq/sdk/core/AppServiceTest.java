@@ -106,19 +106,26 @@ public class AppServiceTest extends AbstractServiceTest {
     @Test
     public void testDeploy() {
         // run blueprint post build/push
-        ResponseEntity<Blueprint> blueprintResponseEntity = blueprintService.findById("2c9180875380891901538106ad851650");
+        ResponseEntity<Blueprint> blueprintResponseEntity = blueprintService.findById("40288186512cd07d01512cd8c1f20036");
         Blueprint blueprint = blueprintResponseEntity.getResults();
 
-        blueprint.setName("Deployed from SDK");
+        blueprint.setName("Busybox Command Override");
         blueprint.setReason("Tests");
         blueprint.setTags("DEV");
+        blueprint.setLeaseTime("5m");
 
         Map<String, String> map = new HashMap<String, String>();
-        map.put("MyApp.image", "intesar/apache:latest-im");
+        //map.put("MyApp.image", "intesar/apache:latest-im");
+        for (int i = 1; i <= 50; i++) {
+            map.put("Busybox." + i + ".command", "sleep " + i * 30);
+        }
+
         blueprint.setCustomizationsMap(map);
 
 
-        //blueprint.setDatacenter(new PkEntityBase().setId(""););
+        PkEntityBase dc = new PkEntityBase();
+        dc.setId("402881865086c7400150876c8cf002c2");
+        blueprint.setDatacenter(dc);
 
         // Deploy based on blueprintId
         //ResponseEntity<App> appResponseEntity = appService.deploy("40288184537c9f6d01537ca663850018");
@@ -146,7 +153,7 @@ public class AppServiceTest extends AbstractServiceTest {
         } catch (InterruptedException e) {
             logger.warn(e.getLocalizedMessage(), e);
         }
-        appService.destroy(app.getId());
+        //appService.destroy(app.getId());
     }
 
 }
