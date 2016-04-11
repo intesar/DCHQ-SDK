@@ -10,15 +10,14 @@ import java.util.List;
 /**
  * Created by atefahmed on 12/22/15.
  */
-public class DockerServerServiceTest extends AbstractServiceTest{
+public class DockerServerServiceTest extends AbstractServiceTest {
 
     private DockerServerService dockerServerService;
 
     @org.junit.Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         dockerServerService = ServiceFactory.buildDockerServerService(rootUrl, username, password);
     }
-
 
 
     @org.junit.Test

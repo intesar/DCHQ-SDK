@@ -43,6 +43,7 @@ import static junit.framework.TestCase.assertNotNull;
 /**
  * Created by Abedeen on 04/05/16.
  */
+
 /**
  * Abstracts class for holding test credentials.
  *
@@ -63,7 +64,7 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"this is a docker script",BuildType.DOCKER_FILE_CONTENT,false}
+                {"this is a docker script", BuildType.DOCKER_FILE_CONTENT, false}
         });
     }
 
@@ -72,7 +73,7 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
     private boolean success;
     private Build buildCreated;
 
-    public BuildCreateServiceTest(String dockerScript,BuildType buildType, boolean success) {
+    public BuildCreateServiceTest(String dockerScript, BuildType buildType, boolean success) {
         this.build = new Build()
                 .withDockerScript(dockerScript)
                 .withBuildType(buildType);
@@ -81,12 +82,13 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
 
 
     }
+
     @org.junit.Test
     public void testCreate() throws Exception {
-        logger.info("Script Started..... {}",build.getDockerScript());
+        logger.info("Script Started..... {}", build.getDockerScript());
         ResponseEntity<Build> response = buildService.create(build);
-        if(response.isErrors())
-            logger.warn("Message from Server... {}",response.getMessages().get(0).getMessageText());
+        if (response.isErrors())
+            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
         Assert.assertNotNull(response.getResults());
         Assert.assertNotNull(response.getResults().getId());
 
@@ -99,6 +101,7 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
 
         }
     }
+
     @After
     public void cleanUp() {
         logger.info("cleaning up...");

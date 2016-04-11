@@ -17,7 +17,8 @@ package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.plugin.Plugin;
-import com.dchq.schema.beans.one.security.Profile;
+
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.runner.RunWith;
@@ -26,11 +27,14 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+
+
+import static junit.framework.TestCase.assertNotNull;
 
 /**
  * Created by Abedeen on 04/05/16.
  */
+
 /**
  * Abstracts class for holding test credentials.
  *
@@ -44,20 +48,62 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
     private PluginService appService;
 
     @org.junit.Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         appService = ServiceFactory.buildPluginService(rootUrl, username, password);
     }
 
     private Plugin plugin;
     private boolean success;
     private Plugin pluginCreated;
+    private String validityMessage;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-
+                {"Plugin 1", "pulgin Sript", "perl", "General Input", false},
         });
     }
 
+    public PluginCreateServiceTest(String pluginName, String pluginScript, String scriptType, String validityMessage, boolean success) {
+        this.plugin = new Plugin();
+        this.plugin.setName(pluginName);
+        this.plugin.setBaseScript(pluginScript);
+        this.plugin.setScriptLang(scriptType);
+        this.success = success;
+        this.validityMessage = validityMessage;
 
+    }
+
+    @org.junit.Test
+    public void testCreate() throws Exception {
+
+        logger.info("Create Group with Group Name [{}]", this.plugin.getName());
+        ResponseEntity<Plugin> response = appService.create(plugin);
+
+        if (response.isErrors())
+            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
+
+        assertNotNull(response);
+        assertNotNull(response.isErrors());
+
+        Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+
+        if (!response.isErrors() && response.getResults() != null) {
+            pluginCreated = response.getResults();
+            assertNotNull(response.getResults());
+            assertNotNull(response.getResults().getId());
+            Assert.assertNotNull(plugin.getName(), pluginCreated.getName());
+
+        }
+
+    }
+
+    @After
+    public void cleanUp() {
+        logger.info("cleaning up...");
+
+        if (pluginCreated != null) {
+            appService.delete(pluginCreated.getId());
+        }
+    }
 }

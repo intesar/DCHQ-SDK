@@ -46,7 +46,7 @@ import static junit.framework.TestCase.assertNotNull;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class BlueprintCreateServiceTest extends AbstractServiceTest {
+public class BlueprintUpdateServiceTest extends AbstractServiceTest {
 
     private BlueprintService blueprintService;
 
@@ -58,8 +58,8 @@ public class BlueprintCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Blueprint_" + (new Date()).toString(), BlueprintType.DOCKER_COMPOSE, "2.0", "LB:\n image: nginx:latest\n", Visibility.EDITABLE, false},
-                {"", BlueprintType.DOCKER_COMPOSE, "2.0", "LB:\n image: nginx:latest\n", Visibility.EDITABLE, true}
+                {"Blueprint_" + (new Date()).toString(), BlueprintType.DOCKER_COMPOSE, "2.0", "LB:\n image: nginx:latest\n", Visibility.EDITABLE, "Updated docker Name", false},
+                {"Blueprintx_update_null", BlueprintType.DOCKER_COMPOSE, "2.0", "LB:\n image: nginx:latest\n", Visibility.EDITABLE, "", true}
         });
     }
 
@@ -67,11 +67,14 @@ public class BlueprintCreateServiceTest extends AbstractServiceTest {
     private Blueprint bluePrint;
     private boolean success;
     private Blueprint bluePrintCreated;
+    private Blueprint bluePrintUpdated;
+    private String bluePrintName;
 
-    public BlueprintCreateServiceTest(String gname, BlueprintType blueprintTpe, String version, String yaml, Visibility visible, boolean success) {
+    public BlueprintUpdateServiceTest(String gname, BlueprintType blueprintTpe, String version, String yaml, Visibility visible, String BluePrintName, boolean success) {
         this.bluePrint = new Blueprint().withName(gname).withBlueprintType(blueprintTpe).withVersion(version).withVisibility(visible)
                 .withUserName(username);
         this.bluePrint.setYml(yaml);
+        this.bluePrintName = BluePrintName;
 
         this.success = success;
 
@@ -79,7 +82,7 @@ public class BlueprintCreateServiceTest extends AbstractServiceTest {
     }
 
     @org.junit.Test
-    public void testCreate() throws Exception {
+    public void testUpdate() throws Exception {
 
         logger.info("Create Bluepring [{}]", bluePrint.getName());
         ResponseEntity<Blueprint> response = blueprintService.create(bluePrint);
@@ -91,16 +94,33 @@ public class BlueprintCreateServiceTest extends AbstractServiceTest {
         assertNotNull(response.isErrors());
 
 
-        if (!success) {
+        if (!response.isErrors() && response.getResults() != null) {
             bluePrintCreated = response.getResults();
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
+
             Assert.assertNotNull(bluePrint.getName(), bluePrintCreated.getName());
             Assert.assertNotNull(bluePrint.getBlueprintType().toString(), bluePrintCreated.getBlueprintType().toString());
             Assert.assertNotNull(bluePrint.getVersion(), bluePrintCreated.getVersion());
             Assert.assertNotNull(bluePrint.getVisibility().toString(), bluePrintCreated.getVisibility().toString());
             Assert.assertNotNull(bluePrint.getUserName(), bluePrintCreated.getUserName());
+            bluePrintCreated.setName(this.bluePrintName);
+            response = blueprintService.update(bluePrintCreated);
+            Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+            if (response.isErrors())
+                logger.warn("Update : Error Message from Server... {}", response.getMessages().get(0).getMessageText());
 
+            assertNotNull(response);
+            assertNotNull(response.isErrors());
+
+
+            if (!response.isErrors() && response.getResults() != null) {
+                bluePrintUpdated = response.getResults();
+                assertNotNull(response.getResults());
+                assertNotNull(response.getResults().getId());
+                Assert.assertNotNull(bluePrintCreated.getName(), bluePrintUpdated.getName());
+
+            }
         }
 
     }
@@ -109,7 +129,7 @@ public class BlueprintCreateServiceTest extends AbstractServiceTest {
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
+        if (bluePrintCreated != null) {
             blueprintService.delete(bluePrintCreated.getId());
         }
     }

@@ -15,6 +15,7 @@
  */
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.security.UserGroup;
@@ -32,6 +33,7 @@ import java.util.List;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Abedeen on 04/05/16.
@@ -45,7 +47,7 @@ import static org.hamcrest.core.Is.is;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class UserGroupCreateServiceTest extends AbstractServiceTest {
+public class UserGroupFindServiceTest extends AbstractServiceTest {
 
 
     private UserGroupService userGroupService;
@@ -58,40 +60,63 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Tahsin Group", false},
+                {"Tahsin Group", " Tahsin Group Updated", false},
                 // checking Empty group names
-                {"", true}
+
         });
     }
 
     private UserGroup userGroup;
     private boolean success;
     private UserGroup userGroupCreated;
+    private UserGroup userGroupUpdated;
 
-    public UserGroupCreateServiceTest(String gname, boolean success) {
+
+    public UserGroupFindServiceTest(String gname, String updatedGourpName, boolean success) {
         this.userGroup = new UserGroup().withName(gname);
+
         this.success = success;
 
     }
 
     @org.junit.Test
-    public void testCreate() throws Exception {
+    public void testFind() throws Exception {
 
         logger.info("Create Group with Group Name [{}]", userGroup.getName());
         ResponseEntity<UserGroup> response = userGroupService.create(userGroup);
 
-        if (response.isErrors())
-            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
+        for (Message message : response.getMessages())
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
+        Assert.assertNotNull(((Boolean) false).toString(), ((Boolean) response.isErrors()).toString());
 
-        Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
         if (!response.isErrors() && response.getResults() != null) {
             userGroupCreated = response.getResults();
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
+
+
             Assert.assertNotNull(userGroup.getName(), userGroupCreated.getName());
+
+
+            logger.info("Find Request for Group with Group ID [{}]", userGroupCreated.getId());
+            response = userGroupService.update(userGroupCreated);
+
+            for (Message message : response.getMessages())
+                logger.warn("Error while Find request  [{}] ", message.getMessageText());
+            Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+            assertNotNull(response);
+            assertNotNull(response.isErrors());
+
+            if (!response.isErrors()) {
+                userGroupUpdated=response.getResults();
+                Assert.assertNotNull(response.getResults());
+                assertEquals(userGroupCreated.getName(), userGroupUpdated.getName());
+
+            }
+
 
         }
 
@@ -101,7 +126,7 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
+        if (userGroupCreated != null) {
             userGroupService.delete(userGroupCreated.getId());
         }
     }

@@ -39,6 +39,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Abedeen on 04/05/16.
  */
+
 /**
  * Abstracts class for holding test credentials.
  *
@@ -47,54 +48,57 @@ import static org.junit.Assert.assertEquals;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class DataCenterCreateServiceTest extends AbstractServiceTest{
+public class DataCenterFindServiceTest extends AbstractServiceTest {
 
     private DataCenterService dataCenterService;
 
     @org.junit.Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         dataCenterService = ServiceFactory.buildDataCenterService(rootUrl, username, password);
     }
 
     DataCenter dataCenter;
     DataCenter dataCenterCreated;
+    DataCenter dataCenterFind;
     boolean success;
     String validationMessage;
+
+
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Test Cluster - AA4",Boolean.FALSE,EntitlementType.ALL_BLUEPRINTS, "\nAll Input Values are normal. Malfunction in SDK",false},
-                {"Test Cluster - AA40",Boolean.TRUE,EntitlementType.ALL_BLUEPRINTS,"\n Auto Flag is set to true ,\n Next required value :Machine Compose id cannot be empty", true},
-                {"",Boolean.FALSE,EntitlementType.ALL_BLUEPRINTS,"\n Empty Cluster Name is Not Valid", true}
+                {"Test Cluster - AA4", Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS, "Test Cluster Updated", "\nAll Input Values are normal. Malfunction in SDK", false}
         });
     }
     // Create - Update - Delete
 
-    public DataCenterCreateServiceTest(String clusterName,Boolean autoScaleFlag,EntitlementType blueprintType,String validationMessage,boolean success) {
+    public DataCenterFindServiceTest(String clusterName, Boolean autoScaleFlag, EntitlementType blueprintType, String updatedName, String validationMessage, boolean success) {
         this.dataCenter = new DataCenter().withName(clusterName).withAutoScale(autoScaleFlag).withBlueprintEntitlementType(blueprintType);
-        this.success=success;
-        this.validationMessage=validationMessage;
+        this.success = success;
+
+        this.validationMessage = validationMessage;
 
     }
 
     @org.junit.Test
-    public void testCreate() throws Exception{
+    public void testUpdate() throws Exception {
 
+        // Create
         logger.info("Create Cluster with Name [{}]", dataCenter.getName());
-        if(success)
-            logger.info("Input for create Cluster is Expected to generate Error: [{}]", validationMessage);
 
         ResponseEntity<DataCenter> response = dataCenterService.create(dataCenter);
-        for (Message message  : response.getMessages())
-            logger.warn("Error while Create request  [{}] ",message.getMessageText());
+        String createMessage = "";
+        for (Message message : response.getMessages()) {
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
+            createMessage += ("Error while Create request  " + message.getMessageText());
+
+        }
 
         assertNotNull(response);
-        assertNotNull(response.isErrors());
-        assertEquals(validationMessage,((Boolean)success).toString(),((Boolean)response.isErrors()).toString());
+        assertNotNull(createMessage, response.isErrors());
 
-        //if(!response.isErrors()  )
 
-        if (!success) {
+        if (!response.isErrors() && response.getResults() != null) {
 
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
@@ -105,15 +109,29 @@ public class DataCenterCreateServiceTest extends AbstractServiceTest{
             assertEquals(dataCenter.getEntitledBlueprint(), dataCenterCreated.getEntitledBlueprint());
             assertEquals(dataCenter.isAutoScale(), dataCenterCreated.isAutoScale());
 
+            logger.info("Update Cluster with Name [{}]", dataCenterCreated.getName());
+            response = dataCenterService.create(dataCenterCreated);
+            if (success)
+                logger.info("Input for Update Cluster is Expected to generate Error: [{}]", validationMessage);
+
+            String updateMessage = "";
+            for (Message message : response.getMessages()) {
+                logger.warn("Error while Update request  [{}] ", message.getMessageText());
+                updateMessage += ("Error while Update request  " + message.getMessageText());
+            }
+
+            assertEquals(validationMessage, ((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+
         }
 
 
     }
+
     @After
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
+        if (dataCenterCreated != null) {
             dataCenterService.delete(dataCenterCreated.getId());
         }
     }

@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Abedeen on 04/05/16.
  */
+
 /**
  * Abstracts class for holding test credentials.
  *
@@ -42,38 +43,38 @@ import static org.junit.Assert.assertEquals;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class DockerServerCreateServiceTest extends AbstractServiceTest{
+public class DockerServerCreateServiceTest extends AbstractServiceTest {
 
     private DockerServerService dockerServerService;
 
     @org.junit.Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         dockerServerService = ServiceFactory.buildDockerServerService(rootUrl, username, password);
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Test RACKSPACE SERVER ",Boolean.FALSE,"DFW","general1-1" , "DFW/6d833af9-9e31-4d4e-a4ea-1f7f3a4d4406"  ,1,"2c918086531095990153e05c4ac30f24","RACKSPACE",false},
+                {"Test RACKSPACE SERVER ", Boolean.FALSE, "DFW", "general1-1", "DFW/6d833af9-9e31-4d4e-a4ea-1f7f3a4d4406", 1, "2c918086531095990153e05c4ac30f24", "RACKSPACE", false},
 
         });
     }
     // Create - Update - Delete
 
-    public DockerServerCreateServiceTest(String serverName,Boolean activeFlag,String region,String hardwareID, String image,int size,String endpoint,String endpointTpe,boolean success) {
-        this.dockerServer = new DockerServer().withDatacenter(getDataCenter("Test Cluster - AAA",Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS)).withName(serverName)
+    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, boolean success) {
+        this.dockerServer = new DockerServer().withDatacenter(getDataCenter("Test Cluster - AAA", Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS)).withName(serverName)
                 .withInactive(activeFlag).withRegion(region).withImageId(image).withSize(size).withEndpoint(endpoint).withEndpointType(endpointTpe).withHardwareId(hardwareID);
 
-        this.success=success;
+        this.success = success;
     }
 
-    public DataCenter getDataCenter(String datacenterName, boolean autoScale, EntitlementType entitlementType){
+    public DataCenter getDataCenter(String datacenterName, boolean autoScale, EntitlementType entitlementType) {
         logger.info("Create Cluster with Name [{}]", datacenterName);
         this.dataCenterService = ServiceFactory.buildDataCenterService(rootUrl, username, password);
-        DataCenter dt =new DataCenter().withName(datacenterName).withAutoScale(autoScale).withBlueprintEntitlementType(entitlementType);
+        DataCenter dt = new DataCenter().withName(datacenterName).withAutoScale(autoScale).withBlueprintEntitlementType(entitlementType);
         ResponseEntity<DataCenter> responseEntity = dataCenterService.create(dt);
-        if(responseEntity.isErrors())
-            logger.warn("Message from Server... {}",responseEntity.getMessages().get(0).getMessageText());
+        if (responseEntity.isErrors())
+            logger.warn("Message from Server... {}", responseEntity.getMessages().get(0).getMessageText());
         assertEquals(false, responseEntity.isErrors());
 
         return responseEntity.getResults();
@@ -81,7 +82,7 @@ public class DockerServerCreateServiceTest extends AbstractServiceTest{
 
     DockerServer dockerServer;
     DockerServer dockerServerCreated;
-    DataCenterService  dataCenterService;
+    DataCenterService dataCenterService;
     boolean success;
 
     @org.junit.Test
@@ -89,14 +90,13 @@ public class DockerServerCreateServiceTest extends AbstractServiceTest{
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
         ResponseEntity<DockerServer> response = dockerServerService.create(dockerServer);
 
-        if(response.isErrors())
-            logger.warn("Message from Server... {}",response.getMessages().get(0).getMessageText());
+        if (response.isErrors())
+            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
 
-        if  (response.getTotalElements()==null) {
+        if (response.getTotalElements() == null) {
             logger.info("No Response for  Machine [{}]", dockerServer.getName());
             assertNotNull(response.getTotalElements());
-        }
-        else if (!success ) {
+        } else if (!success) {
 
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
@@ -114,15 +114,16 @@ public class DockerServerCreateServiceTest extends AbstractServiceTest{
 
 
     }
+
     @After
     public void cleanUp() {
         logger.info("cleaning up...");
 
         if (!success) {
-            if(dockerServerCreated!=null)
-            dockerServerService.delete(dockerServerCreated.getId());
-            if (dockerServer.getDataCenter()!=null)
-            dataCenterService.delete(dockerServer.getDataCenter().getId());
+            if (dockerServerCreated != null)
+                dockerServerService.delete(dockerServerCreated.getId());
+            if (dockerServer.getDataCenter() != null)
+                dataCenterService.delete(dockerServer.getDataCenter().getId());
 
         }
     }

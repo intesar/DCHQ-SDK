@@ -84,7 +84,7 @@ public class RegistryAccountServiceTest extends AbstractServiceTest {
 
         Assert.assertNotNull(responseEntity.getResults());
         Assert.assertEquals(responseEntity.getResults().isInactive(), Boolean.TRUE);
-        Assert.assertEquals(responseEntity.getResults().getBlueprintEntitlementType(),EntitlementType.ALL_TENANT_USERS);
+        Assert.assertEquals(responseEntity.getResults().getBlueprintEntitlementType(), EntitlementType.ALL_TENANT_USERS);
 
         // Delete
 

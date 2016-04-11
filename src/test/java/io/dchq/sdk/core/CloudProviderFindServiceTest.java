@@ -15,6 +15,7 @@
  */
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.blueprint.AccountType;
 import com.dchq.schema.beans.one.blueprint.RegistryAccount;
@@ -48,7 +49,7 @@ import static org.junit.Assert.assertEquals;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class CloudProviderCreateServiceTest extends AbstractServiceTest {
+public class CloudProviderFindServiceTest extends AbstractServiceTest {
     private RegistryAccountService registryAccountService;
 
     @org.junit.Before
@@ -59,27 +60,26 @@ public class CloudProviderCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", "", false},
-                {"Rackspace US 2 Empty testAccount", "", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", "Cloud Provider is not Expected with Empty RackspaceName ", true},
-                {"", "dchqinc3", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", "Clould provider cannot be created with  Empty Name ", true},
-                {"Rackspace US with empty password ", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "", "Clould provider cannot be created with  Empty API Key ", true}
+                {"Rackspace US First testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", "", false},
+
         });
     }
 
     private RegistryAccount registryAccount;
     private boolean success;
     private RegistryAccount registryAccountCreated;
-    private String validationMssage;
+    private String updatedName;
+    private RegistryAccount registryAccountUpdated;
 
-    public CloudProviderCreateServiceTest(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password, String validationMssage, boolean success) {
+    public CloudProviderFindServiceTest(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password, String updatedName, boolean success) {
         this.registryAccount = new RegistryAccount().withName(name).withUsername(rackspaceName).withInactive(isActive).withAccountType(rackspaceType).withPassword(Password);
         this.success = success;
-        this.validationMssage = validationMssage;
+        this.updatedName = updatedName;
 
     }
 
     @org.junit.Test
-    public void testCreate() throws Exception {
+    public void testFind() throws Exception {
         logger.info("Create Registry Account with Name [{}]", registryAccount.getName());
 
         if (success)
@@ -87,18 +87,20 @@ public class CloudProviderCreateServiceTest extends AbstractServiceTest {
 
         ResponseEntity<RegistryAccount> response = registryAccountService.create(registryAccount);
 
-        if (response.isErrors())
-            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
+        String tempMessage = "";
+        for (Message message : response.getMessages()) {
+            logger.warn("Error while Create Cloutprovider  [{}] ", message.getMessageText());
+            tempMessage += ("\n Error while Create Cloutprovider  :" + message.getMessageText());
+        }
 
         boolean tempSuccess = success;
-
         if (success && !response.isErrors()) {
             success = false;
             this.registryAccountCreated = response.getResults();
         }
-        assertNotNull(response);
-        assertNotNull(response.isErrors());
-        assertEquals(validationMssage, ((Boolean) tempSuccess).toString(), ((Boolean) response.isErrors()).toString());
+        //  assertNotNull(response);
+        //  assertNotNull(response.isErrors());
+        assertEquals(tempMessage, ((Boolean) tempSuccess).toString(), ((Boolean) response.isErrors()).toString());
 
         if (!tempSuccess) {
             this.registryAccountCreated = response.getResults();
@@ -107,13 +109,30 @@ public class CloudProviderCreateServiceTest extends AbstractServiceTest {
             assertNotNull(response.getResults().getId());
 
 
-            assertEquals(registryAccount.getUsername(), registryAccountCreated.getUsername());
+            assertEquals("UserName is invalid, when compared with input UserName @ Creation Time ", registryAccount.getUsername(), registryAccountCreated.getUsername());
             assertEquals(registryAccount.isInactive(), registryAccountCreated.isInactive());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
-
             // Password should always be empty
-            assertThat("password-hidden", is(registryAccountCreated.getPassword()));
+            assertThat("Password is not Expected in Response. ", "password-hidden", is(registryAccountCreated.getPassword()));
+
+
+            logger.info("Find by Id for Registry Account with Id [{}]", registryAccountCreated.getId());
+            response = registryAccountService.findById(registryAccountCreated.getId());
+
+            tempMessage = "";
+            for (Message message : response.getMessages()) {
+                logger.warn("Error while Finding Cloutprovider  [{}] ", message.getMessageText());
+                tempMessage += ("\n Error while Finding Cloutprovider  :" + message.getMessageText());
+            }
+
+            assertNotNull(tempMessage, response.getResults());
+            if (!response.isErrors() && response.getResults() != null) {
+                registryAccountUpdated = response.getResults();
+                assertEquals("UserName is invalid, when compared with input UserName @ Update Time ", registryAccountCreated.getUsername(), registryAccountUpdated.getUsername());
+
+
+            }
 
         } else if (!response.isErrors()) {
             success = false;

@@ -16,8 +16,8 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
-import com.dchq.schema.beans.one.blueprint.Blueprint;
-import com.dchq.schema.beans.one.security.UserGroup;
+import com.dchq.schema.beans.one.plugin.Plugin;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -27,11 +27,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 /**
  * Created by Abedeen on 04/05/16.
@@ -45,40 +43,42 @@ import static org.hamcrest.core.Is.is;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class UserGroupCreateServiceTest extends AbstractServiceTest {
+public class PluginUpdateServiceTest extends AbstractServiceTest {
 
-
-    private UserGroupService userGroupService;
+    private PluginService appService;
 
     @org.junit.Before
     public void setUp() throws Exception {
-        userGroupService = ServiceFactory.builduserGroupService(rootUrl, username, password);
+        appService = ServiceFactory.buildPluginService(rootUrl, username, password);
     }
+
+    private Plugin plugin;
+    private boolean success;
+    private Plugin pluginCreated;
+    private String validityMessage;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Tahsin Group", false},
-                // checking Empty group names
-                {"", true}
+                {"Plugin 1", "pulgin Sript", "perl", "General Input", false},
         });
     }
 
-    private UserGroup userGroup;
-    private boolean success;
-    private UserGroup userGroupCreated;
-
-    public UserGroupCreateServiceTest(String gname, boolean success) {
-        this.userGroup = new UserGroup().withName(gname);
+    public PluginUpdateServiceTest(String pluginName, String pluginScript, String scriptType, String validityMessage, boolean success) {
+        this.plugin = new Plugin();
+        this.plugin.setName(pluginName);
+        this.plugin.setBaseScript(pluginScript);
+        this.plugin.setScriptLang(scriptType);
         this.success = success;
+        this.validityMessage = validityMessage;
 
     }
 
     @org.junit.Test
     public void testCreate() throws Exception {
 
-        logger.info("Create Group with Group Name [{}]", userGroup.getName());
-        ResponseEntity<UserGroup> response = userGroupService.create(userGroup);
+        logger.info("Create Group with Group Name [{}]", this.plugin.getName());
+        ResponseEntity<Plugin> response = appService.create(plugin);
 
         if (response.isErrors())
             logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
@@ -87,11 +87,12 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
         assertNotNull(response.isErrors());
 
         Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+
         if (!response.isErrors() && response.getResults() != null) {
-            userGroupCreated = response.getResults();
+            pluginCreated = response.getResults();
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
-            Assert.assertNotNull(userGroup.getName(), userGroupCreated.getName());
+            Assert.assertNotNull(plugin.getName(), pluginCreated.getName());
 
         }
 
@@ -101,12 +102,8 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
-            userGroupService.delete(userGroupCreated.getId());
+        if (pluginCreated != null) {
+            appService.delete(pluginCreated.getId());
         }
     }
 }
-
-
-
-

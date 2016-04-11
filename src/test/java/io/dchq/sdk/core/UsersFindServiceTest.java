@@ -59,7 +59,7 @@ import static org.junit.Assert.assertNotEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class UsersCreateServiceTest extends AbstractServiceTest {
+public class UsersFindServiceTest extends AbstractServiceTest {
 
     private UserService service;
 
@@ -71,23 +71,23 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false},
-                //   {"fn", "ln", "ituser2", "ituser2@dchq.io", "pass1234", false},
-                // TODO: validate password
-                {"fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true},
-                //        {"", "", "ituser2", "ituser4@dchq.io", "", false}
+                {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "fn1", "fn2", false},
+
         });
     }
 
     private Users users;
     private boolean success;
     private Users userCreated;
-    private String errorMessage;
+    private Users userUpdated;
+    private String modifiedFirstName, modifiedLastName;
 
-    public UsersCreateServiceTest(String fn, String ln, String username, String email, String pass, String errorMessage, boolean success) {
+    public UsersFindServiceTest(String fn, String ln, String username, String email, String pass, String fn1, String ln1, boolean success) {
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
         this.success = success;
-        this.errorMessage = errorMessage;
+
+        this.modifiedFirstName = fn1;
+        this.modifiedLastName = ln1;
 
     }
 
@@ -102,7 +102,7 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void testCreate() {
+    public void testFind() {
 
         logger.info("Create user fn [{}] ln [{}] username [{}]", users.getFirstname(), users.getLastname(), users.getUsername());
         ResponseEntity<Users> response = service.create(users);
@@ -110,27 +110,22 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
         for (Message message : response.getMessages())
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
 
-        boolean tempSuccess = success;
-        if (success && !response.isErrors()) {
-            success = false;
-            this.userCreated = response.getResults();
-        }
         // check response is not null
         // check response has no errors
         // check response has user entity with ID
         // check all data send
 
         assertNotNull(response);
-//        assertNotNull(response.isErrors());
-        Assert.assertThat(errorMessage, tempSuccess, is(equals(response.isErrors())));
+        assertNotNull(response.isErrors());
+        assertThat(success, is(equals(response.isErrors())));
 
-        if (!tempSuccess) {
+        if (!success) {
 
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
             this.userCreated = response.getResults();
-
+            logger.info("Create user fn [{}] ln [{}] username [{}]", userCreated.getFirstname(), userCreated.getLastname(), userCreated.getUsername());
             assertEquals(users.getFirstname(), response.getResults().getFirstname());
             assertEquals(users.getLastname(), response.getResults().getLastname());
             assertEquals(users.getUsername(), response.getResults().getUsername());
@@ -138,14 +133,47 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
 
             // Password should always be empty
             assertThat("", is(response.getResults().getPassword()));
+
+            // Modifying User Attributes.
+
+            //   userCreated.setLastname(modifiedLastName);
+
+            logger.info("Find User by Id [{}]", userCreated.getId());
+
+            response = service.findById(userCreated.getId());
+
+            String errors = "";
+            for (Message message : response.getMessages())
+                errors += ("Error while Find request  " + message.getMessageText() + "\n");
+
+
+            assertNotNull(response);
+            assertNotNull(response.isErrors());
+            assertThat(success, is(equals(response.isErrors())));
+
+            if (!response.isErrors()) {
+
+                assertNotNull(response.getResults());
+                assertNotNull(response.getResults().getId());
+
+                this.userUpdated = response.getResults();
+                logger.info("Find by ID user fn [{}] ln [{}] username [{}]", userCreated.getFirstname(), userCreated.getLastname(), userCreated.getUsername());
+                //  assertEquals(userCreated, userUpdated);
+                assertEquals(userCreated.getFirstname(), userUpdated.getFirstname());
+
+                // Password should always be empty
+                assertThat("", is(userUpdated.getPassword()));
+            }
+
         }
+
     }
 
     @After
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
+        if (userCreated != null) {
             service.delete(userCreated.getId());
         }
     }
