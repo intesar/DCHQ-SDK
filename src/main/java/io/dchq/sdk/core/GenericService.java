@@ -63,6 +63,16 @@ interface GenericService<E, RL, RO> {
     RO findManagedById(String id);
 
     /**
+     * Search all entitled
+     *
+     * @param term
+     * @param page     - defaults to zero
+     * @param pageSize - defaults to 20
+     * @return
+     */
+    RL search(String term, Integer page, Integer pageSize);
+
+    /**
      * Create <code>E</code>.
      *
      * @param entity - Object

@@ -270,6 +270,35 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
         return res.getBody();
     }
 
+    @Override
+    public RL search(String term, Integer page, Integer pageSize) {
+        String authHeader = buildAuth();
+
+        String url = baseURI + endpoint + "search";
+        URI uri = getUri(url);
+
+        page = (page == null || page < 0) ? 0 : page;
+        pageSize = (pageSize == null || pageSize < 1) ? 20 : pageSize;
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("page", "" + page);
+        params.add("pageSize", "" + pageSize);
+
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(url).queryParams(params).build();
+
+        RequestEntity request = getBasicRequestEntity(authHeader, uriComponents.toUri());
+
+        org.springframework.http.ResponseEntity<RL> res =
+                template.exchange(
+                        uriComponents.toUriString(),
+                        HttpMethod.GET,
+                        request,
+                        listTypeReference
+                );
+
+        return res.getBody();
+    }
+
     /**
      * Executes POST request
      *
