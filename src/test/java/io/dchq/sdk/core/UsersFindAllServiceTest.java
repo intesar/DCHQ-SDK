@@ -59,7 +59,7 @@ import static org.junit.Assert.assertNotEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class UsersCreateServiceTest extends AbstractServiceTest {
+public class UsersFindAllServiceTest extends AbstractServiceTest {
 
     private UserService service;
 
@@ -71,67 +71,80 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false},
-                //   {"fn", "ln", "ituser2", "ituser2@dchq.io", "pass1234", false},
-                // TODO: validate password
-          //      {"fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true},
-                //        {"", "", "ituser2", "ituser4@dchq.io", "", false}
+                {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234",false},
+
         });
     }
 
     private Users users;
     private boolean success;
     private Users userCreated;
-    private String errorMessage;
+    private int countBeforeCreate=0,countAfterCreate=0,countAfterDelete=0;
 
-    public UsersCreateServiceTest(String fn, String ln, String username, String email, String pass, String errorMessage, boolean success) {
+
+    public UsersFindAllServiceTest(String fn, String ln, String username, String email, String pass,  boolean success) {
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
-        this.users.setInactive(false);
         this.success = success;
-        this.errorMessage = errorMessage;
 
     }
 
-    //@org.junit.Test
-    @Ignore
-    public void testGet() throws Exception {
-        ResponseEntity<List<Users>> responseEntity = service.findAll(0, 2000);
-        Assert.assertNotNull(responseEntity.getTotalElements());
-        for (Users obj : responseEntity.getResults()) {
-            logger.info("User email [{}] first-name [{}] last-name [{}]", obj.getEmail(), obj.getFirstname(), obj.getLastname());
+
+
+    public int testGetUserFromFindAll(String id) {
+
+        ResponseEntity<List<Users>> response = service.findAll();
+
+        String errors = "";
+        for (Message message : response.getMessages())
+            errors += ("Error while Find request  " + message.getMessageText() + "\n");
+
+
+        assertNotNull(response);
+        assertNotNull(response.isErrors());
+        assertThat(false, is(equals(response.isErrors())));
+        int position=0;
+        if(id!=null) {
+            for (Users obj : response.getResults()) {
+                position++;
+if(obj.getId().equals(id) ){
+    logger.info(" User Object Matched in FindAll {}  at Position : {}", id, position);
+    assertEquals("Recently Created User is not at Positon 1 :"+obj.getId(),1, position);
+}
+            }
         }
+
+        logger.info(" Total Number of Users :{}",response.getResults().size());
+
+return response.getResults().size();
     }
 
     @Test
-    public void testCreate() {
+    public void testFindAll() {
 
+        countBeforeCreate=testGetUserFromFindAll(null);
         logger.info("Create user fn [{}] ln [{}] username [{}]", users.getFirstname(), users.getLastname(), users.getUsername());
+
         ResponseEntity<Users> response = service.create(users);
 
         for (Message message : response.getMessages())
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
 
-        boolean tempSuccess = success;
-        if (success && !response.isErrors()) {
-            success = false;
-            this.userCreated = response.getResults();
-        }
         // check response is not null
         // check response has no errors
         // check response has user entity with ID
         // check all data send
 
         assertNotNull(response);
-//        assertNotNull(response.isErrors());
-        Assert.assertThat(errorMessage, tempSuccess, is(equals(response.isErrors())));
+        assertNotNull(response.isErrors());
+        assertThat(success, is(equals(response.isErrors())));
 
-        if (!tempSuccess) {
+        if (!success) {
 
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
             this.userCreated = response.getResults();
-
+            logger.info("Create request successfully completed for user fn [{}] ln [{}] username [{}]", userCreated.getFirstname(), userCreated.getLastname(), userCreated.getUsername());
             assertEquals(users.getFirstname(), response.getResults().getFirstname());
             assertEquals(users.getLastname(), response.getResults().getLastname());
             assertEquals(users.getUsername(), response.getResults().getUsername());
@@ -139,15 +152,25 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
 
             // Password should always be empty
             assertThat("", is(response.getResults().getPassword()));
+
+
+            logger.info("FindAll User by Id [{}]", userCreated.getId());
+            this.countAfterCreate = testGetUserFromFindAll(userCreated.getId());
+            assertEquals("Count of FInd all user between before and after create does not have diffrence of 1 for UserId :"+userCreated.getId(),countBeforeCreate, countAfterCreate-1);
+
         }
+
     }
 
     @After
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
-      //      service.delete(userCreated.getId());
+        if (userCreated != null) {
+            service.delete(userCreated.getId());
+            logger.info("Find All Users After Delete  User by Id {}",userCreated.getId());
+            countAfterDelete=testGetUserFromFindAll(null);
+            assertEquals("Count of FInd all user between before and after delete are not same for UserId :"+userCreated.getId(),countBeforeCreate, countAfterDelete);
         }
     }
 

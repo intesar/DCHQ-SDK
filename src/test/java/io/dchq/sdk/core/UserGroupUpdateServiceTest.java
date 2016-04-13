@@ -54,6 +54,7 @@ public class UserGroupUpdateServiceTest extends AbstractServiceTest {
     @org.junit.Before
     public void setUp() throws Exception {
         userGroupService = ServiceFactory.builduserGroupService(rootUrl, username, password);
+        
     }
 
     @Parameterized.Parameters

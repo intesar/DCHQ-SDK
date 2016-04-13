@@ -45,7 +45,7 @@ import static junit.framework.TestCase.assertNotNull;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class PluginUpdateServiceTest extends AbstractServiceTest {
+public class PluginFindServiceTest extends AbstractServiceTest {
 
     private PluginService appService;
 
@@ -55,19 +55,19 @@ public class PluginUpdateServiceTest extends AbstractServiceTest {
     }
 
     private Plugin plugin;
-    private boolean createError, updateError;
-    private Plugin pluginCreated, pluginUpdated;
-    private String validityMessage, updatedName;
+    private boolean createError,findError;
+    private Plugin pluginCreated, pluginFind;
+    private String validityMessage;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestPlugin11", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, true, userId2, "General Input", "Plugin Updated", false, false},
+                {"TestPlugin11", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, true, userId2, "General Input",  false,false},
         });
     }
 
-    public PluginUpdateServiceTest(String pluginName, String version, String pluginScript, String scriptType, String license,
-                                   EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId, String validityMessage, String updatedName, boolean createError, boolean updateError) {
+    public PluginFindServiceTest(String pluginName, String version, String pluginScript, String scriptType, String license,
+                                   EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId, String validityMessage,  boolean createError,boolean findError) {
         this.plugin = new Plugin();
         this.plugin.setName(pluginName);
         this.plugin.setVersion(version);
@@ -76,14 +76,15 @@ public class PluginUpdateServiceTest extends AbstractServiceTest {
         this.plugin.setLicense(license);
         this.plugin.setEntitlementType(entitlementType);
         this.createError = createError;
-        this.updateError = updateError;
+        this.findError=findError;
+
         this.validityMessage = validityMessage;
-        this.updatedName = updatedName;
+
 
     }
 
     @org.junit.Test
-    public void testUpdate() throws Exception {
+    public void testFind() throws Exception {
 
         logger.info("Create Object with Name [{}]", this.plugin.getName());
         ResponseEntity<Plugin> response = appService.create(plugin);
@@ -94,11 +95,11 @@ public class PluginUpdateServiceTest extends AbstractServiceTest {
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
-
         Assert.assertNotNull(((Boolean) createError).toString(), ((Boolean) response.isErrors()).toString());
 
         if (!response.isErrors() && response.getResults() != null) {
             pluginCreated = response.getResults();
+            logger.info("Created Object Successfully  with  Name [{}]", this.pluginCreated.getName());
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
@@ -109,37 +110,35 @@ public class PluginUpdateServiceTest extends AbstractServiceTest {
             Assert.assertNotNull(plugin.getScriptLang(), pluginCreated.getScriptLang());
             Assert.assertNotNull(plugin.getLicense(), pluginCreated.getLicense());
             Assert.assertNotNull(plugin.getEntitlementType().toString(), pluginCreated.getEntitlementType().toString());
-
-
         }
-        pluginCreated.setName(updatedName);
-        logger.info("Update Object with  Name [{}]", this.pluginCreated.getName());
-        response = appService.create(pluginCreated);
 
+        logger.info("Find Object with ID [{}]", this.pluginCreated.getId());
+        response = appService.findById(pluginCreated.getId());
         for (Message message : response.getMessages())
-            logger.warn("Error while Update request  [{}] ", message.getMessageText());
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
 
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
-
-        Assert.assertNotNull(((Boolean) updateError).toString(), ((Boolean) response.isErrors()).toString());
+        Assert.assertNotNull(((Boolean) createError).toString(), ((Boolean) response.isErrors()).toString());
 
         if (!response.isErrors() && response.getResults() != null) {
-            pluginUpdated = response.getResults();
+            pluginFind = response.getResults();
+            logger.info("Find Object Successfully  with  ID [{}]", this.pluginCreated.getId());
+
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
             // Comparing objects agains created Objects.
-            Assert.assertNotNull(pluginUpdated.getName(), pluginCreated.getName());
-            /*Assert.assertNotNull(pluginUpdated.getName(), pluginCreated.getName());
-            Assert.assertNotNull(pluginUpdated.getVersion(), pluginCreated.getVersion());
-            Assert.assertNotNull(pluginUpdated.getBaseScript(), pluginCreated.getBaseScript());
-            Assert.assertNotNull(pluginUpdated.getScriptLang(), pluginCreated.getScriptLang());
-            Assert.assertNotNull(pluginUpdated.getLicense(), pluginCreated.getLicense());
-            Assert.assertNotNull(pluginUpdated.getEntitlementType().toString(), pluginCreated.getEntitlementType().toString());*/
-            logger.info("Update Object Successfully  with  Name [{}]", this.pluginUpdated.getName());
+            Assert.assertNotNull(pluginFind.getName(), pluginCreated.getName());
+            Assert.assertNotNull(pluginFind.getVersion(), pluginCreated.getVersion());
+            Assert.assertNotNull(pluginFind.getBaseScript(), pluginCreated.getBaseScript());
+            Assert.assertNotNull(pluginFind.getScriptLang(), pluginCreated.getScriptLang());
+            Assert.assertNotNull(pluginFind.getLicense(), pluginCreated.getLicense());
+            Assert.assertNotNull(pluginFind.getEntitlementType().toString(), pluginCreated.getEntitlementType().toString());
         }
+
+
 
     }
 
@@ -149,7 +148,7 @@ public class PluginUpdateServiceTest extends AbstractServiceTest {
 
         if (pluginCreated != null) {
             appService.delete(pluginCreated.getId());
-            logger.info("Deleted Object Successfully  with  ID [{}]", this.pluginCreated.getId());
+            logger.info("Deleted Object Successfully  with  Name [{}]", this.pluginCreated.getName());
         }
     }
 }

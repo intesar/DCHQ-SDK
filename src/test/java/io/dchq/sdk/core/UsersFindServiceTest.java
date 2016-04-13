@@ -66,6 +66,7 @@ public class UsersFindServiceTest extends AbstractServiceTest {
     @org.junit.Before
     public void setUp() throws Exception {
         service = ServiceFactory.buildUserService(rootUrl, username, password);
+
     }
 
     @Parameterized.Parameters
@@ -91,15 +92,7 @@ public class UsersFindServiceTest extends AbstractServiceTest {
 
     }
 
-    //@org.junit.Test
-    @Ignore
-    public void testGet() throws Exception {
-        ResponseEntity<List<Users>> responseEntity = service.findAll(0, 2000);
-        Assert.assertNotNull(responseEntity.getTotalElements());
-        for (Users obj : responseEntity.getResults()) {
-            logger.info("User email [{}] first-name [{}] last-name [{}]", obj.getEmail(), obj.getFirstname(), obj.getLastname());
-        }
-    }
+
 
     @Test
     public void testFind() {

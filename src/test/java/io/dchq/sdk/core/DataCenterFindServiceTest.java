@@ -81,7 +81,7 @@ public class DataCenterFindServiceTest extends AbstractServiceTest {
     }
 
     @org.junit.Test
-    public void testUpdate() throws Exception {
+    public void testFind() throws Exception {
 
         // Create
         logger.info("Create Cluster with Name [{}]", dataCenter.getName());
@@ -109,15 +109,15 @@ public class DataCenterFindServiceTest extends AbstractServiceTest {
             assertEquals(dataCenter.getEntitledBlueprint(), dataCenterCreated.getEntitledBlueprint());
             assertEquals(dataCenter.isAutoScale(), dataCenterCreated.isAutoScale());
 
-            logger.info("Update Cluster with Name [{}]", dataCenterCreated.getName());
-            response = dataCenterService.create(dataCenterCreated);
+            logger.info("Find Cluster with ClusterID [{}]", dataCenterCreated.getId());
+            response = dataCenterService.findById(dataCenterCreated.getId());
             if (success)
                 logger.info("Input for Update Cluster is Expected to generate Error: [{}]", validationMessage);
 
             String updateMessage = "";
             for (Message message : response.getMessages()) {
-                logger.warn("Error while Update request  [{}] ", message.getMessageText());
-                updateMessage += ("Error while Update request  " + message.getMessageText());
+                logger.warn("Error while Find request  [{}] ", message.getMessageText());
+                updateMessage += ("Error while Find request  " + message.getMessageText());
             }
 
             assertEquals(validationMessage, ((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());

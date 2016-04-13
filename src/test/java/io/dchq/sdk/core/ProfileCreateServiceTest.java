@@ -97,7 +97,7 @@ public class ProfileCreateServiceTest extends AbstractServiceTest {
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
+        if (profileCreated!=null) {
             profileService.delete(profileCreated.getId());
         }
     }

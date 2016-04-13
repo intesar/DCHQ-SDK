@@ -15,13 +15,16 @@
  */
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 //import com.dchq.schema.beans.one.blueprint.Blueprint;
 //import com.dchq.schema.beans.one.blueprint.BlueprintType;
 import com.dchq.schema.beans.one.base.NameEntityBase;
 import com.dchq.schema.beans.one.base.Visibility;
+import com.dchq.schema.beans.one.blueprint.AccountType;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.blueprint.BlueprintType;
+import com.dchq.schema.beans.one.blueprint.RegistryAccount;
 import com.dchq.schema.beans.one.build.Build;
 import com.dchq.schema.beans.one.build.BuildTask;
 import com.dchq.schema.beans.one.build.BuildTaskStatus;
@@ -68,15 +71,42 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
         });
     }
 
-
+    private RegistryAccountService registryAccountService;
     private Build build;
     private boolean success;
     private Build buildCreated;
+    private RegistryAccount githubRegistryAccount;
+    private RegistryAccount dockerRegistryAccount;
+
+    public RegistryAccount geGitHubRegistry(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password,String url,String email) {
+
+        RegistryAccount registryAccount=null;
+        registryAccount = new RegistryAccount().withName(name).withUsername(rackspaceName).withInactive(isActive).withAccountType(rackspaceType)
+                .withPassword(Password).withUrl(url).withEmail(email);
+
+        registryAccountService = ServiceFactory.buildRegistryAccountService(rootUrl, username, password);
+        ResponseEntity<RegistryAccount> response = registryAccountService.create(registryAccount);
+        for (Message message : response.getMessages())
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
+        if (!response.isErrors() && response.getResults() != null) {
+            registryAccount=response.getResults();
+        }
+
+
+        return registryAccount;
+    }
 
     public BuildCreateServiceTest(String dockerScript, BuildType buildType, boolean success) {
+     //    githubRegistryAccount = geGitHubRegistry("GitHub_Test", "abedeen", Boolean.FALSE, AccountType.GITHUB, "1458051037017",null,null);
+      //   dockerRegistryAccount = geGitHubRegistry("docker_Test", "abedeen", Boolean.FALSE, AccountType.DOCKER_REGISTRY, "Welcome@123","https://registry.hub.docker.com/","s.z.abedeen@gmail.com");
         this.build = new Build()
                 .withDockerScript(dockerScript)
                 .withBuildType(buildType);
+      //  build.setRegistryAccount(githubRegistryAccount.get);
+      //  build.set
+
+
+
 
         this.success = success;
 
@@ -87,6 +117,7 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
     public void testCreate() throws Exception {
         logger.info("Script Started..... {}", build.getDockerScript());
         ResponseEntity<Build> response = buildService.create(build);
+
         if (response.isErrors())
             logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
         Assert.assertNotNull(response.getResults());
@@ -105,10 +136,16 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
     @After
     public void cleanUp() {
         logger.info("cleaning up...");
+        if (githubRegistryAccount!=null)
+            registryAccountService.delete(githubRegistryAccount.getId());
+        if (dockerRegistryAccount!=null)
+            registryAccountService.delete(dockerRegistryAccount.getId());
 
-        if (!success) {
+        if (buildCreated!=null) {
             buildService.delete(buildCreated.getId());
         }
+
     }
 
 }
+

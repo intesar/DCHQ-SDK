@@ -101,7 +101,7 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (!success) {
+        if (userGroupCreated!=null) {
             userGroupService.delete(userGroupCreated.getId());
         }
     }
