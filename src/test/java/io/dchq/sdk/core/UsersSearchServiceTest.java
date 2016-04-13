@@ -19,9 +19,13 @@ package io.dchq.sdk.core;
 import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
+import com.dchq.schema.beans.one.security.UserGroup;
 import com.dchq.schema.beans.one.security.Users;
+import junit.framework.*;
 import org.hamcrest.core.Is;
 import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
@@ -31,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -59,7 +64,7 @@ import static org.junit.Assert.assertNotEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class UsersCreateServiceTest extends AbstractServiceTest {
+public class UsersSearchServiceTest extends AbstractServiceTest {
 
     private UserService service;
 
@@ -71,50 +76,44 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false},
+                {"fn", "ln", "ituser11", "ituser1123@dchq.io", "pass1234", "", false},
                 //   {"fn", "ln", "ituser2", "ituser2@dchq.io", "pass1234", false},
                 // TODO: validate password
-          //      {"fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true},
+                //      {"fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true},
                 //        {"", "", "ituser2", "ituser4@dchq.io", "", false}
         });
     }
 
     private Users users;
-    private boolean success;
+    private boolean createError;
     private Users userCreated;
     private String errorMessage;
 
-    public UsersCreateServiceTest(String fn, String ln, String username, String email, String pass, String errorMessage, boolean success) {
+    public UsersSearchServiceTest(String fn, String ln, String username, String email, String pass, String errorMessage, boolean success) {
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
         this.users.setInactive(false);
-        this.success = success;
+        this.createError = success;
         this.errorMessage = errorMessage;
 
     }
 
-    //@org.junit.Test
-    @Ignore
-    public void testGet() throws Exception {
-        ResponseEntity<List<Users>> responseEntity = service.findAll(0, 2000);
-        Assert.assertNotNull(responseEntity.getTotalElements());
-        for (Users obj : responseEntity.getResults()) {
-            logger.info("User email [{}] first-name [{}] last-name [{}]", obj.getEmail(), obj.getFirstname(), obj.getLastname());
-        }
-    }
+
 
     @Test
-    public void testCreate() {
+    public void testSearch() {
 
         logger.info("Create user fn [{}] ln [{}] username [{}]", users.getFirstname(), users.getLastname(), users.getUsername());
         ResponseEntity<Users> response = service.create(users);
 
-        for (Message message : response.getMessages())
+        for (Message message : response.getMessages()) {
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
+            errorMessage+=message.getMessageText()+"\n";
+        }
 
-        boolean tempSuccess = success;
-        if (success && !response.isErrors()) {
-            success = false;
+
+        if (!response.isErrors() && response.getResults()!=null) {
             this.userCreated = response.getResults();
+            logger.info("Created Object Successfully with id  [{}] ",userCreated.getId());
         }
         // check response is not null
         // check response has no errors
@@ -122,15 +121,13 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
         // check all data send
 
         assertNotNull(response);
-//        assertNotNull(response.isErrors());
-        Assert.assertThat(errorMessage, tempSuccess, is(equals(response.isErrors())));
+        assertNotNull(response.isErrors());
+        assertEquals(errorMessage, createError, response.isErrors());
 
-        if (!tempSuccess) {
+        if (!createError) {
 
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
-
-            this.userCreated = response.getResults();
 
             assertEquals(users.getFirstname(), response.getResults().getFirstname());
             assertEquals(users.getLastname(), response.getResults().getLastname());
@@ -140,6 +137,24 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
             // Password should always be empty
             assertThat("", is(response.getResults().getPassword()));
         }
+        logger.warn("Search Object wth username  [{}] ",userCreated.getUsername());
+        ResponseEntity<List<Users>> userSearchResponseEntity = service.search(userCreated.getUsername(), 0, 1);
+        errorMessage="";
+        for (Message message : userSearchResponseEntity.getMessages()) {
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
+            errorMessage+=message.getMessageText()+"\n";
+        }
+
+        assertNotNull(userSearchResponseEntity);
+        assertNotNull(userSearchResponseEntity.isErrors());
+        assertFalse(errorMessage,userSearchResponseEntity.isErrors());
+
+        assertNotNull(userSearchResponseEntity.getResults());
+        junit.framework.Assert.assertEquals(1, userSearchResponseEntity.getResults().size());
+
+        Users searchedEntity = userSearchResponseEntity.getResults().get(0);
+        junit.framework.Assert.assertEquals(userCreated.getId(), searchedEntity.getId());
+        junit.framework.Assert.assertEquals(userCreated.getUsername(), searchedEntity.getUsername());
     }
 
     @After
@@ -147,7 +162,8 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
         logger.info("cleaning up...");
 
         if (userCreated!=null) {
-            service.delete(userCreated.getId());
+                  service.delete(userCreated.getId());
+            logger.info("Deleted Object Successfully by Id {}",userCreated.getId());
         }
     }
 
