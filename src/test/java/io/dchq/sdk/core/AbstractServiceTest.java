@@ -36,4 +36,7 @@ public abstract class AbstractServiceTest {
     protected static String userId2 = "402881865150455e015150b07e6501cb";
     protected String username2 = "TSPkvDkhlKN5SXDED7B6";
     protected String password2 = "LkNFqRPYXu3bTXzuWa85hrFivO5ugRPd57nMPF2k";
+
+    // UserGroup with userId2 entitled user
+    protected static String USER_GROUP = "40288184540d076e01540d199209002e";
 }

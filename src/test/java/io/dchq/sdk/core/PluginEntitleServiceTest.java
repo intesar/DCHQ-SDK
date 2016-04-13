@@ -16,6 +16,7 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.base.NameEntityBase;
 import com.dchq.schema.beans.one.base.UsernameEntityBase;
 import com.dchq.schema.beans.one.plugin.Plugin;
 import com.dchq.schema.beans.one.security.EntitlementType;
@@ -62,14 +63,15 @@ public class PluginEntitleServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestPlugin1", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, userId2, "General Input", false},
-                {"TestPlugin2", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, null, "General Input", false},
-                {"TestPlugin3", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, "", "General Input", false}
+                {"TestPlugin1", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, true, userId2, "General Input", false},
+                {"TestPlugin1", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, false, USER_GROUP, "General Input", false},
+                {"TestPlugin2", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, false, null, "General Input", false},
+                {"TestPlugin3", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, false, "", "General Input", false}
         });
     }
 
     public PluginEntitleServiceTest(String pluginName, String version, String pluginScript, String scriptType, String license,
-                                    EntitlementType entitlementType, String entitledUserId, String validityMessage, boolean errors) {
+                                    EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId, String validityMessage, boolean errors) {
         this.plugin = new Plugin();
         this.plugin.setName(pluginName);
         this.plugin.setVersion(version);
@@ -80,11 +82,16 @@ public class PluginEntitleServiceTest extends AbstractServiceTest {
         this.plugin.setEntitlementType(entitlementType);
 
 
-        if (!StringUtils.isEmpty(entitledUserId)) {
+        if (!StringUtils.isEmpty(entitledUserId) && isEntitlementTypeUser) {
             UsernameEntityBase entitledUser = new UsernameEntityBase().withId(entitledUserId);
             List<UsernameEntityBase> entiledUsers = new ArrayList<>();
             entiledUsers.add(entitledUser);
             this.plugin.setEntitledUsers(entiledUsers);
+        } else if (!StringUtils.isEmpty(entitledUserId)) { // assume user-group
+            NameEntityBase entitledUser = new NameEntityBase().withId(entitledUserId);
+            List<NameEntityBase> entiledUsers = new ArrayList<>();
+            entiledUsers.add(entitledUser);
+            this.plugin.setEntitledUserGroups(entiledUsers);
         }
 
         this.errors = errors;
