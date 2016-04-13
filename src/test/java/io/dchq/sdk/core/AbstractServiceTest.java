@@ -31,8 +31,9 @@ public abstract class AbstractServiceTest {
     protected String rootUrl = "http://104.130.163.208:33901/api/1.0/";
     protected String username = "admin@dchq.io";
     protected String password = "admin123";
-//    protected String rootUrl = "http://localhost:9090/api/1.0/";
-//    protected String username = "mdshannan@gmail.com";
-//    protected String password = "apple123";
 
+    // Create another user for entitlement check
+    protected static String userId2 = "402881865150455e015150b07e6501cb";
+    protected String username2 = "TSPkvDkhlKN5SXDED7B6";
+    protected String password2 = "LkNFqRPYXu3bTXzuWa85hrFivO5ugRPd57nMPF2k";
 }
