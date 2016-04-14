@@ -132,6 +132,7 @@ public class CloudProviderSearchServiceTest extends AbstractServiceTest {
         RegistryAccount searchedEntity = registryAccountResponseEntity.getResults().get(0);
         junit.framework.Assert.assertEquals(registryAccountCreated.getId(), searchedEntity.getId());
         junit.framework.Assert.assertEquals(registryAccountCreated.getName(), searchedEntity.getName());
+
     }
 
     @After
@@ -140,6 +141,7 @@ public class CloudProviderSearchServiceTest extends AbstractServiceTest {
 
         if (registryAccountCreated!=null) {
             registryAccountService.delete(registryAccountCreated.getId());
+            logger.info("Deleted Object successfully by ID [{}] ",registryAccountCreated.getId());
         }
     }
 }
