@@ -281,6 +281,7 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
         pageSize = (pageSize == null || pageSize < 1) ? 20 : pageSize;
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("q", "" + term);
         params.add("page", "" + page);
         params.add("pageSize", "" + pageSize);
 

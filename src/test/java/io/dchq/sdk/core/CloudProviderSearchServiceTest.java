@@ -79,7 +79,7 @@ public class CloudProviderSearchServiceTest extends AbstractServiceTest {
     }
 
     @org.junit.Test
-    public void testCreate() throws Exception {
+    public void testSearch() throws Exception {
 
         logger.info("Create Registry Account with Name [{}]", registryAccount.getName());
 

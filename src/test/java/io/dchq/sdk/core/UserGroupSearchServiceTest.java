@@ -51,7 +51,7 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestGroup1", false}
+                {"TestGroup2", false}
         });
     }
 

@@ -66,8 +66,8 @@ public class DataCenterSearchServiceTest extends AbstractServiceTest{
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"Test Cluster - AA4",Boolean.FALSE,EntitlementType.ALL_BLUEPRINTS, "\nAll Input Values are normal. Malfunction in SDK",false},
-                {"Test Cluster - AA40",Boolean.TRUE,EntitlementType.ALL_BLUEPRINTS,"\n Auto Flag is set to true ,\n Next required value :Machine Compose id cannot be empty", true},
-                {"",Boolean.FALSE,EntitlementType.ALL_BLUEPRINTS,"\n Empty Cluster Name is Not Valid", true}
+             //   {"Test Cluster - AA40",Boolean.TRUE,EntitlementType.ALL_BLUEPRINTS,"\n Auto Flag is set to true ,\n Next required value :Machine Compose id cannot be empty", true},
+             //   {"",Boolean.FALSE,EntitlementType.ALL_BLUEPRINTS,"\n Empty Cluster Name is Not Valid", true}
         });
     }
 
@@ -80,7 +80,7 @@ public class DataCenterSearchServiceTest extends AbstractServiceTest{
     }
 
     @org.junit.Test
-    public void testCreate() throws Exception{
+    public void testSearch() throws Exception{
 
         logger.info("Create Cluster with Name [{}]", dataCenter.getName());
 
