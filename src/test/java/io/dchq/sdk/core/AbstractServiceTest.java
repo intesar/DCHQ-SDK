@@ -28,15 +28,30 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractServiceTest {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected String rootUrl = "http://104.130.163.208:33901/api/1.0/";
+    protected String rootUrl2 = "http://40.112.248.96:8080/api/1.0/";
+    protected String rootUrl = "http://localhost:8080/api/1.0/";
     protected String username = "admin@dchq.io";
     protected String password = "admin123";
 
     // Create another user for entitlement check
-    protected static String userId2 = "402881865150455e015150b07e6501cb";
-    protected String username2 = "TSPkvDkhlKN5SXDED7B6";
-    protected String password2 = "LkNFqRPYXu3bTXzuWa85hrFivO5ugRPd57nMPF2k";
+    protected static String userId2 = "ff808181542bf58901542cc78cbc00b2";
+    protected String username2 = "F9MM2rzkWlmGkRyWwQsx";// accesskey
+    protected String password2 = "6O4YYEbJVMXckLd4p5yAgZZwHKPD02MkOIq9JriI";//secret key
 
     // UserGroup with userId2 entitled user
-    protected static String USER_GROUP = "40288184540d076e01540d199209002e";
+    protected static String USER_GROUP ="ff808181542bf58901542cc8344a00b3";
+
+    protected int waitTime = 0,maxWaitTime=0;
+
+    public int wait(int milliSeconds) throws Exception {
+        logger.info("Waiting for [{}] seconds  ",milliSeconds);
+        if (maxWaitTime<=waitTime) {
+            logger.info("wait Time Exceeded the Limit [{}]  ", (maxWaitTime / 1000 / 60));
+            return 0;
+        }
+        Thread.sleep(milliSeconds);
+        waitTime+=milliSeconds;
+        logger.info("Time Wait during Provisioning [{}] Minutes ", (waitTime / 1000 / 60));
+        return 1;
+    }
 }

@@ -50,7 +50,7 @@ import static org.junit.Assert.assertFalse;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class DockerServerCreateServiceTest extends DockerServerTest {
+public class DockerServerSearchServiceTest extends DockerServerTest {
 
 
     @org.junit.Before
@@ -67,7 +67,7 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
     }
 
 
-    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, boolean success) {
+    public DockerServerSearchServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, boolean success) {
         datacenterCreated = getDataCenter("Test_Cluster_" + (new Date().toString()), Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS);
         Assert.assertNotNull(datacenterCreated);
 
@@ -80,7 +80,7 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
 
     @org.junit.Test
-    public void testCreate() throws Exception {
+    public void testSearch() throws Exception {
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
         ResponseEntity<DockerServer> response = dockerServerService.create(dockerServer);
         String errorMessage = "";
@@ -117,9 +117,30 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
                     Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
-                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
+//                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
                     Assert.assertEquals(dockerServer.getEndpointType(), dockerServerCreated.getEndpointType());
+
+                    // Testing Search Functionality
+                    logger.info("Search Request for  Machine [{}]", dockerServerCreated.getName());
+                    ResponseEntity<List<DockerServer>> dockerServerResponseEntity = dockerServerService.search(dockerServerCreated.getName(), 0, 1);
+                     errorMessage = "";
+                    for (Message message : dockerServerResponseEntity.getMessages()) {
+                        logger.warn("Error while Search request  [{}] ", message.getMessageText());
+                        errorMessage += message.getMessageText() + "\n";
+                    }
+
+
+                    assertNotNull(dockerServerResponseEntity);
+                    assertNotNull(dockerServerResponseEntity.isErrors());
+                    junit.framework.Assert.assertFalse(errorMessage, dockerServerResponseEntity.isErrors());
+
+                    assertNotNull(dockerServerResponseEntity.getResults());
+                    junit.framework.Assert.assertEquals(1, dockerServerResponseEntity.getResults().size());
+
+                    DockerServer searchedEntity = dockerServerResponseEntity.getResults().get(0);
+                    junit.framework.Assert.assertEquals(dockerServerCreated.getId(), searchedEntity.getId());
+                    junit.framework.Assert.assertEquals(dockerServerCreated.getName(), searchedEntity.getName());
 
 
                 }

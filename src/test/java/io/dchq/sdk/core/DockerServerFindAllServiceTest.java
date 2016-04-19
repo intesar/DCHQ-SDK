@@ -17,6 +17,7 @@ package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.blueprint.RegistryAccount;
 import com.dchq.schema.beans.one.provider.DataCenter;
 import com.dchq.schema.beans.one.provider.DockerServer;
 import com.dchq.schema.beans.one.security.EntitlementType;
@@ -50,7 +51,7 @@ import static org.junit.Assert.assertFalse;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class DockerServerCreateServiceTest extends DockerServerTest {
+public class DockerServerFindAllServiceTest extends DockerServerTest {
 
 
     @org.junit.Before
@@ -65,9 +66,35 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
         });
     }
+    public int testDockerServerPosition(String id) {
+
+        ResponseEntity<List<DockerServer>> response = dockerServerService.findAll();
+
+        String errors = "";
+        for (Message message : response.getMessages())
+            errors += ("Error while Find All request  " + message.getMessageText() + "\n");
 
 
-    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, boolean success) {
+        assertNotNull(response);
+        assertNotNull(response.isErrors());
+        assertThat(false, is(equals(response.isErrors())));
+        int position=0;
+        if(id!=null) {
+            for (DockerServer obj : response.getResults()) {
+                position++;
+                if(obj.getId().equals(id) ){
+                    logger.info("  Object Matched in FindAll {}  at Position : {}", id, position);
+                    assertEquals("Recently Created Object is not at Positon 1 :"+obj.getId(),1, position);
+                }
+            }
+        }
+
+        logger.info(" Total Number of Objects :{}",response.getResults().size());
+
+        return response.getResults().size();
+    }
+
+    public DockerServerFindAllServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, boolean success) {
         datacenterCreated = getDataCenter("Test_Cluster_" + (new Date().toString()), Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS);
         Assert.assertNotNull(datacenterCreated);
 
@@ -78,9 +105,9 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
         this.createError = success;
     }
 
-
+    DockerServer dockerServerFindById;
     @org.junit.Test
-    public void testCreate() throws Exception {
+    public void testFindAll() throws Exception {
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
         ResponseEntity<DockerServer> response = dockerServerService.create(dockerServer);
         String errorMessage = "";
@@ -117,9 +144,13 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
                     Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
-                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
+                    //     Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
                     Assert.assertEquals(dockerServer.getEndpointType(), dockerServerCreated.getEndpointType());
+                    logger.info("Executing FindAll for Position of Server  [{}]", dockerServerCreated.getName());
+                    Assert.assertEquals("Created Object was expected to be at Position 1,",1,testDockerServerPosition(dockerServerCreated.getId()));
+
+
 
 
                 }

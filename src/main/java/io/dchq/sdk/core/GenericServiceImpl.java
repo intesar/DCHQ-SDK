@@ -462,7 +462,31 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
 
         return res.getBody();
     }
+    @Override
+    public RO delete(String id,boolean force) {
 
+        String url = baseURI + endpoint + id;
+        if(force)
+            url+="?force=true";
+
+        URI uri = getUri(url);
+
+        HttpHeaders map = getHttpHeaders();
+
+        //set your entity to send
+        HttpEntity<E> requestEntity = new HttpEntity<>(map);
+
+
+        org.springframework.http.ResponseEntity<RO> res =
+                template.exchange(
+                        url,
+                        HttpMethod.DELETE,
+                        requestEntity,
+                        singleTypeReference
+                );
+
+        return res.getBody();
+    }
 
     private HttpHeaders getHttpHeaders() {
         HttpHeaders map = new HttpHeaders();

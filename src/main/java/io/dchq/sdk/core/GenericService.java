@@ -114,7 +114,14 @@ interface GenericService<E, RL, RO> {
      * @return
      */
     RO delete(String id);
-
+    /**
+     * Delete <code>E</code> by id.
+     *
+     * @param id - Entity id
+     * @param force - Force
+     * @return
+     */
+    RO delete(String id,boolean force);
     /**
      * Update <code>E</code>
      *

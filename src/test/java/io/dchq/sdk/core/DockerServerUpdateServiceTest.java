@@ -50,8 +50,9 @@ import static org.junit.Assert.assertFalse;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class DockerServerCreateServiceTest extends DockerServerTest {
-
+public class DockerServerUpdateServiceTest extends DockerServerTest {
+    DockerServer dockerServerUpdated;
+    boolean inActiveUpdated;
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -61,13 +62,14 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000, false},
+                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000, true,false},
 
         });
     }
 
 
-    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, boolean success) {
+    public DockerServerUpdateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout,boolean dockerNameUpdated, boolean success) {
+        this.inActiveUpdated=dockerNameUpdated;
         datacenterCreated = getDataCenter("Test_Cluster_" + (new Date().toString()), Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS);
         Assert.assertNotNull(datacenterCreated);
 
@@ -80,7 +82,7 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
 
     @org.junit.Test
-    public void testCreate() throws Exception {
+    public void testUpdate() throws Exception {
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
         ResponseEntity<DockerServer> response = dockerServerService.create(dockerServer);
         String errorMessage = "";
@@ -117,9 +119,33 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
                     Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
-                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
                     Assert.assertEquals(dockerServer.getEndpointType(), dockerServerCreated.getEndpointType());
+
+                    dockerServerCreated.setInactive(inActiveUpdated);
+                    logger.info("Update Machine with ActiveFlag [{}]", dockerServerCreated.isInactive());
+                    response = dockerServerService.update(dockerServerCreated);
+                     errorMessage = "";
+                    for (Message message : response.getMessages()) {
+                        logger.warn("Error while Update request  [{}] ", message.getMessageText());
+                        errorMessage += ("Error while Update request  [{}] " + message.getMessageText());
+                    }
+                    assertNotNull(response);
+                    assertNotNull(response.isErrors());
+                    Assert.assertFalse("Machine Update Replied with Error." + errorMessage, response.isErrors());
+
+                    if (response.getResults() != null) {
+
+
+                        dockerServerUpdated=response.getResults();
+                        assertNotNull(response.getResults());
+                        assertNotNull(response.getResults().getId());
+
+                        Assert.assertEquals(dockerServerCreated.isInactive(), dockerServerUpdated.isInactive());
+
+
+                    }
+
 
 
                 }
