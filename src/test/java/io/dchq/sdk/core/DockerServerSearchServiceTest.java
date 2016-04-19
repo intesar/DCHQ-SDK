@@ -136,7 +136,7 @@ public class DockerServerSearchServiceTest extends DockerServerTest {
                     junit.framework.Assert.assertFalse(errorMessage, dockerServerResponseEntity.isErrors());
 
                     assertNotNull(dockerServerResponseEntity.getResults());
-                    junit.framework.Assert.assertEquals(1, dockerServerResponseEntity.getResults().size());
+                    junit.framework.Assert.assertEquals("Search Request Error, ",1, dockerServerResponseEntity.getResults().size());
 
                     DockerServer searchedEntity = dockerServerResponseEntity.getResults().get(0);
                     junit.framework.Assert.assertEquals(dockerServerCreated.getId(), searchedEntity.getId());

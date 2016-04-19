@@ -88,6 +88,8 @@ public class DataCenterCreateServiceTest extends AbstractServiceTest{
         for (Message message  : response.getMessages())
             logger.warn("Error while Create request  [{}] ",message.getMessageText());
 
+        if(response.getResults()!=null)   this.dataCenterCreated = response.getResults();
+
         assertNotNull(response);
         assertNotNull(response.isErrors());
         assertEquals(validationMessage,((Boolean)success).toString(),((Boolean)response.isErrors()).toString());
@@ -98,8 +100,6 @@ public class DataCenterCreateServiceTest extends AbstractServiceTest{
 
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
-
-            this.dataCenterCreated = response.getResults();
 
             assertEquals(dataCenter.getName(), dataCenterCreated.getName());
             assertEquals(dataCenter.getEntitledBlueprint(), dataCenterCreated.getEntitledBlueprint());
