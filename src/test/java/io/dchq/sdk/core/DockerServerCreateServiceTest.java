@@ -54,26 +54,24 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
 
     @org.junit.Before
-    public void setUp() throws Exception {
+    public void setUp(){
         dockerServerService = ServiceFactory.buildDockerServerService(rootUrl, username, password);
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000, false},
+                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000,"Cluster_Create_Server_Test", false},
 
         });
     }
 
 
-    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, boolean success) {
-        datacenterCreated = getDataCenter("Test_Cluster_" + (new Date().toString()), Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS);
+    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout,String clusterName, boolean success) {
+        datacenterCreated = getDataCenter(clusterName, Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS);
         Assert.assertNotNull(datacenterCreated);
-
         this.dockerServer = new DockerServer().withDatacenter(datacenterCreated).withName(serverName)
                 .withInactive(activeFlag).withRegion(region).withImageId(image).withSize(size).withEndpoint(endpoint).withEndpointType(endpointTpe).withHardwareId(hardwareID);
-
         maxWaitTime = tinout;
         this.createError = success;
     }
@@ -81,8 +79,10 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
     @org.junit.Test
     public void testCreate() throws Exception {
+
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
         ResponseEntity<DockerServer> response = dockerServerService.create(dockerServer);
+
         String errorMessage = "";
         for (Message message : response.getMessages()) {
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
@@ -94,7 +94,7 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
             logger.info("Expecting No Response for  Machine Create [{}]", dockerServer.getName());
 
 //            assertNotNull(response.getTotalElements());
-            Assert.assertEquals("", 1, wait(7000));
+
             dockerServerResponseEntity = dockerServerService.search(dockerServer.getName(), 0, 1);
             errorMessage = "";
             for (Message message : dockerServerResponseEntity.getMessages()) {
@@ -111,13 +111,14 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
                 for (DockerServer searchDocker : dockerServerResponseEntity.getResults()) {
                     dockerServerProvisioning = searchDocker;
                 }
-                Assert.assertNotNull("Machine Not created...", dockerServerProvisioning.getId());
+                Assert.assertNotNull("Machine Provision not started...", dockerServerProvisioning);
                 dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
+                Assert.assertNotNull("Machine is not in Running State.",dockerServerCreated);
                 if (dockerServerCreated != null) {
 
                     Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
-                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
+//                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
                     Assert.assertEquals(dockerServer.getEndpointType(), dockerServerCreated.getEndpointType());
 
@@ -131,20 +132,69 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
 
     }
+    public DataCenter getDataCenter(){
+        setUp();
+        DataCenter tempDataCenter=null;
+        DockerServer tempDockerServer=createMachine();
+        if(tempDockerServer!=null) tempDataCenter=tempDockerServer.getDataCenter();
+return tempDataCenter;
+    }
 
+    public DockerServer createMachine()  {
+
+        logger.info("Create Machine with Name [{}]", dockerServer.getName());
+        ResponseEntity<DockerServer> response = dockerServerService.create(dockerServer);
+
+        String errorMessage = "";
+        for (Message message : response.getMessages()) {
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
+            errorMessage += ("Error while Create request  [{}] " + message.getMessageText());
+        }
+
+
+        if (response.getTotalElements() == null) {
+            logger.info("Expecting No Response for  Machine Create [{}]", dockerServer.getName());
+
+            dockerServerResponseEntity = dockerServerService.search(dockerServer.getName(), 0, 1);
+
+            for (Message message : dockerServerResponseEntity.getMessages())
+                logger.warn("Error while Create request  [{}] ", message.getMessageText());
+
+            if (dockerServerResponseEntity.getResults() != null) {
+
+                String serverStatus = "";
+                for (DockerServer searchDocker : dockerServerResponseEntity.getResults())
+                    dockerServerProvisioning = searchDocker;
+
+                dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
+
+
+
+            }
+
+
+        }
+        if(dockerServerCreated==null)
+            cleanUp();
+
+return dockerServerCreated;
+
+    }
     @After
-    public void cleanUp() throws Exception {
+    public void cleanUp()  {
         logger.info("cleaning up...");
 
 
         if (dockerServerProvisioning != null) {
             logger.info("Deleting Machine ");
             dockerServerService.delete(dockerServerProvisioning.getId(), true);
-            assertEquals("Unable to Destroy Object after Test ", "DESTROYED", validateProvision(dockerServerProvisioning, "DESTROYING").getDockerServerStatus().name());
+            validateProvision(dockerServerProvisioning, "DESTROYING");
+
         }
         if (datacenterCreated != null) {
             logger.info("Deleting Cluster ");
-            assertFalse(dataCenterService.delete(datacenterCreated.getId()).isErrors());
+            dataCenterService.delete(datacenterCreated.getId());
+
         }
 
     }

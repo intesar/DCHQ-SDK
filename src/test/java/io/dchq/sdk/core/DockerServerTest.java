@@ -32,19 +32,21 @@ public class DockerServerTest extends AbstractServiceTest {
         ResponseEntity<DataCenter> responseEntity = dataCenterService.create(dt);
         if (responseEntity.isErrors())
             logger.warn("Message from Server... {}", responseEntity.getMessages().get(0).getMessageText());
-        assertEquals(false, responseEntity.isErrors());
+
+
         return responseEntity.getResults();
 
     }
-    public DockerServer validateProvision(DockerServer inputDocker, String action)throws Exception{
+    public DockerServer validateProvision(DockerServer inputDocker, String action){
         int warningCount=0;
         waitTime=0;
         DockerServer outDockerserver=null;
-        String serverStatus=inputDocker.getDockerServerStatus()==null?"":inputDocker.getDockerServerStatus().name();
+        DockerServer tempDockerserver=null;
+        String serverStatus=inputDocker.getDockerServerStatus()==null?:inputDocker.getDockerServerStatus().name();
         provision:
         do {
 
-            Assert.assertEquals("",1,wait(10000));
+            if(wait(10000)==0) break provision;
             ResponseEntity<DockerServer>  response = dockerServerService.findById(inputDocker.getId());
 
             assertNotNull(response);
@@ -52,10 +54,10 @@ public class DockerServerTest extends AbstractServiceTest {
             assertEquals(response.getMessages().toString(), ((Boolean) createError).toString(), ((Boolean) response.isErrors()).toString());
 
             if(response.getResults()!=null) {
-                outDockerserver=response.getResults();
-                serverStatus = outDockerserver.getDockerServerStatus().name();
+                tempDockerserver=response.getResults();
+                serverStatus = tempDockerserver.getDockerServerStatus().name();
                 logger.info("Current Serverstatus   [{}] ", serverStatus);
-                if (serverStatus.equals("CONNECTED") ||serverStatus.equals("DESTROYED")) return outDockerserver;
+                if (serverStatus.equals("CONNECTED") ||serverStatus.equals("DESTROYED")) break provision;
 
             }
             if (serverStatus == "WARNINGS" ){ warningCount++; serverStatus = action;}
@@ -65,8 +67,9 @@ public class DockerServerTest extends AbstractServiceTest {
 
 
         } while (serverStatus == action);
-        Assert.assertEquals("",1,wait(10000));
+        if( tempDockerserver.getDockerServerStatus().name().equals("CONNECTED") ||  tempDockerserver.getDockerServerStatus().name().equals("DESTROYED"))outDockerserver=tempDockerserver;
         return outDockerserver;
 
     }
+
 }

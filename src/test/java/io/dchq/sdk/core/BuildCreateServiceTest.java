@@ -29,6 +29,8 @@ import com.dchq.schema.beans.one.build.Build;
 import com.dchq.schema.beans.one.build.BuildTask;
 import com.dchq.schema.beans.one.build.BuildTaskStatus;
 import com.dchq.schema.beans.one.build.BuildType;
+import com.dchq.schema.beans.one.provider.DataCenter;
+import com.dchq.schema.beans.one.provider.DockerServer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -37,9 +39,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
 
@@ -58,6 +58,14 @@ import static junit.framework.TestCase.assertNotNull;
 public class BuildCreateServiceTest extends AbstractServiceTest {
 
     private BuildService buildService;
+    private DockerServerCreateServiceTest dockerServerCreateService;
+
+    public DataCenter getDataCenter() throws Exception {
+        dockerServerCreateService = new DockerServerCreateServiceTest("TEST_BUILD_RACKSPACE_SERVER ", Boolean.FALSE, "HKG", "general1-1", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 360000,"Build_Cluster_("+getDateSuffix(null)+")", false);
+        dockerServerCreateService.setUp();
+
+return dockerServerCreateService.getDataCenter();
+    }
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -67,7 +75,7 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"this is a docker script", BuildType.DOCKER_FILE_CONTENT, false}
+                {"Test Build2", BuildType.GITHUB_PUBLIC_REPO,"https://github.com/dockerfile/ubuntu.git","ff808181542bf58901542d2e611400fa","abedeen/syed", "latest","ff808181542bf58901542d29602400f7",false}
         });
     }
 
@@ -78,36 +86,23 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
     private RegistryAccount githubRegistryAccount;
     private RegistryAccount dockerRegistryAccount;
 
-    public RegistryAccount geGitHubRegistry(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password,String url,String email) {
-
-        RegistryAccount registryAccount=null;
-        registryAccount = new RegistryAccount().withName(name).withUsername(rackspaceName).withInactive(isActive).withAccountType(rackspaceType)
-                .withPassword(Password).withUrl(url).withEmail(email);
-
-        registryAccountService = ServiceFactory.buildRegistryAccountService(rootUrl, username, password);
-        ResponseEntity<RegistryAccount> response = registryAccountService.create(registryAccount);
-        for (Message message : response.getMessages())
-            logger.warn("Error while Create request  [{}] ", message.getMessageText());
-        if (!response.isErrors() && response.getResults() != null) {
-            registryAccount=response.getResults();
-        }
 
 
-        return registryAccount;
-    }
+    DataCenter createDataCenter =null;
 
-    public BuildCreateServiceTest(String dockerScript, BuildType buildType, boolean success) {
-     //    githubRegistryAccount = geGitHubRegistry("GitHub_Test", "abedeen", Boolean.FALSE, AccountType.GITHUB, "1458051037017",null,null);
-      //   dockerRegistryAccount = geGitHubRegistry("docker_Test", "abedeen", Boolean.FALSE, AccountType.DOCKER_REGISTRY, "Welcome@123","https://registry.hub.docker.com/","s.z.abedeen@gmail.com");
+    public BuildCreateServiceTest(String dockerScript, BuildType buildType,String gitURL,String cluster,String pustToRepository,String tag,String registryAccountId, boolean success)  throws Exception {
+        createDataCenter = getDataCenter();
         this.build = new Build()
-                .withDockerScript(dockerScript)
                 .withBuildType(buildType);
-      //  build.setRegistryAccount(githubRegistryAccount.get);
-      //  build.set
+        this.build.setCluster(createDataCenter.getId());
+        //this.build.setCluster("ff8081815434dd7e015434e0a2240007");
 
-
-
-
+        build.setTag(tag);
+        build.setGitCloneUrl(gitURL);
+        build.setRepository(pustToRepository);
+        NameEntityBase neb = new NameEntityBase();
+        neb.setId(registryAccountId);
+        build.setRegistryAccount(neb);
         this.success = success;
 
 
@@ -115,35 +110,70 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
 
     @org.junit.Test
     public void testCreate() throws Exception {
+
+      //  Assert.assertNotNull(dockerServerCreateService.dockerServerCreated);
+
         logger.info("Script Started..... {}", build.getDockerScript());
         ResponseEntity<Build> response = buildService.create(build);
 
-        if (response.isErrors())
-            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
-        Assert.assertNotNull(response.getResults());
-        Assert.assertNotNull(response.getResults().getId());
+        String errorMessage = "";
+        for (Message message : response.getMessages()) {
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
+            errorMessage += ("Error while Create request  [{}] " + message.getMessageText());
+        }
+        assertNotNull(response.getResults());
+        assertNotNull(response.getResults().getId());
+        Assert.assertNotNull(errorMessage,response.getResults());
+      //  Assert.assertNotNull(response.getResults().getId());
 
-        if (!success) {
+        if (response.getResults()!=null) {
+
+            assertNotNull(response.getResults());
+            assertNotNull(response.getResults().getId());
+
             buildCreated = response.getResults();
+            ResponseEntity<BuildTask> responseTask  = buildService.buildNow(buildCreated.getId());
+            BuildTask buildTask=getTask(responseTask);
+          //  assertNotNull(buildTask);
 
-            Assert.assertNotNull(build.getDockerScript(), buildCreated.getDockerScript());
-            Assert.assertNotNull(build.getBuildType().toString(), buildCreated.getBuildType().toString());
+                maxWaitTime=3*60*1000;
+            waitTime=0;
+                do{
+                    wait(10000);
+                    responseTask  = buildService.findBuildTaskById(buildTask.getId());
+                    buildTask=getTask(responseTask);
+               //     assertNotNull(buildTask);
 
+
+                }while(buildTask.getBuildTaskStatus().name().equals("PROCESSING"));
 
         }
     }
+public BuildTask getTask(ResponseEntity<BuildTask> responseTask) {
 
+    String errorMessage = "";
+    BuildTask buildTask =null;
+    for (Message message : responseTask.getMessages()) {
+        logger.warn("Error while Running Build Task request  [{}] ", message.getMessageText());
+        errorMessage += ("Error while Running Build Task request  " + message.getMessageText());
+    }
+    if (responseTask.getResults() != null) {
+        buildTask = responseTask.getResults();
+        Assert.assertFalse("Machine Creation Replied with Error." + errorMessage, responseTask.isErrors());
+
+
+    }
+    return buildTask;
+}
     @After
-    public void cleanUp() {
+    public void cleanUp() throws Exception  {
         logger.info("cleaning up...");
-        if (githubRegistryAccount!=null)
-            registryAccountService.delete(githubRegistryAccount.getId());
-        if (dockerRegistryAccount!=null)
-            registryAccountService.delete(dockerRegistryAccount.getId());
 
-        if (buildCreated!=null) {
-            buildService.delete(buildCreated.getId());
-        }
+        if(buildCreated!=null) buildService.delete(buildCreated.getId());
+
+
+            dockerServerCreateService.cleanUp();
+
 
     }
 

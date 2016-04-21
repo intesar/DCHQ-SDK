@@ -25,14 +25,14 @@ public class BuildServiceTest extends AbstractServiceTest {
         buildService = ServiceFactory.buildBuildService(rootUrl, username, password);
     }
 
-    @org.junit.Test
+ /*   @org.junit.Test
     public void testFindAll() throws Exception {
         ResponseEntity<List<Build>> responseEntity = buildService.findAll();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Build bl : responseEntity.getResults()) {
             logger.info("Build repository [{}] buildType [{}] author [{}]", bl.getRepository(), bl.getBuildType(), bl.getCreatedBy());
         }
-    }
+    }*/
 
 //    @org.junit.Test
 //    public void testFindById() throws Exception {
@@ -41,14 +41,14 @@ public class BuildServiceTest extends AbstractServiceTest {
 //        Assert.assertNotNull(responseEntity.getResults().getId());
 //    }
 
-    @org.junit.Test
+   /* @org.junit.Test
     public void testFindAllManaged() throws Exception {
         ResponseEntity<List<Build>> responseEntity = buildService.findAllManaged();
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Build bl : responseEntity.getResults()) {
             logger.info("Managed Build type [{}] name [{}] author [{}]", bl.getBuildType(), bl.getDescription(), bl.getCreatedBy());
         }
-    }
+    }*/
 
 //    @org.junit.Test
 //    public void testFindManagedById() throws Exception {

@@ -47,7 +47,8 @@ public class BuildServiceImpl extends GenericServiceImpl<Build, ResponseEntity<L
     public ResponseEntity<BuildTask> buildNow(String buildId) {
         ResponseEntity<Build> buildResponseEntity = findById(buildId);
         Build build = buildResponseEntity.getResults();
-        return buildNow(build);
+        ResponseEntity<BuildTask> buildTaskResponse = (ResponseEntity<BuildTask>) super.post(build, "/buildnow/" + build.getId(), buildTaskTypeReference);
+        return buildTaskResponse;
     }
 
     @Override
