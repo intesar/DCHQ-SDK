@@ -31,6 +31,8 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 import static junit.framework.TestCase.assertNotNull;
@@ -127,21 +129,20 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
     public static Iterable<Object[]> generateParameters() {
 
         List<Object[]> governamce = new ArrayList<Object[]>();
-        governamce.add(new Object[]{"*", "*", "*", "shell,perl,python,ruby"});
+        governamce.add(new Object[]{"*", "*", "shell,perl,python,ruby"});
 
 
         List<Object[]> result = new ArrayList<Object[]>();
-        result.add(new Object[]{"Hero", "h1", "h2"});
-        result.add(new Object[]{"Dummy_test_Plugin", "", "121"});
+        result.add(new Object[]{"Dummy_test_Plugin", ""});
         result.add(new Object[]{"pulgin Sript"});
-        result.add(new Object[]{"shell", "perl", "python", "ruby", "", "Rails"});
+        result.add(new Object[]{"shell", "perl", "python", "ruby", ""});
 
         result = testCaseGovernance(governamce, result);
         return result;
     }
 
     public PluginCreateServiceTest(String pluginName, String pluginScript, String scriptType,
-                                   String validityMessage, boolean errors) {
+                                    boolean errors) {
         this.plugin = new Plugin();
         this.plugin.setName(pluginName);
         //    this.plugin.setVersion(version);
@@ -150,7 +151,7 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
         //    this.plugin.setLicense(license);
 
         this.success = errors;
-        this.validityMessage = validityMessage;
+       // this.validityMessage = validityMessage;
 
     }
 
@@ -177,32 +178,59 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
         }
         System.out.println("Total Number of for Test Cases : "+result.size());
         System.out.println("Generating Governance for Test Cases");
+        List<Object[]> expectedResult = new ArrayList<Object[]>();
         for(int i=0;i<governamce.size();i++)
         {
             Object[] govCase =governamce.get(i);
             for(int j=0;j<result.size();j++)
             {
                 Object[] singleCase =result.get(i);
-                singleCase=getExpectedResult(govCase,singleCase);
+            //    singleCase=getExpectedResult(govCase,singleCase);
+                expectedResult.add(getExpectedResult(govCase,singleCase));
+              //  result.set(j,singleCase);
 
             }
 
 
         }
-        return result;
+        return expectedResult;
     }
 
-    public static  Object[] getExpectedResult(Object[] govCase,Object[] singlecase)
+    public static  Object[] getExpectedResult(Object[] govCase,Object[] singleCase)
     {
-        Object[] expectTestResult= new Object[singlecase.length+1];
+        Object[] expectTestResult= new Object[singleCase.length+1];
+        boolean expectResult=false;
+        ruleLoop: for(int i=0;i<govCase.length;i++)
+        {
+            expectTestResult[i]=singleCase[i];
 
-        return null;
+            if(govCase.getClass()==singleCase.getClass()){
+                String govString =govCase[i].toString();
+                String caseString =singleCase[i].toString();
+
+                // Generating regular Expression fo input govering case
+                if(govString.equals("*")) govString=".+";
+                else if (govString.equals("")) govString=".*";
+                else if (govString.equals(caseString)) govString=caseString;
+                else if (govString.contains(caseString) ) govString=caseString;
+
+                Pattern p = Pattern.compile(govString);
+                Matcher m = p.matcher(caseString);
+                //   System.out.println(m.find());
+                if (!m.matches()) {
+                    expectResult = true;
+                    break ruleLoop;
+                }
+            }
+
+        }
+
+        expectTestResult[singleCase.length]=expectResult;
+
+
+        return expectTestResult;
     }
-    @org.junit.Test
-    public void testDummyCreate() throws Exception {
 
-
-    }
 
     public static Obj getItem(List<Object[]> sampleCase, Obj sc, int pos) {
 
@@ -275,7 +303,7 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
         return factorial;
     }
 
-    //  @org.junit.Test
+    @org.junit.Test
     public void testCreate() throws Exception {
 
         logger.info("Create Group with Group Name [{}]", this.plugin.getName());
