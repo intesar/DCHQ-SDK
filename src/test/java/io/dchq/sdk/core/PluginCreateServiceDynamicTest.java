@@ -16,6 +16,8 @@
 package io.dchq.sdk.core;
 
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.base.Gist;
+import com.dchq.schema.beans.one.container.Env;
 import com.dchq.schema.beans.one.plugin.Plugin;
 
 import com.dchq.schema.beans.one.security.EntitlementType;
@@ -26,11 +28,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +46,7 @@ import static junit.framework.TestCase.assertNotNull;
  * @author Abedeen.
  * @since 1.0
  */
-class Obj {
+class TestCaseCobinations {
 
     int[] testMaxCount;
     int totalTestCase;
@@ -71,7 +70,7 @@ class Obj {
     }
 
 
-    public Obj(int[] testMaxCount, int totalTestCase, int caseItems) {
+    public TestCaseCobinations(int[] testMaxCount, int totalTestCase, int caseItems) {
         this.testMaxCount = testMaxCount;
         this.totalTestCase = totalTestCase;
         this.caseItems = caseItems;
@@ -99,7 +98,7 @@ public class PluginCreateServiceDynamicTest extends AbstractServiceTest {
         System.out.println( "Combination of Test Cases :" + testCaseCount);
         System.out.println( "Generating Combination of test cases....");
         int[] counter = new int[testMaxCount.length];
-        Obj calculation = new Obj(testMaxCount, testCaseCount, testCase);
+        TestCaseCobinations calculation = new TestCaseCobinations(testMaxCount, testCaseCount, testCase);
         List<Object[]> result = new ArrayList<Object[]>();
         for (int i = 0; i < testCaseCount; i++) {
             Object[] temptestCase = new Object[testMaxCount.length];
@@ -150,7 +149,7 @@ public class PluginCreateServiceDynamicTest extends AbstractServiceTest {
         return sc;
     }
 
-    public static Obj getObjectItem(List<Object[]> sampleCase, Obj sc, int pos) {
+    public static TestCaseCobinations getObjectItem(List<Object[]> sampleCase, TestCaseCobinations sc, int pos) {
 
         Object[] test = sampleCase.get(pos);
 
@@ -244,7 +243,21 @@ public class PluginCreateServiceDynamicTest extends AbstractServiceTest {
         return expectTestResult;
     }
     private PluginService appService;
+public static Set<Env> getEnviroment(String name,boolean isHidden,String property,String val){
+     Set<Env> envs = new HashSet<>();
+    envs.add(new Env().withEval(name).withHidden(isHidden).withProp(property).withVal(val));
+    return envs;
+}
 
+    public static Gist getGist(String name, boolean visible, String property, String val){
+
+        Gist g =new Gist();
+        g.setId(name);
+        g.setPublicVisible(visible);
+        g.setChecksum(property);
+        g.setUrl(val);
+        return g;
+    }
     @org.junit.Before
     public void setUp() throws Exception {
         appService = ServiceFactory.buildPluginService(rootUrl, username, password);
@@ -259,7 +272,7 @@ public class PluginCreateServiceDynamicTest extends AbstractServiceTest {
     public static Iterable<Object[]> generateParameters() {
 
         List<Object[]> governamce = new ArrayList<Object[]>();
-        governamce.add(new Object[]{"*", "*","SHELL,PERL,PYTHON,RUBY","Apache License 2.0, EULA","","",""});
+        governamce.add(new Object[]{"*", "*","SHELL,PERL,PYTHON,RUBY","Apache License 2.0, EULA","","","","","",""});
       //  governamce.add(new Object[]{"*", "*","Apache License 2.0, EULA","SHELL,PERL,PYTHON,RUBY","","*"});
 
 
@@ -271,13 +284,21 @@ public class PluginCreateServiceDynamicTest extends AbstractServiceTest {
         result.add(new Object[]{"This is Sample Descrition", ""});
         result.add(new Object[]{EntitlementType.CUSTOM,EntitlementType.OWNER,null});
         result.add(new Object[]{true,false});
+        result.add(new Object[]{null,getEnviroment("Eval1",true,"Property1","val2"),getEnviroment("",true,"Property1","val2"),getEnviroment("Eval1",false,"Property1","val2"),
+                getEnviroment("Eval1",true,"","val2"),getEnviroment("Eval1",true,"Property1","")});
+        result.add(new Object[]{true,false});
+        result.add(new Object[]{null,getGist("Eval1",true,"Property1","val2"),getGist("",true,"Property1","val2"),getGist("Eval1",false,"Property1","val2"),
+                getGist("Eval1",true,"","val2"),getGist("Eval1",true,"Property1","")});
+
+
+
 
         result = testCaseGovernance(governamce, result);
         return result;
     }
 
     public PluginCreateServiceDynamicTest(String pluginName, String pluginScript, String scriptType,
-                                          String license,String description , EntitlementType entitlementType,boolean inactiveFlag,boolean errors) {
+                                          String license,String description , EntitlementType entitlementType,boolean inactiveFlag,Set<Env> env,boolean deleted,Gist gist,boolean errors) {
         this.plugin = new Plugin();
         this.plugin.setName(pluginName);
         //    this.plugin.setVersion(version);
@@ -287,6 +308,9 @@ public class PluginCreateServiceDynamicTest extends AbstractServiceTest {
         this.plugin.setDescription(description);
         this.plugin.setEntitlementType(entitlementType);
         this.plugin.setInactive(inactiveFlag);
+        this.plugin.setEnvs(env);
+        this.plugin.setDeleted(deleted);
+        this.plugin.setGist(gist);
 
         this.success = errors;
 
@@ -330,7 +354,8 @@ public class PluginCreateServiceDynamicTest extends AbstractServiceTest {
             Assert.assertEquals(plugin.getScriptLang(), pluginCreated.getScriptLang());
             Assert.assertEquals(plugin.getLicense(), pluginCreated.getLicense());
             Assert.assertEquals(plugin.getDescription(), pluginCreated.getDescription());
-            Assert.assertEquals(plugin.isInactive(), pluginCreated.isInactive());
+//            Assert.assertEquals(plugin.isInactive(), pluginCreated.isInactive());
+            Assert.assertEquals(plugin.getEnvs(), pluginCreated.getEnvs());
 //            Assert.assertNotSame(plugin.getEntitlementType(), pluginCreated.getEntitlementType());
 
         }
