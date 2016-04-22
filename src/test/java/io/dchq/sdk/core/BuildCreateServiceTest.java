@@ -61,7 +61,7 @@ public class BuildCreateServiceTest extends AbstractServiceTest {
     private DockerServerCreateServiceTest dockerServerCreateService;
 
     public DataCenter getDataCenter() throws Exception {
-        dockerServerCreateService = new DockerServerCreateServiceTest("TEST_BUILD_RACKSPACE_SERVER ", Boolean.FALSE, "HKG", "general1-1", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 360000,"Build_Cluster_("+getDateSuffix(null)+")", false);
+        dockerServerCreateService = new DockerServerCreateServiceTest("TEST_BUILD_RACK ("+getDateSuffix(null)+")", Boolean.FALSE, "HKG", "general1-1", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 360000,"Build_Cluster("+getDateSuffix(null)+")", false);
         dockerServerCreateService.setUp();
 
 return dockerServerCreateService.getDataCenter();
@@ -95,6 +95,7 @@ return dockerServerCreateService.getDataCenter();
         this.build = new Build()
                 .withBuildType(buildType);
         this.build.setCluster(createDataCenter.getId());
+
         //this.build.setCluster("ff8081815434dd7e015434e0a2240007");
 
         build.setTag(tag);
