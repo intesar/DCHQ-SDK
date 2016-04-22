@@ -15,7 +15,9 @@
  */
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.container.Env;
 import com.dchq.schema.beans.one.plugin.Plugin;
 
 import com.dchq.schema.beans.one.security.EntitlementType;
@@ -25,21 +27,21 @@ import org.junit.FixMethodOrder;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
+import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
- * Created by Abedeen on 04/05/16.
- */
-
-/**
- * Abstracts class for holding test credentials.
+ * PluginService create tests
  *
- * @author Abedeen.
+ * @author Abedeen
+ * @author Intesar Mohammed
  * @since 1.0
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -54,27 +56,70 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
     }
 
     private Plugin plugin;
-    private boolean success;
+    private boolean errors;
     private Plugin pluginCreated;
     private String validityMessage;
 
+    /**
+     * Name: Not-Empty, Max_Length:Short-Text, Unique with Version
+     * Version: default:1.0,
+     * Description: Optional, Max_length:Large-Text
+     * Script: Not-Empty, Large-Text
+     * Script-Lang: default:SHELL, POWERSHELL, PERL, RUBY, PYTHON
+     * License: default:EUlA, Apache License 2.0
+     * Timeout: default:30, > 0, Max < ?
+     * Entitlement-Type: OWNER, CUSTOM: USERS, GROUPS
+     * Entitled-Users:
+     * Valid user_id
+     * Entitled-Groups
+     * Valid group_id
+     * Arguments: Optional
+     * ScriptArgs: Optional
+     * ENV: Optional
+     * prop:  Not-Empty
+     * val: Not-Empty
+     * eVal: value should be ignored
+     * hidden: default: false, true
+     * InActive: Empty: false, true
+     * <p/>
+     * <p/>
+     * Test-Cases
+     * 1. Valid - name, version, script,
+     */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestPlugin11", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, true, userId2, "General Input", false},
+                // Positive Test-Cases
+                {"TestPlugin11", "1.1", null, "Dummy Script", "PERL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                // Negative Test-Cases
         });
     }
 
-    public PluginCreateServiceTest(String pluginName, String version, String pluginScript, String scriptType, String license,
-                                   EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId, String validityMessage, boolean errors) {
+    public PluginCreateServiceTest(String pluginName, String version, String description, String pluginScript, String scriptType, String license,
+                                   Integer timeout, EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId,
+                                   String scriptArgs, Set<Env> envs, Boolean inactive,
+                                   String validityMessage, boolean errors) {
         this.plugin = new Plugin();
         this.plugin.setName(pluginName);
         this.plugin.setVersion(version);
+        this.plugin.setDescription(description);
+
         this.plugin.setBaseScript(pluginScript);
         this.plugin.setScriptLang(scriptType);
+
         this.plugin.setLicense(license);
+        this.plugin.setTimeout(timeout);
+
+        this.plugin.setEnvs(envs);
+        this.plugin.setScriptArgs(scriptArgs);
+
         this.plugin.setEntitlementType(entitlementType);
-        this.success = errors;
+
+        this.plugin.setInactive(inactive);
+
+
+        this.errors = errors;
         this.validityMessage = validityMessage;
 
     }
@@ -82,30 +127,63 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
     @org.junit.Test
     public void testCreate() throws Exception {
 
-        logger.info("Create Group with Group Name [{}]", this.plugin.getName());
+        logger.info("Creating Plugin with name [{}]", this.plugin.getName());
         ResponseEntity<Plugin> response = appService.create(plugin);
 
-        if (response.isErrors())
-            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
+        if (response.isErrors()) {
+            for (Message m : response.getMessages())
+                logger.warn("[{}]", m.getMessageText());
+        }
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
 
-        Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+        assertThat(errors, is(equals(response.isErrors())));
 
-        if (!response.isErrors() && response.getResults() != null) {
+        if (!response.isErrors()) {
             pluginCreated = response.getResults();
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
-            // Comparing objects agains created Objects.
-            Assert.assertNotNull(plugin.getName(), pluginCreated.getName());
-            Assert.assertNotNull(plugin.getName(),pluginCreated.getName());
-            Assert.assertNotNull(plugin.getVersion(),pluginCreated.getVersion());
-            Assert.assertNotNull(plugin.getBaseScript(),pluginCreated.getBaseScript());
-            Assert.assertNotNull(plugin.getScriptLang(),pluginCreated.getScriptLang());
-            Assert.assertNotNull(plugin.getLicense(),pluginCreated.getLicense());
-            Assert.assertNotNull(plugin.getEntitlementType().toString(),pluginCreated.getEntitlementType().toString());
+            // Comparing objects against created Objects.
+            assertEquals(plugin.getName(), pluginCreated.getName());
+
+            // handle empty
+            if (StringUtils.isEmpty(plugin.getVersion())) {
+                assertEquals("1.0", pluginCreated.getVersion());
+            } else {
+                assertEquals(plugin.getVersion(), pluginCreated.getVersion());
+            }
+
+            assertEquals(plugin.getDescription(), pluginCreated.getDescription());
+
+            // handle empty
+            if (StringUtils.isEmpty(plugin.getLicense())) {
+                assertEquals("EULA", pluginCreated.getLicense());
+            } else {
+                assertEquals(plugin.getLicense(), pluginCreated.getLicense());
+            }
+
+            // handle empty
+            if (StringUtils.isEmpty(plugin.getTimeout())) {
+                assertEquals("30", pluginCreated.getTimeout());
+            } else {
+                assertEquals(plugin.getTimeout(), pluginCreated.getTimeout());
+            }
+
+            assertEquals(plugin.getBaseScript(), pluginCreated.getBaseScript());
+            // handle empty
+            if (StringUtils.isEmpty(plugin.getScriptLang())) {
+                assertEquals("SHELL", pluginCreated.getScriptLang());
+            } else {
+                assertEquals(plugin.getScriptLang(), pluginCreated.getScriptLang());
+            }
+            assertEquals(plugin.getEnvs(), pluginCreated.getEnvs());
+            assertEquals(plugin.getScriptArgs(), pluginCreated.getScriptArgs());
+            // TODO handle empty
+            //assertEquals(plugin.getInactive(), pluginCreated.getInactive());
+
+            assertEquals(plugin.getEntitlementType(), pluginCreated.getEntitlementType());
 
         }
 

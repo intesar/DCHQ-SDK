@@ -37,37 +37,41 @@ public class DockerServerTest extends AbstractServiceTest {
         return responseEntity.getResults();
 
     }
-    public DockerServer validateProvision(DockerServer inputDocker, String action){
-        int warningCount=0;
-        waitTime=0;
-        DockerServer outDockerserver=null;
-        DockerServer tempDockerserver=null;
-        String serverStatus=inputDocker.getDockerServerStatus()==null?:inputDocker.getDockerServerStatus().name();
+
+    public DockerServer validateProvision(DockerServer inputDocker, String action) {
+        int warningCount = 0;
+        waitTime = 0;
+        DockerServer outDockerserver = null;
+        DockerServer tempDockerserver = null;
+        String serverStatus = inputDocker.getDockerServerStatus() == null ? "" :inputDocker.getDockerServerStatus().name();
         provision:
         do {
 
-            if(wait(10000)==0) break provision;
-            ResponseEntity<DockerServer>  response = dockerServerService.findById(inputDocker.getId());
+            if (wait(10000) == 0) break provision;
+            ResponseEntity<DockerServer> response = dockerServerService.findById(inputDocker.getId());
 
             assertNotNull(response);
             assertNotNull(response.isErrors());
             assertEquals(response.getMessages().toString(), ((Boolean) createError).toString(), ((Boolean) response.isErrors()).toString());
 
-            if(response.getResults()!=null) {
-                tempDockerserver=response.getResults();
+            if (response.getResults() != null) {
+                tempDockerserver = response.getResults();
                 serverStatus = tempDockerserver.getDockerServerStatus().name();
                 logger.info("Current Serverstatus   [{}] ", serverStatus);
-                if (serverStatus.equals("CONNECTED") ||serverStatus.equals("DESTROYED")) break provision;
+                if (serverStatus.equals("CONNECTED") || serverStatus.equals("DESTROYED")) break provision;
 
             }
-            if (serverStatus == "WARNINGS" ){ warningCount++; serverStatus = action;}
-            else if (warningCount>0 ||warningCount < 5 ){
+            if (serverStatus == "WARNINGS") {
+                warningCount++;
+                serverStatus = action;
+            } else if (warningCount > 0 || warningCount < 5) {
                 warningCount++;
             }
 
 
         } while (serverStatus == action);
-        if( tempDockerserver.getDockerServerStatus().name().equals("CONNECTED") ||  tempDockerserver.getDockerServerStatus().name().equals("DESTROYED"))outDockerserver=tempDockerserver;
+        if (tempDockerserver.getDockerServerStatus().name().equals("CONNECTED") || tempDockerserver.getDockerServerStatus().name().equals("DESTROYED"))
+            outDockerserver = tempDockerserver;
         return outDockerserver;
 
     }
