@@ -110,7 +110,7 @@ public class CloudProviderUpdateServiceTest extends AbstractServiceTest {
 
 
             assertEquals("UserName is invalid, when compared with input UserName @ Creation Time ", registryAccount.getUsername(), registryAccountCreated.getUsername());
-            assertEquals(registryAccount.isInactive(), registryAccountCreated.isInactive());
+            assertEquals(registryAccount.getInactive(), registryAccountCreated.getInactive());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
             // Password should always be empty

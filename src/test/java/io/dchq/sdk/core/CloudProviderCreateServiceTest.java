@@ -108,7 +108,7 @@ public class CloudProviderCreateServiceTest extends AbstractServiceTest {
 
 
             assertEquals(registryAccount.getUsername(), registryAccountCreated.getUsername());
-            assertEquals(registryAccount.isInactive(), registryAccountCreated.isInactive());
+            assertEquals(registryAccount.getInactive(), registryAccountCreated.getInactive());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
 

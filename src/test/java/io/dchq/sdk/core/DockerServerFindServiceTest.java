@@ -79,6 +79,7 @@ public class DockerServerFindServiceTest extends DockerServerTest {
     }
 
     DockerServer dockerServerFindById;
+
     @org.junit.Test
     public void testFind() throws Exception {
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
@@ -115,9 +116,9 @@ public class DockerServerFindServiceTest extends DockerServerTest {
                 dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
                 if (dockerServerCreated != null) {
 
-                    Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
+                    Assert.assertEquals(dockerServer.getInactive(), dockerServerCreated.getInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
-               //     Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
+                    //     Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
                     Assert.assertEquals(dockerServer.getEndpointType(), dockerServerCreated.getEndpointType());
 
@@ -139,10 +140,10 @@ public class DockerServerFindServiceTest extends DockerServerTest {
 
                         assertNotNull(response.getResults());
                         assertNotNull(response.getResults().getId());
-                        dockerServerFindById=response.getResults();
+                        dockerServerFindById = response.getResults();
                         logger.info("Find Machine with ID [{}] complete", dockerServerFindById.getId());
                         Assert.assertEquals(dockerServerCreated.getName(), dockerServerFindById.getName());
-                        Assert.assertEquals(dockerServerCreated.isInactive(), dockerServerFindById.isInactive());
+                        Assert.assertEquals(dockerServerCreated.getInactive(), dockerServerFindById.getInactive());
                         Assert.assertEquals(dockerServerCreated.getRegion(), dockerServerFindById.getRegion());
                         Assert.assertEquals(dockerServerCreated.getSize(), dockerServerFindById.getSize());
                         Assert.assertEquals(dockerServerCreated.getEndpoint(), dockerServerFindById.getEndpoint());

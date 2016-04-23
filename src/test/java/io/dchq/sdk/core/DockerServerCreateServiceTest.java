@@ -54,20 +54,20 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
 
     @org.junit.Before
-    public void setUp(){
+    public void setUp() {
         dockerServerService = ServiceFactory.buildDockerServerService(rootUrl, username, password);
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000,"Cluster_Create_Server_Test", false},
+                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000, "Cluster_Create_Server_Test", false},
 
         });
     }
 
 
-    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout,String clusterName, boolean success) {
+    public DockerServerCreateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, String clusterName, boolean success) {
         datacenterCreated = getDataCenter(clusterName, Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS);
         Assert.assertNotNull(datacenterCreated);
         this.dockerServer = new DockerServer().withDatacenter(datacenterCreated).withName(serverName)
@@ -113,10 +113,10 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
                 }
                 Assert.assertNotNull("Machine Provision not started...", dockerServerProvisioning);
                 dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
-                Assert.assertNotNull("Machine is not in Running State.",dockerServerCreated);
+                Assert.assertNotNull("Machine is not in Running State.", dockerServerCreated);
                 if (dockerServerCreated != null) {
 
-                    Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
+                    Assert.assertEquals(dockerServer.getInactive(), dockerServerCreated.getInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
 //                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
@@ -132,15 +132,16 @@ public class DockerServerCreateServiceTest extends DockerServerTest {
 
 
     }
-    public DataCenter getDataCenter(){
+
+    public DataCenter getDataCenter() {
         setUp();
-        DataCenter tempDataCenter=null;
-        DockerServer tempDockerServer=createMachine();
-        if(tempDockerServer!=null) tempDataCenter=tempDockerServer.getDataCenter();
-return tempDataCenter;
+        DataCenter tempDataCenter = null;
+        DockerServer tempDockerServer = createMachine();
+        if (tempDockerServer != null) tempDataCenter = tempDockerServer.getDataCenter();
+        return tempDataCenter;
     }
 
-    public DockerServer createMachine()  {
+    public DockerServer createMachine() {
 
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
         ResponseEntity<DockerServer> response = dockerServerService.create(dockerServer);
@@ -169,19 +170,19 @@ return tempDataCenter;
                 dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
 
 
-
             }
 
 
         }
-        if(dockerServerCreated==null)
+        if (dockerServerCreated == null)
             cleanUp();
 
-return dockerServerCreated;
+        return dockerServerCreated;
 
     }
+
     @After
-    public void cleanUp()  {
+    public void cleanUp() {
         logger.info("cleaning up...");
 
 

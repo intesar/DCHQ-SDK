@@ -62,14 +62,14 @@ public class DockerServerUpdateServiceTest extends DockerServerTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000, true,false},
+                {"Test_RACKSPACE_SERVER2 ", Boolean.FALSE, "HKG", "general1-4", "HKG/d6a7813f-235e-4c05-a108-d0f9e316ba50", 1, "ff8081815428f7f80154290f1e64000b", "RACKSPACE", 300000, true, false},
 
         });
     }
 
 
-    public DockerServerUpdateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout,boolean dockerNameUpdated, boolean success) {
-        this.inActiveUpdated=dockerNameUpdated;
+    public DockerServerUpdateServiceTest(String serverName, Boolean activeFlag, String region, String hardwareID, String image, int size, String endpoint, String endpointTpe, int tinout, boolean dockerNameUpdated, boolean success) {
+        this.inActiveUpdated = dockerNameUpdated;
         datacenterCreated = getDataCenter("Test_Cluster_" + (new Date().toString()), Boolean.FALSE, EntitlementType.ALL_BLUEPRINTS);
         Assert.assertNotNull(datacenterCreated);
 
@@ -117,15 +117,15 @@ public class DockerServerUpdateServiceTest extends DockerServerTest {
                 dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
                 if (dockerServerCreated != null) {
 
-                    Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
+                    Assert.assertEquals(dockerServer.getInactive(), dockerServerCreated.getInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
                     Assert.assertEquals(dockerServer.getEndpointType(), dockerServerCreated.getEndpointType());
 
                     dockerServerCreated.setInactive(inActiveUpdated);
-                    logger.info("Update Machine with ActiveFlag [{}]", dockerServerCreated.isInactive());
+                    logger.info("Update Machine with ActiveFlag [{}]", dockerServerCreated.getInactive());
                     response = dockerServerService.update(dockerServerCreated);
-                     errorMessage = "";
+                    errorMessage = "";
                     for (Message message : response.getMessages()) {
                         logger.warn("Error while Update request  [{}] ", message.getMessageText());
                         errorMessage += ("Error while Update request  [{}] " + message.getMessageText());
@@ -137,15 +137,14 @@ public class DockerServerUpdateServiceTest extends DockerServerTest {
                     if (response.getResults() != null) {
 
 
-                        dockerServerUpdated=response.getResults();
+                        dockerServerUpdated = response.getResults();
                         assertNotNull(response.getResults());
                         assertNotNull(response.getResults().getId());
 
-                        Assert.assertEquals(dockerServerCreated.isInactive(), dockerServerUpdated.isInactive());
+                        Assert.assertEquals(dockerServerCreated.getInactive(), dockerServerUpdated.getInactive());
 
 
                     }
-
 
 
                 }

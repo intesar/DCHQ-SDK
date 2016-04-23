@@ -66,6 +66,7 @@ public class DockerServerFindAllServiceTest extends DockerServerTest {
 
         });
     }
+
     public int testDockerServerPosition(String id) {
 
         ResponseEntity<List<DockerServer>> response = dockerServerService.findAll();
@@ -78,18 +79,18 @@ public class DockerServerFindAllServiceTest extends DockerServerTest {
         assertNotNull(response);
         assertNotNull(response.isErrors());
         assertThat(false, is(equals(response.isErrors())));
-        int position=0;
-        if(id!=null) {
+        int position = 0;
+        if (id != null) {
             for (DockerServer obj : response.getResults()) {
                 position++;
-                if(obj.getId().equals(id) ){
+                if (obj.getId().equals(id)) {
                     logger.info("  Object Matched in FindAll {}  at Position : {}", id, position);
-                    assertEquals("Recently Created Object is not at Positon 1 :"+obj.getId(),1, position);
+                    assertEquals("Recently Created Object is not at Positon 1 :" + obj.getId(), 1, position);
                 }
             }
         }
 
-        logger.info(" Total Number of Objects :{}",response.getResults().size());
+        logger.info(" Total Number of Objects :{}", response.getResults().size());
 
         return response.getResults().size();
     }
@@ -106,6 +107,7 @@ public class DockerServerFindAllServiceTest extends DockerServerTest {
     }
 
     DockerServer dockerServerFindById;
+
     @org.junit.Test
     public void testFindAll() throws Exception {
         logger.info("Create Machine with Name [{}]", dockerServer.getName());
@@ -142,15 +144,13 @@ public class DockerServerFindAllServiceTest extends DockerServerTest {
                 dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
                 if (dockerServerCreated != null) {
 
-                    Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
+                    Assert.assertEquals(dockerServer.getInactive(), dockerServerCreated.getInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
                     //     Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
                     Assert.assertEquals(dockerServer.getEndpointType(), dockerServerCreated.getEndpointType());
                     logger.info("Executing FindAll for Position of Server  [{}]", dockerServerCreated.getName());
-                    Assert.assertEquals("Created Object was expected to be at Position 1,",1,testDockerServerPosition(dockerServerCreated.getId()));
-
-
+                    Assert.assertEquals("Created Object was expected to be at Position 1,", 1, testDockerServerPosition(dockerServerCreated.getId()));
 
 
                 }

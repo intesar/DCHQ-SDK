@@ -91,7 +91,7 @@ public class CloudProviderSearchServiceTest extends AbstractServiceTest {
         for (Message message : response.getMessages())
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
 
-        if ( !response.isErrors() && response.getResults()!=null)
+        if (!response.isErrors() && response.getResults() != null)
             this.registryAccountCreated = response.getResults();
 
 
@@ -107,7 +107,7 @@ public class CloudProviderSearchServiceTest extends AbstractServiceTest {
 
 
             assertEquals(registryAccount.getUsername(), registryAccountCreated.getUsername());
-            assertEquals(registryAccount.isInactive(), registryAccountCreated.isInactive());
+            assertEquals(registryAccount.getInactive(), registryAccountCreated.getInactive());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
 
@@ -117,14 +117,14 @@ public class CloudProviderSearchServiceTest extends AbstractServiceTest {
 
         }
         ResponseEntity<List<RegistryAccount>> registryAccountResponseEntity = registryAccountService.search(registryAccountCreated.getName(), 0, 1);
-        String errorMessage="";
+        String errorMessage = "";
         for (Message message : registryAccountResponseEntity.getMessages()) {
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
-            errorMessage+=message.getMessageText()+"\n";
+            errorMessage += message.getMessageText() + "\n";
         }
         assertNotNull(registryAccountResponseEntity);
         assertNotNull(registryAccountResponseEntity.isErrors());
-        assertFalse(errorMessage,registryAccountResponseEntity.isErrors());
+        assertFalse(errorMessage, registryAccountResponseEntity.isErrors());
 
         assertNotNull(registryAccountResponseEntity.getResults());
         junit.framework.Assert.assertEquals(1, registryAccountResponseEntity.getResults().size());
@@ -139,9 +139,9 @@ public class CloudProviderSearchServiceTest extends AbstractServiceTest {
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (registryAccountCreated!=null) {
+        if (registryAccountCreated != null) {
             registryAccountService.delete(registryAccountCreated.getId());
-            logger.info("Deleted Object successfully by ID [{}] ",registryAccountCreated.getId());
+            logger.info("Deleted Object successfully by ID [{}] ", registryAccountCreated.getId());
         }
     }
 }

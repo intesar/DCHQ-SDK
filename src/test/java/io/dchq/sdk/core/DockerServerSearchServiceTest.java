@@ -115,7 +115,7 @@ public class DockerServerSearchServiceTest extends DockerServerTest {
                 dockerServerCreated = validateProvision(dockerServerProvisioning, "PROVISIONING");
                 if (dockerServerCreated != null) {
 
-                    Assert.assertEquals(dockerServer.isInactive(), dockerServerCreated.isInactive());
+                    Assert.assertEquals(dockerServer.getInactive(), dockerServerCreated.getInactive());
                     Assert.assertEquals(dockerServer.getRegion(), dockerServerCreated.getRegion());
 //                    Assert.assertEquals(dockerServer.getSize(), dockerServerCreated.getSize());
                     Assert.assertEquals(dockerServer.getEndpoint(), dockerServerCreated.getEndpoint());
@@ -124,7 +124,7 @@ public class DockerServerSearchServiceTest extends DockerServerTest {
                     // Testing Search Functionality
                     logger.info("Search Request for  Machine [{}]", dockerServerCreated.getName());
                     ResponseEntity<List<DockerServer>> dockerServerResponseEntity = dockerServerService.search(dockerServerCreated.getName(), 0, 1);
-                     errorMessage = "";
+                    errorMessage = "";
                     for (Message message : dockerServerResponseEntity.getMessages()) {
                         logger.warn("Error while Search request  [{}] ", message.getMessageText());
                         errorMessage += message.getMessageText() + "\n";
@@ -136,7 +136,7 @@ public class DockerServerSearchServiceTest extends DockerServerTest {
                     junit.framework.Assert.assertFalse(errorMessage, dockerServerResponseEntity.isErrors());
 
                     assertNotNull(dockerServerResponseEntity.getResults());
-                    junit.framework.Assert.assertEquals("Search Request Error, ",1, dockerServerResponseEntity.getResults().size());
+                    junit.framework.Assert.assertEquals("Search Request Error, ", 1, dockerServerResponseEntity.getResults().size());
 
                     DockerServer searchedEntity = dockerServerResponseEntity.getResults().get(0);
                     junit.framework.Assert.assertEquals(dockerServerCreated.getId(), searchedEntity.getId());

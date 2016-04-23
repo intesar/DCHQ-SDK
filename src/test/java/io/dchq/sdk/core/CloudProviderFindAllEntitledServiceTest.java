@@ -56,7 +56,7 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
 public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest {
-    private RegistryAccountService registryAccountService,registryAccountService2;
+    private RegistryAccountService registryAccountService, registryAccountService2;
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -69,7 +69,7 @@ public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest
         return Arrays.asList(new Object[][]{
                 {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.CUSTOM, true, userId2, "General Input", false},
                 {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.CUSTOM, false, USER_GROUP, "General Input", false},
-                {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f",EntitlementType.OWNER, false, null, "General Input", false},
+                {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.OWNER, false, null, "General Input", false},
                 {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.OWNER, false, "", "General Input", false}
         });
     }
@@ -79,7 +79,7 @@ public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest
     private RegistryAccount registryAccountCreated;
     private String validationMssage;
 
-    public CloudProviderFindAllEntitledServiceTest(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password,EntitlementType blueprintType, boolean isEntitlementTypeUser, String entitledUserId ,String validationMessage,boolean success) {
+    public CloudProviderFindAllEntitledServiceTest(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password, EntitlementType blueprintType, boolean isEntitlementTypeUser, String entitledUserId, String validationMessage, boolean success) {
         this.registryAccount = new RegistryAccount().withName(name).withUsername(rackspaceName).withInactive(isActive).withAccountType(rackspaceType).withPassword(Password);
         if (!StringUtils.isEmpty(entitledUserId) && isEntitlementTypeUser) {
             UsernameEntityBase entitledUser = new UsernameEntityBase().withId(entitledUserId);
@@ -106,11 +106,10 @@ public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest
         ResponseEntity<RegistryAccount> response = registryAccountService.create(registryAccount);
 
 
-        if(response.getResults()!=null)   this.registryAccountCreated = response.getResults();
+        if (response.getResults() != null) this.registryAccountCreated = response.getResults();
 
         if (response.isErrors())
             logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
-
 
 
         assertNotNull(response);
@@ -125,7 +124,7 @@ public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest
 
 
             assertEquals(registryAccount.getUsername(), registryAccountCreated.getUsername());
-            assertEquals(registryAccount.isInactive(), registryAccountCreated.isInactive());
+            assertEquals(registryAccount.getInactive(), registryAccountCreated.getInactive());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
 
@@ -142,17 +141,17 @@ public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest
             assertNotNull(entitledResponse);
             assertNotNull(entitledResponse.isErrors());
             assertThat(false, is(equals(entitledResponse.isErrors())));
-            int position=0;
-                for (RegistryAccount obj : entitledResponse.getResults()) {
-                    position++;
-                    if(obj.getId().equals(registryAccountCreated.getId()) ){
-                        logger.info("  Object Matched in FindAll {}  at Position : {}", registryAccountCreated.getId(), position);
-                        assertEquals("Recently Created Object is not at Positon 1 :"+obj.getId(),1, position);
-                    }
+            int position = 0;
+            for (RegistryAccount obj : entitledResponse.getResults()) {
+                position++;
+                if (obj.getId().equals(registryAccountCreated.getId())) {
+                    logger.info("  Object Matched in FindAll {}  at Position : {}", registryAccountCreated.getId(), position);
+                    assertEquals("Recently Created Object is not at Positon 1 :" + obj.getId(), 1, position);
                 }
+            }
 
 
-            logger.info(" Total Number of Objects :{}",entitledResponse.getResults().size());
+            logger.info(" Total Number of Objects :{}", entitledResponse.getResults().size());
 
             // valid User2 can access plugin
           /*  if (registryAccount.getEntitlementType() == EntitlementType.CUSTOM && !StringUtils.isEmpty(userId2)) {
@@ -170,7 +169,6 @@ public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest
             }*/
 
 
-
         }
     }
 
@@ -178,7 +176,7 @@ public class CloudProviderFindAllEntitledServiceTest extends AbstractServiceTest
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (registryAccountCreated!=null) {
+        if (registryAccountCreated != null) {
             registryAccountService.delete(registryAccountCreated.getId());
         }
     }

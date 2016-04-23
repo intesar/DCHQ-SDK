@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
 public class CloudProviderEntitledServiceTest extends AbstractServiceTest {
-    private RegistryAccountService registryAccountService,registryAccountService2;
+    private RegistryAccountService registryAccountService, registryAccountService2;
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -68,7 +68,7 @@ public class CloudProviderEntitledServiceTest extends AbstractServiceTest {
         return Arrays.asList(new Object[][]{
                 {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.CUSTOM, true, userId2, "General Input", false},
                 {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.CUSTOM, false, USER_GROUP, "General Input", false},
-                {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f",EntitlementType.OWNER, false, null, "General Input", false},
+                {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.OWNER, false, null, "General Input", false},
                 {"Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", EntitlementType.OWNER, false, "", "General Input", false}
         });
     }
@@ -78,7 +78,7 @@ public class CloudProviderEntitledServiceTest extends AbstractServiceTest {
     private RegistryAccount registryAccountCreated;
     private String validationMssage;
 
-    public CloudProviderEntitledServiceTest(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password,EntitlementType blueprintType, boolean isEntitlementTypeUser, String entitledUserId ,String validationMessage,boolean success) {
+    public CloudProviderEntitledServiceTest(String name, String rackspaceName, Boolean isActive, AccountType rackspaceType, String Password, EntitlementType blueprintType, boolean isEntitlementTypeUser, String entitledUserId, String validationMessage, boolean success) {
         this.registryAccount = new RegistryAccount().withName(name).withUsername(rackspaceName).withInactive(isActive).withAccountType(rackspaceType).withPassword(Password);
         if (!StringUtils.isEmpty(entitledUserId) && isEntitlementTypeUser) {
             UsernameEntityBase entitledUser = new UsernameEntityBase().withId(entitledUserId);
@@ -105,11 +105,10 @@ public class CloudProviderEntitledServiceTest extends AbstractServiceTest {
         ResponseEntity<RegistryAccount> response = registryAccountService.create(registryAccount);
 
 
-        if(response.getResults()!=null)   this.registryAccountCreated = response.getResults();
+        if (response.getResults() != null) this.registryAccountCreated = response.getResults();
 
         if (response.isErrors())
             logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
-
 
 
         assertNotNull(response);
@@ -124,7 +123,7 @@ public class CloudProviderEntitledServiceTest extends AbstractServiceTest {
 
 
             assertEquals(registryAccount.getUsername(), registryAccountCreated.getUsername());
-            assertEquals(registryAccount.isInactive(), registryAccountCreated.isInactive());
+            assertEquals(registryAccount.getInactive(), registryAccountCreated.getInactive());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
             assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
 
@@ -151,7 +150,6 @@ public class CloudProviderEntitledServiceTest extends AbstractServiceTest {
             }
 
 
-
         }
     }
 
@@ -159,7 +157,7 @@ public class CloudProviderEntitledServiceTest extends AbstractServiceTest {
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (registryAccountCreated!=null) {
+        if (registryAccountCreated != null) {
             registryAccountService.delete(registryAccountCreated.getId());
         }
     }

@@ -15,7 +15,11 @@
  */
 package io.dchq.sdk.core;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.base.NameEntityBase;
+import com.dchq.schema.beans.one.base.UsernameEntityBase;
+import com.dchq.schema.beans.one.container.Env;
 import com.dchq.schema.beans.one.plugin.Plugin;
 
 import com.dchq.schema.beans.one.security.EntitlementType;
@@ -25,90 +29,23 @@ import org.junit.FixMethodOrder;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.ArrayList;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
- * Created by Abedeen on 04/05/16.
- */
-
-/**
- * Abstracts class for holding test credentials.
+ * PluginService create tests
  *
- * @author Abedeen.
+ * @author Abedeen
+ * @author Intesar Mohammed
  * @since 1.0
  */
-class Obj {
-
-    int[] testMaxCount;
-    int totalTestCase;
-    int caseItems;
-    int[] counter;
-    int[] move;
-    String content;
-    Object contentObjecct;
-    int loopCount = 0;
-
-    public void arrangeCounter() {
-
-        for (int i = caseItems - 2; i >= 0; i--) {
-            if (loopCount > 0) {
-                if (counter[i] + 1 < testMaxCount[i]) {
-                    loopCount = 0;
-                    counter[i]++;
-                } else if (counter[i] + 1 == testMaxCount[i]) counter[i] = 0;
-            }
-        }
-    }
-
-
-    public Obj(int[] testMaxCount, int totalTestCase, int caseItems) {
-        this.testMaxCount = testMaxCount;
-        this.totalTestCase = totalTestCase;
-        this.caseItems = caseItems;
-        counter = new int[testMaxCount.length];
-        move = new int[testMaxCount.length];
-        for (int i = 0; i < move.length; i++) {
-            if (i == move.length - 1) move[i] = 1;
-            else move[i] = 0;
-        }
-    }
-
-    public int[] getTestMaxCount() {
-        return testMaxCount;
-    }
-
-    public void setTestMaxCount(int[] testMaxCount) {
-        this.testMaxCount = testMaxCount;
-    }
-
-    public int getTotalTestCase() {
-        return totalTestCase;
-    }
-
-    public void setTotalTestCase(int totalTestCase) {
-        this.totalTestCase = totalTestCase;
-    }
-
-    public int getCaseItems() {
-        return caseItems;
-    }
-
-    public void setCaseItems(int caseItems) {
-        this.caseItems = caseItems;
-    }
-
-}
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
 public class PluginCreateServiceTest extends AbstractServiceTest {
@@ -121,215 +58,180 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
     }
 
     private Plugin plugin;
-    private boolean success;
+    private boolean errors;
     private Plugin pluginCreated;
     private String validityMessage;
+    private Boolean isEntitlementTypeUser;
 
-    @Parameterized.Parameters(name = "Name: {3}")
-    public static Iterable<Object[]> generateParameters() {
+    /**
+     * Name: Not-Empty, Max_Length:Short-Text, Unique with Version per owner
+     * Version: default:1.0,
+     * Description: Optional, Max_length:Large-Text
+     * Script: Not-Empty, Large-Text
+     * Script-Lang: default:SHELL, POWERSHELL, PERL, RUBY, PYTHON
+     * License: default:EUlA, Apache License 2.0
+     * Timeout: default:30, > 0, Max < ?
+     * Entitlement-Type: default:OWNER, CUSTOM: USERS, GROUPS
+     * Entitled-Users:
+     * Valid user_id
+     * Entitled-Groups
+     * Valid group_id
+     * Arguments: Optional
+     * ScriptArgs: Optional
+     * ENV: Optional
+     * prop:  Not-Empty
+     * val: Not-Empty
+     * eVal: value should be ignored
+     * hidden: default: false, true
+     * InActive: default: false, true
+     * <p/>
+     * <p/>
+     * Test-Cases
+     * 1. Valid - name, version, script,
+     */
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][]{
+                // Positive Test-Cases
+                // Script-Lang
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "PERL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "POWERSHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "RUBY", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "PYTHON", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "", "Dummy Script", "PYTHON", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", null, "Dummy Script", "PYTHON", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "", "", "Dummy Script", "PYTHON", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", null, "", "Dummy Script", "PYTHON", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", null, "", "Dummy Script", "", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", null, "", "Dummy Script", null, "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", null, "", "Dummy Script", null, "", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", null, "", "Dummy Script", null, null, 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", null, "", "Dummy Script", null, null, 30, EntitlementType.CUSTOM, true, userId2, null, null, true, "General Input", false},
+                {"TestPlugin11", null, "", "Dummy Script", null, null, 30, EntitlementType.OWNER, true, userId2, null, null, true, "General Input", false},
+                // License
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "EULA", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                // Negative Test-Cases
+                // name
+                {"", "1.2", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                {null, "1.2", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                // script-lang
+                {"TestPlugin11", "1.2", "Description", "Dummy Script", "invalid", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                {"TestPlugin11", "1.2", "Description", "Dummy Script", "shell", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                {"TestPlugin11", "1.2", "Description", "Dummy Script", "powershell", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                {"TestPlugin11", "1.2", "Description", "Dummy Script", "perl", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                {"TestPlugin11", "1.2", "Description", "Dummy Script", "ruby", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                {"TestPlugin11", "1.2", "Description", "Dummy Script", "python", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
 
-        List<Object[]> governamce = new ArrayList<Object[]>();
-        governamce.add(new Object[]{"*", "*", "shell,perl,python,ruby"});
-
-
-        List<Object[]> result = new ArrayList<Object[]>();
-        result.add(new Object[]{"Dummy_test_Plugin", ""});
-        result.add(new Object[]{"pulgin Sript"});
-        result.add(new Object[]{"shell", "perl", "python", "ruby", ""});
-
-        result = testCaseGovernance(governamce, result);
-        return result;
+                // script
+                {"TestPlugin11", "1.2", "Description", "", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+                {"TestPlugin11", "1.2", "Description", null, "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", true},
+        });
     }
 
-    public PluginCreateServiceTest(String pluginName, String pluginScript, String scriptType,
-                                    boolean errors) {
+    public PluginCreateServiceTest(String pluginName, String version, String description, String pluginScript, String scriptType, String license,
+                                   Integer timeout, EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId,
+                                   String scriptArgs, Set<Env> envs, Boolean inactive,
+                                   String validityMessage, boolean errors) {
         this.plugin = new Plugin();
         this.plugin.setName(pluginName);
-        //    this.plugin.setVersion(version);
+        this.plugin.setVersion(version);
+        this.plugin.setDescription(description);
+
         this.plugin.setBaseScript(pluginScript);
         this.plugin.setScriptLang(scriptType);
-        //    this.plugin.setLicense(license);
 
-        this.success = errors;
-       // this.validityMessage = validityMessage;
+        this.plugin.setLicense(license);
+        this.plugin.setTimeout(timeout);
 
-    }
+        this.plugin.setEnvs(envs);
+        this.plugin.setScriptArgs(scriptArgs);
 
-    public static List<Object[]> testCaseGovernance(List<Object[]> governamce, List<Object[]> sampleCase) {
-        int[] testMaxCount = getItemcount(sampleCase);
-        int testCaseCount = getItemcountFactorial(sampleCase);
-        int testCase = testMaxCount.length;
-
-        System.out.println( "Combination of Test Cases :" + testCaseCount);
-        System.out.println( "Generating Combination of test cases....");
-        int[] counter = new int[testMaxCount.length];
-        Obj calculation = new Obj(testMaxCount, testCaseCount, testCase);
-        List<Object[]> result = new ArrayList<Object[]>();
-        for (int i = 0; i < testCaseCount; i++) {
-            Object[] temptestCase = new Object[testMaxCount.length];
-            for (int j = 0; j < testCase; j++) {
-                Object[] ob = sampleCase.get(j);
-                calculation = getObjectItem(sampleCase, calculation, j);
-                temptestCase[j] = calculation.contentObjecct;
-                if (j < testCase - 1) System.out.print(" , ");
-            }
-            result.add(temptestCase);
-
-        }
-        System.out.println("Total Number of for Test Cases : "+result.size());
-        System.out.println("Generating Governance for Test Cases");
-        List<Object[]> expectedResult = new ArrayList<Object[]>();
-        for(int i=0;i<governamce.size();i++)
-        {
-            Object[] govCase =governamce.get(i);
-            for(int j=0;j<result.size();j++)
-            {
-                Object[] singleCase =result.get(i);
-            //    singleCase=getExpectedResult(govCase,singleCase);
-                expectedResult.add(getExpectedResult(govCase,singleCase));
-              //  result.set(j,singleCase);
-
-            }
-
-
-        }
-        return expectedResult;
-    }
-
-    public static  Object[] getExpectedResult(Object[] govCase,Object[] singleCase)
-    {
-        Object[] expectTestResult= new Object[singleCase.length+1];
-        boolean expectResult=false;
-        ruleLoop: for(int i=0;i<govCase.length;i++)
-        {
-            expectTestResult[i]=singleCase[i];
-
-            if(govCase.getClass()==singleCase.getClass()){
-                String govString =govCase[i].toString();
-                String caseString =singleCase[i].toString();
-
-                // Generating regular Expression fo input govering case
-                if(govString.equals("*")) govString=".+";
-                else if (govString.equals("")) govString=".*";
-                else if (govString.equals(caseString)) govString=caseString;
-                else if (govString.contains(caseString) ) govString=caseString;
-
-                Pattern p = Pattern.compile(govString);
-                Matcher m = p.matcher(caseString);
-                //   System.out.println(m.find());
-                if (!m.matches()) {
-                    expectResult = true;
-                    break ruleLoop;
-                }
-            }
-
+        this.isEntitlementTypeUser = isEntitlementTypeUser;
+        this.plugin.setEntitlementType(entitlementType);
+        if (EntitlementType.CUSTOM == entitlementType && isEntitlementTypeUser) {
+            this.plugin.setEntitledUsers(new ArrayList<UsernameEntityBase>(Arrays.asList(new UsernameEntityBase().withId(entitledUserId))));
+        } else if (EntitlementType.CUSTOM == entitlementType && !isEntitlementTypeUser) {
+            this.plugin.setEntitledUserGroups(new ArrayList<NameEntityBase>(Arrays.asList(new NameEntityBase().withId(entitledUserId))));
         }
 
-        expectTestResult[singleCase.length]=expectResult;
+        this.plugin.setInactive(inactive);
 
 
-        return expectTestResult;
-    }
+        this.errors = errors;
+        this.validityMessage = validityMessage;
 
-
-    public static Obj getItem(List<Object[]> sampleCase, Obj sc, int pos) {
-
-        Object[] test = sampleCase.get(pos);
-
-        int nextCount = sc.counter[pos];
-        sc.content = test[nextCount].toString();
-        if (sc.counter[pos] == sc.testMaxCount[pos] - 1 && sc.move[pos] == 1) {
-            sc.counter[pos] = 0;
-            sc.loopCount++;
-            sc.arrangeCounter();
-        } else if (sc.move[pos] == 1)
-            sc.counter[pos]++;
-        return sc;
-    }
-
-    public static Obj getObjectItem(List<Object[]> sampleCase, Obj sc, int pos) {
-
-        Object[] test = sampleCase.get(pos);
-
-        int nextCount = sc.counter[pos];
-        sc.contentObjecct = test[nextCount];
-        if (sc.counter[pos] == sc.testMaxCount[pos] - 1 && sc.move[pos] == 1) {
-            sc.counter[pos] = 0;
-            sc.loopCount++;
-            sc.arrangeCounter();
-        } else if (sc.move[pos] == 1)
-            sc.counter[pos]++;
-        return sc;
-    }
-
-    public static int[] getItemcount(List<Object[]> sampleCase) {
-        Object[] ob = sampleCase.get(0);
-        String itemCount = "";
-        int count = 1;
-        for (int i = 0; i < sampleCase.size(); i++) {
-            Object[] obj = sampleCase.get(i);
-            itemCount += obj.length + ",";
-        }
-        String[] numberStrs = itemCount.split(",");
-        int[] numbers = new int[numberStrs.length];
-        for (int i = 0; i < numberStrs.length; i++)
-            numbers[i] = Integer.parseInt(numberStrs[i]);
-
-        return numbers;
-    }
-
-    public static int getItemcountFactorial(List<Object[]> sampleCase) {
-        Object[] ob = sampleCase.get(0);
-        String itemCount = "";
-        int count = 1;
-        for (int i = 0; i < sampleCase.size(); i++) {
-            Object[] obj = sampleCase.get(i);
-            itemCount += obj.length + ",";
-        }
-        String[] numberStrs = itemCount.split(",");
-        int numbers = 1;
-        for (int i = 0; i < numberStrs.length; i++)
-            numbers *= Integer.parseInt(numberStrs[i]);
-
-        return numbers;
-    }
-
-    public static int getTestCaseCount(int number) {
-        int factorial = number;
-
-        for (int i = (number - 1); i > 1; i--) {
-            factorial = factorial * i;
-        }
-        return factorial;
     }
 
     @org.junit.Test
     public void testCreate() throws Exception {
 
-        logger.info("Create Group with Group Name [{}]", this.plugin.getName());
+        logger.info("Creating Plugin with name [{}]", this.plugin.getName());
         ResponseEntity<Plugin> response = appService.create(plugin);
 
-        if (response.isErrors())
-            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
+        if (response.isErrors()) {
+            for (Message m : response.getMessages())
+                logger.warn("[{}]", m.getMessageText());
+        }
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
 
-        Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+        assertEquals(errors, response.isErrors());
 
-        if (!response.isErrors() && response.getResults() != null) {
+        if (!response.isErrors()) {
             pluginCreated = response.getResults();
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
-            // Comparing objects agains created Objects.
-            Assert.assertNotNull(plugin.getName(), pluginCreated.getName());
-            Assert.assertNotNull(plugin.getName(), pluginCreated.getName());
-            Assert.assertNotNull(plugin.getVersion(), pluginCreated.getVersion());
-            Assert.assertNotNull(plugin.getBaseScript(), pluginCreated.getBaseScript());
-            Assert.assertNotNull(plugin.getScriptLang(), pluginCreated.getScriptLang());
-            Assert.assertNotNull(plugin.getLicense(), pluginCreated.getLicense());
-            Assert.assertNotNull(plugin.getEntitlementType().toString(), pluginCreated.getEntitlementType().toString());
+            // name
+            assertEquals(plugin.getName(), pluginCreated.getName());
+
+            // version
+            if (StringUtils.isEmpty(plugin.getVersion())) {
+                assertEquals("1.0", pluginCreated.getVersion());
+            } else {
+                assertEquals(plugin.getVersion(), pluginCreated.getVersion());
+            }
+
+            assertEquals(plugin.getDescription(), pluginCreated.getDescription());
+            assertEquals(plugin.getBaseScript(), pluginCreated.getBaseScript());
+
+            // license
+            if (StringUtils.isEmpty(plugin.getLicense())) {
+                assertEquals("EULA", pluginCreated.getLicense());
+            } else {
+                assertEquals(plugin.getLicense(), pluginCreated.getLicense());
+            }
+
+            // timeout
+            if (StringUtils.isEmpty(plugin.getTimeout())) {
+                assertEquals("30", pluginCreated.getTimeout());
+            } else {
+                assertEquals(plugin.getTimeout(), pluginCreated.getTimeout());
+            }
+
+            assertEquals(plugin.getBaseScript(), pluginCreated.getBaseScript());
+            // script-lang
+            if (StringUtils.isEmpty(plugin.getScriptLang())) {
+                assertEquals("SHELL", pluginCreated.getScriptLang());
+            } else {
+                assertEquals(plugin.getScriptLang(), pluginCreated.getScriptLang());
+            }
+            assertEquals(plugin.getEnvs(), pluginCreated.getEnvs());
+            assertEquals(plugin.getScriptArgs(), pluginCreated.getScriptArgs());
+
+            assertEquals(plugin.getEntitlementType(), pluginCreated.getEntitlementType());
+
+            assertEquals(plugin.getInactive(), pluginCreated.getInactive());
+
+            assertEquals(plugin.getEntitlementType(), pluginCreated.getEntitlementType());
+            if (EntitlementType.CUSTOM == plugin.getEntitlementType() && isEntitlementTypeUser) {
+                assertEquals(plugin.getEntitledUsers(), pluginCreated.getEntitledUsers());
+            } else if (EntitlementType.CUSTOM == plugin.getEntitlementType() && !isEntitlementTypeUser) {
+                assertEquals(plugin.getEntitledUserGroups(), pluginCreated.getEntitledUserGroups());
+            }
+
 
         }
 
