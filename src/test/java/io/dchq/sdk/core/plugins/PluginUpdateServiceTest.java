@@ -17,6 +17,9 @@ package io.dchq.sdk.core.plugins;
 
 import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.base.NameEntityBase;
+import com.dchq.schema.beans.one.base.UsernameEntityBase;
+import com.dchq.schema.beans.one.container.Env;
 import com.dchq.schema.beans.one.plugin.Plugin;
 
 import com.dchq.schema.beans.one.security.EntitlementType;
@@ -29,21 +32,19 @@ import org.junit.FixMethodOrder;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
+import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
-
-/**
- * Created by Abedeen on 04/05/16.
- */
 
 /**
  * Abstracts class for holding test credentials.
  *
  * @author Abedeen.
+ * @author Intesar Mohammed
  * @since 1.0
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -57,91 +58,206 @@ public class PluginUpdateServiceTest extends AbstractServiceTest {
         appService = ServiceFactory.buildPluginService(rootUrl, username, password);
     }
 
-    private Plugin plugin;
+    private static Plugin plugin;
     private boolean createError, updateError;
-    private Plugin pluginCreated, pluginUpdated;
+    private Plugin pluginCreated;
     private String validityMessage, updatedName;
+    private Boolean isEntitlementTypeUser;
+    private boolean errors;
 
+    // base -- create - find - change -- update -- check
+
+    /**
+     * Name: Not-Empty, Max_Length:Short-Text, Unique with Version per owner
+     * Version: default:1.0,
+     * Description: Optional, Max_length:Large-Text
+     * Script: Not-Empty, Large-Text
+     * Script-Lang: default:SHELL, POWERSHELL, PERL, RUBY, PYTHON
+     * License: default:EUlA, Apache License 2.0
+     * Timeout: default:30, > 0, Max < ?
+     * Entitlement-Type: default:OWNER, CUSTOM: USERS, GROUPS
+     * Entitled-Users:
+     * Valid user_id
+     * Entitled-Groups
+     * Valid group_id
+     * Arguments: Optional
+     * ScriptArgs: Optional
+     * ENV: Optional
+     * prop:  Not-Empty
+     * val: Not-Empty
+     * eVal: value should be ignored
+     * hidden: default: false, true
+     * InActive: default: false, true
+     * <p/>
+     * <p/>
+     * Test-Cases
+     * 1. Valid - name, version, script,
+     */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestPlugin11", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, true, userId2, "General Input", "Plugin Updated", false, false},
+                // sets of two, first is the base and the second is the update version
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin12", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.4", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description1", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script1", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "PERL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "RUBY", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "PYTHON", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "POWERSHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "EULA", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 31, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.OWNER, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, null, true, "General Input", false},
+
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
+                {"TestPlugin11", "1.3", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), false, "General Input", false},
         });
     }
 
-    public PluginUpdateServiceTest(String pluginName, String version, String pluginScript, String scriptType, String license,
-                                   EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId, String validityMessage, String updatedName, boolean createError, boolean updateError) {
-        this.plugin = new Plugin();
-        this.plugin.setName(pluginName);
-        this.plugin.setVersion(version);
+    private static int count = 0;
+
+    public PluginUpdateServiceTest(String pluginName, String version, String description, String pluginScript, String scriptType, String license,
+                                   Integer timeout, EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId,
+                                   String scriptArgs, Set<Env> envs, Boolean inactive,
+                                   String validityMessage, boolean errors) {
+
+        if (count == 0) {
+            plugin = new Plugin();
+        }
+
+        plugin.setName(pluginName);
+        plugin.setVersion(version);
+        plugin.setDescription(description);
+
         this.plugin.setBaseScript(pluginScript);
         this.plugin.setScriptLang(scriptType);
+
         this.plugin.setLicense(license);
+        this.plugin.setTimeout(timeout);
+
+        this.plugin.setEnvs(envs);
+        this.plugin.setScriptArgs(scriptArgs);
+
+        this.isEntitlementTypeUser = isEntitlementTypeUser;
         this.plugin.setEntitlementType(entitlementType);
-        this.createError = createError;
-        this.updateError = updateError;
+        if (EntitlementType.CUSTOM == entitlementType && isEntitlementTypeUser) {
+            this.plugin.setEntitledUsers(new ArrayList<UsernameEntityBase>(Arrays.asList(new UsernameEntityBase().withId(entitledUserId))));
+        } else if (EntitlementType.CUSTOM == entitlementType && !isEntitlementTypeUser) {
+            this.plugin.setEntitledUserGroups(new ArrayList<NameEntityBase>(Arrays.asList(new NameEntityBase().withId(entitledUserId))));
+        }
+
+        this.plugin.setInactive(inactive);
+
+
+        this.errors = errors;
         this.validityMessage = validityMessage;
-        this.updatedName = updatedName;
 
     }
 
     @org.junit.Test
     public void testUpdate() throws Exception {
 
-        logger.info("Create Object with Name [{}]", this.plugin.getName());
-        ResponseEntity<Plugin> response = appService.create(plugin);
+        logger.info("Updating Plugin with Name [{}]", this.plugin.getName());
 
-        for (Message message : response.getMessages())
-            logger.warn("Error while Create request  [{}] ", message.getMessageText());
+        ResponseEntity<Plugin> response = null;
+        if (count++ == 0) {
+            response = this.appService.create(this.plugin);
+            this.plugin = response.getResults();
+            logger.info("Skipping test bed...");
+            return;
+        } else {
+            response = appService.update(plugin);
+            count = 0;
+        }
 
+        if (response.isErrors()) {
+            for (Message m : response.getMessages())
+                logger.warn("[{}]", m.getMessageText());
+        }
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
 
-        Assert.assertNotNull(((Boolean) createError).toString(), ((Boolean) response.isErrors()).toString());
+        assertEquals(errors, response.isErrors());
 
-        if (!response.isErrors() && response.getResults() != null) {
+        if (!response.isErrors()) {
             pluginCreated = response.getResults();
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
-            // Comparing objects agains created Objects.
-            Assert.assertNotNull(plugin.getName(), pluginCreated.getName());
-            Assert.assertNotNull(plugin.getVersion(), pluginCreated.getVersion());
-            Assert.assertNotNull(plugin.getBaseScript(), pluginCreated.getBaseScript());
-            Assert.assertNotNull(plugin.getScriptLang(), pluginCreated.getScriptLang());
-            Assert.assertNotNull(plugin.getLicense(), pluginCreated.getLicense());
-            Assert.assertNotNull(plugin.getEntitlementType().toString(), pluginCreated.getEntitlementType().toString());
+            // name
+            assertEquals(plugin.getName(), pluginCreated.getName());
+
+            // version
+            if (StringUtils.isEmpty(plugin.getVersion())) {
+                assertEquals("1.0", pluginCreated.getVersion());
+            } else {
+                assertEquals(plugin.getVersion(), pluginCreated.getVersion());
+            }
+
+            assertEquals(plugin.getDescription(), pluginCreated.getDescription());
+            assertEquals(plugin.getBaseScript(), pluginCreated.getBaseScript());
+
+            // license
+            if (StringUtils.isEmpty(plugin.getLicense())) {
+                assertEquals("EULA", pluginCreated.getLicense());
+            } else {
+                assertEquals(plugin.getLicense(), pluginCreated.getLicense());
+            }
+
+            // timeout
+            if (StringUtils.isEmpty(plugin.getTimeout())) {
+                assertEquals("30", pluginCreated.getTimeout());
+            } else {
+                assertEquals(plugin.getTimeout(), pluginCreated.getTimeout());
+            }
+
+            assertEquals(plugin.getBaseScript(), pluginCreated.getBaseScript());
+            // script-lang
+            if (StringUtils.isEmpty(plugin.getScriptLang())) {
+                assertEquals("SHELL", pluginCreated.getScriptLang());
+            } else {
+                assertEquals(plugin.getScriptLang(), pluginCreated.getScriptLang());
+            }
+            assertEquals(plugin.getEnvs(), pluginCreated.getEnvs());
+            assertEquals(plugin.getScriptArgs(), pluginCreated.getScriptArgs());
+
+            assertEquals(plugin.getEntitlementType(), pluginCreated.getEntitlementType());
+
+            assertEquals(plugin.getInactive(), pluginCreated.getInactive());
+
+            assertEquals(plugin.getEntitlementType(), pluginCreated.getEntitlementType());
+            if (EntitlementType.CUSTOM == plugin.getEntitlementType() && isEntitlementTypeUser) {
+                assertEquals(plugin.getEntitledUsers(), pluginCreated.getEntitledUsers());
+            } else if (EntitlementType.CUSTOM == plugin.getEntitlementType() && !isEntitlementTypeUser) {
+                assertEquals(plugin.getEntitledUserGroups(), pluginCreated.getEntitledUserGroups());
+            }
 
 
-        }
-        pluginCreated.setName(updatedName);
-        logger.info("Update Object with  Name [{}]", this.pluginCreated.getName());
-        response = appService.create(pluginCreated);
-
-        for (Message message : response.getMessages())
-            logger.warn("Error while Update request  [{}] ", message.getMessageText());
-
-
-        assertNotNull(response);
-        assertNotNull(response.isErrors());
-
-        Assert.assertNotNull(((Boolean) updateError).toString(), ((Boolean) response.isErrors()).toString());
-
-        if (!response.isErrors() && response.getResults() != null) {
-            pluginUpdated = response.getResults();
-            assertNotNull(response.getResults());
-            assertNotNull(response.getResults().getId());
-
-            // Comparing objects agains created Objects.
-            Assert.assertNotNull(pluginUpdated.getName(), pluginCreated.getName());
-            /*Assert.assertNotNull(pluginUpdated.getName(), pluginCreated.getName());
-            Assert.assertNotNull(pluginUpdated.getVersion(), pluginCreated.getVersion());
-            Assert.assertNotNull(pluginUpdated.getBaseScript(), pluginCreated.getBaseScript());
-            Assert.assertNotNull(pluginUpdated.getScriptLang(), pluginCreated.getScriptLang());
-            Assert.assertNotNull(pluginUpdated.getLicense(), pluginCreated.getLicense());
-            Assert.assertNotNull(pluginUpdated.getEntitlementType().toString(), pluginCreated.getEntitlementType().toString());*/
-            logger.info("Update Object Successfully  with  Name [{}]", this.pluginUpdated.getName());
         }
 
     }
