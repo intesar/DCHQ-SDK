@@ -1,5 +1,19 @@
 package io.dchq.sdk.core;
 
+import io.dchq.sdk.core.blueprints.BlueprintCreateServiceTest;
+import io.dchq.sdk.core.blueprints.BlueprintUpdateServiceTest;
+import io.dchq.sdk.core.builds.BuildCreateServiceTest;
+import io.dchq.sdk.core.clusters.DataCenterCreateServiceTest;
+import io.dchq.sdk.core.clusters.DataCenterUpdateServiceTest;
+import io.dchq.sdk.core.groups.UserGroupCreateServiceTest;
+import io.dchq.sdk.core.groups.UserGroupUpdateServiceTest;
+import io.dchq.sdk.core.plugins.PluginCreateServiceTest;
+import io.dchq.sdk.core.plugins.PluginUpdateServiceTest;
+import io.dchq.sdk.core.providers.CloudProviderCreateServiceTest;
+import io.dchq.sdk.core.providers.CloudProviderUpdateServiceTest;
+import io.dchq.sdk.core.providers.RegistryAccountServiceTest;
+import io.dchq.sdk.core.users.UsersCreateServiceTest;
+import io.dchq.sdk.core.users.UsersUpdateServiceTest;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
