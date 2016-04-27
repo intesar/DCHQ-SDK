@@ -14,7 +14,7 @@ import io.dchq.sdk.core.providers.CloudProviderUpdateServiceTest;
 import io.dchq.sdk.core.providers.RegistryAccountServiceTest;
 import io.dchq.sdk.core.users.UsersCreateServiceTest;
 import io.dchq.sdk.core.users.UsersUpdateServiceTest;
-import io.dchq.sdk.core.util.StringGenenerator;
+
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -52,7 +52,7 @@ public class TestRunner {
     public static void main(String[] arg){
         System.out.println("{\"TestGroup 1\", false},");
         // Max Short Text :255,256,Speical Characters Charcters Passed
-        System.out.println("\""+StringGenenerator.generateRandomString(25000)+"\"");
+
        //System.out.println("{"+StringGenenerator.generateRandomString(256)+", true},");
         // Special Characters
         /*     System.out.println("{"+StringGenenerator.DIACRITICS+", true},");
