@@ -19,5 +19,6 @@ public interface UserService extends GenericService<Users, ResponseEntity<List<U
      * @return User response
      */
     ResponseEntity<List<Users>> get();
+    ResponseEntity<Users> tenantSignup(Users user);
 
 }

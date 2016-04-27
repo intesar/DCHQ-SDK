@@ -42,4 +42,6 @@ public class UserServiceImpl extends GenericServiceImpl<Users, ResponseEntity<Li
     public ResponseEntity<List<Users>> get() {
         return findAll();
     }
+    @Override
+    public ResponseEntity<Users> tenantSignup(Users user){return doPost(user,"tenant-sign-up/");};
 }

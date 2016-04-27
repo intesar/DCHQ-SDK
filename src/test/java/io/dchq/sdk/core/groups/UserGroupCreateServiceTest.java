@@ -15,12 +15,14 @@
  */
 package io.dchq.sdk.core.groups;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.security.UserGroup;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.UserGroupService;
+import io.dchq.sdk.core.util.StringGenenerator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -35,10 +37,6 @@ import java.util.List;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
-/**
- * Created by Abedeen on 04/05/16.
- */
 
 /**
  * Abstracts class for holding test credentials.
@@ -58,53 +56,66 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
         userGroupService = ServiceFactory.builduserGroupService(rootUrl, username, password);
     }
 
+    /*
+    * Name: Not-Empty, Max_Length:Short-Text, Unique per System.
+    * user Ids: Empty,Valid User id
+    * */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Tahsin Group", false},
+                {"TestGroup 1", false, false},
+                // Passing " as group Name
+                {"1\"My Group\"", true, false},
+                // Group Names with  Max Short Text :255 Charcters Passed
+                {"FwqkRRVOH2tuh8iigqZWTngTgLYzpcaqVahyLQqAXvzUhPpbN4qFz2TeeZASJUtC4x1nsFzP9cOkNAcFuHEGysRR6VafWArGW1jkWiWXD6CUfpkhwPoGNhIkcWLOqRrO7aqDifoZ8EGWKNHY49vTCKZ1jOI2JbZVToQeQGAERFJSlby4o2vc131o2wTFqMnp4KIwhjVQ97PBFjOxJhfnd9a5PAxNHLYBvnzTcCK45uGBiZhu3ubWOr6yM1s28pY", false, false},
+                {"  TestGroup   1", false, false},
+                {"_TestGroup   1", false, false},
+                {"1", false, false},
+                {"–—¡¿\\\"“”'‘’\\\"« »\\\"", false, false},
+                {"&¢©÷><µ·¶±€£®§™¥°", false, false},
+                {"2.00005", false, false},
+                {" TestGroup    1", false, false},
+                // Group Name Length 256.
+                {"tQ9ukuIEBiYsSGkM1cRfES7DctIaE1W3GJ3K4WCQQxwYcNPy6NArpf2RFCEUXfmmmRkMVsvkh3TDQwWdxcyuWbbzX8xgxcfX6XwvCqVkbLE7rQ348EInhBNkIupRSvsMKaR51KFrVS7cNMi1WmJsNxWA3vEaKczJ2EHSauHx7Rs3Ln8UiEcjazU2qluzdaoQCTNBayw4VFJAAPVFHLG3wNV9OPjRUj39mNjCZBsZQJI1g2NYw6gQ1qkhqNOcWeFw", false, true},
                 // checking Empty group names
-                {"", true}
+                {"", false, true}
         });
     }
 
     private UserGroup userGroup;
-    private boolean success;
+    private boolean error;
     private UserGroup userGroupCreated;
 
-    public UserGroupCreateServiceTest(String gname, boolean success) {
-        this.userGroup = new UserGroup().withName(gname);
-        this.success = success;
-
+    public UserGroupCreateServiceTest(String gname, boolean isInActive, boolean success) {
+        this.userGroup = new UserGroup().withName(gname).withInactive(isInActive);
+        this.error = success;
     }
-
     @org.junit.Test
     public void testCreate() throws Exception {
 
         logger.info("Create Group with Group Name [{}]", userGroup.getName());
         ResponseEntity<UserGroup> response = userGroupService.create(userGroup);
-
-        if (response.isErrors())
-            logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
-
+        for (Message m : response.getMessages())
+            logger.warn("[{}]", m.getMessageText());
+        if (response.getResults() != null)
+            userGroupCreated = response.getResults();
         assertNotNull(response);
         assertNotNull(response.isErrors());
+        Assert.assertEquals(error, response.isErrors());
 
-        Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
-        if (!response.isErrors() && response.getResults() != null) {
-            userGroupCreated = response.getResults();
-            assertNotNull(response.getResults());
-            assertNotNull(response.getResults().getId());
-            Assert.assertNotNull(userGroup.getName(), userGroupCreated.getName());
-
+        if (!error) {
+            assertNotNull("Response is null ", response.getResults());
+            assertNotNull("Group Id is null", response.getResults().getId());
+            Assert.assertEquals("Group Name does not match input value", userGroup.getName(), userGroupCreated.getName());
+            Assert.assertEquals("User group Active/Inactive status does not match input Value", userGroup.getInactive(), userGroupCreated.getInactive());
+            // TODO: Duplicate Group Name Test
         }
-
     }
-
     @After
     public void cleanUp() {
         logger.info("cleaning up...");
 
-        if (userGroupCreated!=null) {
+        if (userGroupCreated != null) {
             userGroupService.delete(userGroupCreated.getId());
         }
     }

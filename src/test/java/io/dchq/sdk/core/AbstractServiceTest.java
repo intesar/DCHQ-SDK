@@ -34,18 +34,27 @@ public abstract class AbstractServiceTest {
     protected String rootUrl2 = "http://40.112.248.96:8080/api/1.0/";
     protected String rootUrl = "http://localhost:8080/api/1.0/";
     protected String username = "admin@dchq.io";
+    protected String userId="402881834d9ee4d1014d9ee5d73f0014";
     protected String password = "admin123";
 
     // Create another user for entitlement check
-    protected static String userId2 = "ff808181542bf58901542cc78cbc00b2";
-    protected String username2 = "F9MM2rzkWlmGkRyWwQsx";// accesskey
-    protected String password2 = "6O4YYEbJVMXckLd4p5yAgZZwHKPD02MkOIq9JriI";//secret key
+    protected static String userId2 = "ff8081815441aa54015441b0e112000c";
+    protected String username2 = "PM4pf6gUz6gnyIVWmBPk";// accesskey
+    protected String password2 = "pzJSWhcNvRTLTTL0FyEXgltLkHzQLA6JmzoIlO9z";//secret key
 
     // UserGroup with userId2 entitled user
     protected static String USER_GROUP ="ff808181542bf58901542cc8344a00b3";
 
     protected int waitTime = 0,maxWaitTime=0;
+public boolean isNullOrEmpty(Object inObj){
+    if(inObj==null){ return true;}
+    else if(inObj.getClass().equals(String.class)){
+       String str=inObj.toString();
+    if(str != null && !str.isEmpty()) return true; else return false;
+    }else if(inObj!=null) return false;
 
+return false;
+}
     public int wait(int milliSeconds)  {
         logger.info("Waiting for [{}]  seconds  ",milliSeconds/1000);
         if (maxWaitTime<=waitTime) {
