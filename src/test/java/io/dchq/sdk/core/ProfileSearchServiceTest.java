@@ -1,10 +1,10 @@
 package io.dchq.sdk.core;
 
-import com.dchq.schema.beans.base.ResponseEntity;
-import com.dchq.schema.beans.one.security.Profile;
-import org.junit.Assert;
+        import com.dchq.schema.beans.base.ResponseEntity;
+        import com.dchq.schema.beans.one.security.Profile;
+        import org.junit.Assert;
 
-import java.util.List;
+        import java.util.List;
 
 /**
  * Created by ${Sujitha} on ${1/5/2016}.
@@ -12,18 +12,18 @@ import java.util.List;
 
 
 
-import org.junit.After;
+        import org.junit.After;
 
-import org.junit.FixMethodOrder;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.junit.runners.Parameterized;
+        import org.junit.FixMethodOrder;
+        import org.junit.runner.RunWith;
+        import org.junit.runners.MethodSorters;
+        import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
-import java.util.Collection;
+        import java.util.Arrays;
+        import java.util.Collection;
 
 
-import static junit.framework.TestCase.assertNotNull;
+        import static junit.framework.TestCase.assertNotNull;
 
 /**
  * Created by tahsin on 12/24/15.
@@ -36,7 +36,7 @@ import static junit.framework.TestCase.assertNotNull;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
-public class ProfileCreateServiceTest extends AbstractServiceTest {
+public class ProfileSearchServiceTest extends AbstractServiceTest {
 
 
     private ProfileService profileService;
@@ -61,8 +61,24 @@ public class ProfileCreateServiceTest extends AbstractServiceTest {
     private boolean success;
     private Profile profileCreated;
 
+    public ProfileSearchServiceTest(){}
+    public Profile searchProfile(String term) throws Exception{
+        setUp();
+        ResponseEntity<List<Profile>> response = profileService.findAll();
+        for (Profile obj : response.getResults()) {
+            if (obj.getName().equals(term))
+                return obj;
 
-    public ProfileCreateServiceTest(String profilename, boolean boolProfile, int containerCapacity, int cpuCapacity, int memoryCapacity, int storageCapacity, boolean success) {
+        }
+        if(response.getResults().size()>0){
+            profileCreated=response.getResults().get(0);
+        }
+
+return profileCreated;
+    }
+
+
+    public ProfileSearchServiceTest(String profilename, boolean boolProfile, int containerCapacity, int cpuCapacity, int memoryCapacity, int storageCapacity, boolean success) {
         this.profile = new Profile().withName(profilename).withDefaultProfile(boolProfile).withContainerCap(containerCapacity).withCpuCap(cpuCapacity).withMemoryCap(memoryCapacity).withStorageCap(storageCapacity);
         this.success = success;
 

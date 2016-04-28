@@ -19,6 +19,9 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class TestRunner {
 
   /*  public static void main(String[] args) {
@@ -49,8 +52,8 @@ public class TestRunner {
 
 
     }*/
-    public static void main(String[] arg){
-        System.out.println("{\"TestGroup 1\", false},");
+ //   public static void main(String[] arg){
+   //     System.out.println("{\"TestGroup 1\", false},");
         // Max Short Text :255,256,Speical Characters Charcters Passed
 
        //System.out.println("{"+StringGenenerator.generateRandomString(256)+", true},");
@@ -61,5 +64,16 @@ public class TestRunner {
         // checking Empty group names
           System.out.println(" {\"\", true}");*/
 
+  // }
+  public static void main(String[] args) {
+
+      String email1 = "";//"user@domain.com";
+      System.out.println(email1 +":is e-mail  "+isValidRegularExpression(email1,"^[a-z0-9_-]{3,15}$" ));
+
+  }
+    public static boolean isValidRegularExpression(String email,String expression) {
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(expression);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
     }
 }

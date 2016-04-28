@@ -18,9 +18,11 @@ package io.dchq.sdk.core.users;
 
 import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.base.PkEntityBase;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
-import com.dchq.schema.beans.one.security.Users;
+import com.dchq.schema.beans.one.security.*;
 import io.dchq.sdk.core.AbstractServiceTest;
+import io.dchq.sdk.core.ProfileSearchServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.UserService;
 import org.hamcrest.core.Is;
@@ -29,10 +31,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -70,11 +69,25 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     public void setUp() throws Exception {
         service = ServiceFactory.buildUserService(rootUrl, username, password);
     }
-
+public static Profile getProfile(String name) {
+    try {
+        ProfileSearchServiceTest tempProf = new ProfileSearchServiceTest();
+        return tempProf.searchProfile(name);
+    }catch (Exception e){
+        System.out.println("ERROR :"+e.getMessage());
+    }
+return null;
+}
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false},
+             /*   {null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,true},
+                {null,null,"testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",true},
+                {null,"Last","admin",null,null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",false},*/
+                {null,"Last","testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",true},
+                {null,"Last","testuser1","ituser@dchq.io",null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",true},
+                {null,"Last","testuser1","ituser@dchq.io",null,null,null,getProfile("BASIC"),null,null,null,null,null,null,null,"Only fn,ln",false},
+               // {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false},
                 //   {"fn", "ln", "ituser2", "ituser2@dchq.io", "pass1234", false},
                 // TODO: validate password
           //      {"fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true},
@@ -83,27 +96,41 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     }
 
     private Users users;
-    private boolean success;
+    private boolean error;
     private Users userCreated;
     private String errorMessage;
 
-    public UsersCreateServiceTest(String fn, String ln, String username, String email, String pass, String errorMessage, boolean success) {
+    public UsersCreateServiceTest(String fn, String ln, String username,
+                                  String email, String company, String title, String phoneNumber, Profile profile,
+                                  String tenant, Organization organization, Set<String> userGroupId, List<String> authorities,
+                                  String pass, PkEntityBase cluster, Boolean isActive, String message, boolean success) {
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
+        this.users.setCompany(company);
+        this.users.setJobTitle(title);
+        this.users.setPhoneNumber(phoneNumber);
+        this.users.setProfile(profile);
+        this.users.setTenantPk(tenant);
         this.users.setInactive(false);
-        this.success = success;
-        this.errorMessage = errorMessage;
+        this.users.setOrganization(organization);
+        this.users.setUserGroupIds(userGroupId);
+        this.users.setAuthorities(authorities);
+        this.users.setPreferredDataCenter(cluster);
+        this.users.setInactive(isActive);
+        this.errorMessage=message;
+        this.error = success;
+
 
     }
 
     //@org.junit.Test
-    @Ignore
+  /*  @Ignore
     public void testGet() throws Exception {
         ResponseEntity<List<Users>> responseEntity = service.findAll(0, 2000);
         Assert.assertNotNull(responseEntity.getTotalElements());
         for (Users obj : responseEntity.getResults()) {
             logger.info("User email [{}] first-name [{}] last-name [{}]", obj.getEmail(), obj.getFirstname(), obj.getLastname());
         }
-    }
+    }*/
 
     @Test
     public void testCreate() {
@@ -114,31 +141,31 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
         for (Message message : response.getMessages())
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
 
-        boolean tempSuccess = success;
-        if (success && !response.isErrors()) {
-            success = false;
+
+
+        if (response.getResults()!=null) {
             this.userCreated = response.getResults();
+            logger.info("Create user Successful..");
         }
+
         // check response is not null
-        // check response has no errors
+        // check response has no errors50zc
         // check response has user entity with ID
         // check all data send
-
         assertNotNull(response);
-//        assertNotNull(response.isErrors());
-        Assert.assertThat(errorMessage, tempSuccess, is(equals(response.isErrors())));
+        assertNotNull(response.isErrors());
+        assertEquals("Expected :\n" + errorMessage, error, response.isErrors());
 
-        if (!tempSuccess) {
+        if (!error) {
 
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
-            this.userCreated = response.getResults();
-
-            assertEquals(users.getFirstname(), response.getResults().getFirstname());
-            assertEquals(users.getLastname(), response.getResults().getLastname());
-            assertEquals(users.getUsername(), response.getResults().getUsername());
-            assertEquals(users.getEmail(), response.getResults().getEmail());
+            assertEquals(users.getFirstname(), userCreated.getFirstname());
+            assertEquals(users.getLastname() , userCreated.getLastname());
+            assertEquals(users.getUsername() , userCreated.getUsername());
+            assertEquals(users.getEmail()    , userCreated.getEmail());
+            assertEquals(users.getProfile()    , userCreated.getProfile());
 
             // Password should always be empty
             assertThat("", is(response.getResults().getPassword()));
@@ -147,9 +174,9 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
 
     @After
     public void cleanUp() {
-        logger.info("cleaning up...");
 
         if (userCreated!=null) {
+            logger.info("cleaning up...");
             service.delete(userCreated.getId());
         }
     }
