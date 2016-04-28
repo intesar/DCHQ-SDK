@@ -50,7 +50,7 @@ public boolean isNullOrEmpty(Object inObj){
     if(inObj==null){ return true;}
     else if(inObj.getClass().equals(String.class)){
        String str=inObj.toString();
-    if(str != null && !str.isEmpty()) return true; else return false;
+    if(str == null || str.isEmpty()) return true; else return false;
     }else if(inObj!=null) return false;
 
 return false;

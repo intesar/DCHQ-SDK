@@ -124,7 +124,7 @@ public class BlueprintCreateServiceTest extends AbstractServiceTest {
                 {"2.00005", "LB:\n image: nginx:latest\n", BlueprintType.DOCKER_COMPOSE, null, null, "General Input", true, null, null, null,null,null,null,null,null,null,false},
                 {" Build Test    1", "LB:\n image: nginx:latest\n", BlueprintType.DOCKER_COMPOSE, null, null, "General Input", true, null, null, null,null,null,null,null,null,null,false},
                 // Group Name Length 256.
-                {"tQ9ukuIEBiYsSGkM1cRfES7DctIaE1W3GJ3K4WCQQxwYcNPy6NArpf2RFCEUXfmmmRkMVsvkh3TDQwWdxcyuWbbzX8xgxcfX6XwvCqVkbLE7rQ348EInhBNkIupRSvsMKaR51KFrVS7cNMi1WmJsNxWA3vEaKczJ2EHSauHx7Rs3Ln8UiEcjazU2qluzdaoQCTNBayw4VFJAAPVFHLG3wNV9OPjRUj39mNjCZBsZQJI1g2NYw6gQ1qkhqNOcWeFw", "LB:\n image: nginx:latest\n", BlueprintType.DOCKER_COMPOSE, null, null, "Build Name char Length:256 Characters", true, null, null, null,null,null,null,null,null,null,false},
+                {"tQ9ukuIEBiYsSGkM1cRfES7DctIaE1W3GJ3K4WCQQxwYcNPy6NArpf2RFCEUXfmmmRkMVsvkh3TDQwWdxcyuWbbzX8xgxcfX6XwvCqVkbLE7rQ348EInhBNkIupRSvsMKaR51KFrVS7cNMi1WmJsNxWA3vEaKczJ2EHSauHx7Rs3Ln8UiEcjazU2qluzdaoQCTNBayw4VFJAAPVFHLG3wNV9OPjRUj39mNjCZBsZQJI1g2NYw6gQ1qkhqNOcWeFw", "LB:\n image: nginx:latest\n", BlueprintType.DOCKER_COMPOSE, null, null, "Build Name char Length:256 Characters", true, null, null, null,null,null,null,null,null,null,true},
                 // checking Empty group names
                 {"", "LB:\n image: nginx:latest\n", BlueprintType.DOCKER_COMPOSE, null, null, "Empty BUild Name", true, null, null, null,null,null,null,null,null,null,true},
 

@@ -67,8 +67,8 @@ public class TestRunner {
   // }
   public static void main(String[] args) {
 
-      String email1 = "";//"user@domain.com";
-      System.out.println(email1 +":is e-mail  "+isValidRegularExpression(email1,"^[a-z0-9_-]{3,15}$" ));
+      String email1 = "aaaaaaa";//"user@domain.com";
+      System.out.println(email1 +":is e-mail  "+isValidRegularExpression(email1, "(.{8,255})"));
 
   }
     public static boolean isValidRegularExpression(String email,String expression) {

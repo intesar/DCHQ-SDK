@@ -81,12 +81,17 @@ return null;
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-             /*   {null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,true},
-                {null,null,"testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",true},
-                {null,"Last","admin",null,null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",false},*/
-                {null,"Last","testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",true},
-                {null,"Last","testuser1","ituser@dchq.io",null,null,null,null,null,null,null,null,null,null,null,"Only fn,ln",true},
-                {null,"Last","testuser1","ituser@dchq.io",null,null,null,getProfile("BASIC"),null,null,null,null,null,null,null,"Only fn,ln",false},
+              /*  {null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"All Null",true},
+                {null,null,"testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only Username",true},
+                {null,"Last","admin",null,null,null,null,null,null,null,null,null,null,null,null,"Only ,ln UserName",true},
+                {null,"Last","testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only ln,Username",true},
+                {null,"Last","testuser1","ituser@dchq.io",null,null,null,null,null,null,null,null,null,null,null,"Only ln,Username,emailid,",true},
+               {null,"Last","testuser1","ituser@dchq.io",null,null,null,getProfile("BASIC"),null,null,null,null,"aaaaaaaa",null,null,"All Mandatory Fields ln,Username,emailid,Profile,password",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,null,null,"aaaaaaaa",null,null,"Non Mandatory Fields ",false},
+              */  {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),"ff808181545040790154514a03b9013d",null,null,null,"aaaaaaaa",null,null,"Non Mandatory Fields ",false},
+
+
+              //  {null,"Last","testuser1","ituser@dchq.io",null,null,null,getProfile("BASIC"),"202881834d9ee4d1014d9ee5d73f0010",null,null,null,null,null,null,"Only fn,ln",false},
                // {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false},
                 //   {"fn", "ln", "ituser2", "ituser2@dchq.io", "pass1234", false},
                 // TODO: validate password
@@ -155,7 +160,15 @@ return null;
         assertNotNull(response);
         assertNotNull(response.isErrors());
         assertEquals("Expected :\n" + errorMessage, error, response.isErrors());
-
+/*
+*
+*
+    public UsersCreateServiceTest(String fn, String ln, String username,
+                                  String email, String company, String title, String phoneNumber, Profile profile,
+                                  String tenant, Organization organization, Set<String> userGroupId, List<String> authorities,
+                                  String pass, PkEntityBase cluster, Boolean isActive, String message, boolean success) {
+        this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
+* */
         if (!error) {
 
             assertNotNull(response.getResults());
@@ -165,7 +178,14 @@ return null;
             assertEquals(users.getLastname() , userCreated.getLastname());
             assertEquals(users.getUsername() , userCreated.getUsername());
             assertEquals(users.getEmail()    , userCreated.getEmail());
-            assertEquals(users.getProfile()    , userCreated.getProfile());
+            assertEquals(users.getCompany()    , userCreated.getCompany());
+            assertEquals(users.getJobTitle()    , userCreated.getJobTitle());
+            assertEquals(users.getPhoneNumber()    , userCreated.getPhoneNumber());
+
+            if(isNullOrEmpty(users.getTenantPk()))
+            assertNotNull(userCreated.getTenantPk());
+            else assertEquals(users.getTenantPk()    , userCreated.getTenantPk());
+
 
             // Password should always be empty
             assertThat("", is(response.getResults().getPassword()));
