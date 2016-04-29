@@ -74,14 +74,28 @@ public class DataCenterSearchServiceTest extends AbstractServiceTest {
         });
     }
 
+    public DataCenterSearchServiceTest() throws Exception {
+        setUp();
+        dataCenterCreated=null;
 
+    }
     public DataCenterSearchServiceTest(String clusterName,Boolean autoScaleFlag,EntitlementType blueprintType,String validationMessage,boolean success) {
         this.dataCenter = new DataCenter().withName(clusterName).withAutoScale(autoScaleFlag).withBlueprintEntitlementType(blueprintType);
         this.createError=success;
         this.validationMessage=validationMessage;
 
     }
+public DataCenter searchDataCenter(String name){
+    ResponseEntity<List<DataCenter>> dataCenterResponseEntity = dataCenterService.search(name, 0, 1);
+    String errorMessage = "";
+    for (Message message : dataCenterResponseEntity.getMessages())
+        logger.warn("Error while Create request  [{}] ", message.getMessageText());
 
+    if(dataCenterResponseEntity.getResults().size()>0)
+    dataCenterCreated = dataCenterResponseEntity.getResults().get(0);
+
+    return dataCenterCreated;
+}
     @org.junit.Test
     public void testSearch() throws Exception{
 

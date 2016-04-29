@@ -20,11 +20,13 @@ import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.base.PkEntityBase;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
+import com.dchq.schema.beans.one.provider.DataCenter;
 import com.dchq.schema.beans.one.security.*;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ProfileSearchServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.UserService;
+import io.dchq.sdk.core.clusters.DataCenterSearchServiceTest;
 import org.hamcrest.core.Is;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -38,6 +40,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * <code>UsersService</code> Integration Tests.
@@ -61,6 +64,7 @@ import static org.junit.Assert.assertNotEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
+
 public class UsersCreateServiceTest extends AbstractServiceTest {
 
     private UserService service;
@@ -69,7 +73,14 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     public void setUp() throws Exception {
         service = ServiceFactory.buildUserService(rootUrl, username, password);
     }
-public static Profile getProfile(String name) {
+
+    public static PkEntityBase searchDataCenter(String term) throws Exception{
+        DataCenterSearchServiceTest dsst = new DataCenterSearchServiceTest();
+        PkEntityBase pkeb=dsst.searchDataCenter(term);
+        return pkeb;
+    }
+
+    public static Profile getProfile(String name) {
     try {
         ProfileSearchServiceTest tempProf = new ProfileSearchServiceTest();
         return tempProf.searchProfile(name);
@@ -78,18 +89,29 @@ public static Profile getProfile(String name) {
     }
 return null;
 }
+    public static Organization getOrganization(String name,Boolean inActive,Boolean deleted){
+      return  new Organization().withName(name).withInactive(inActive).withDeleted(deleted);
+    }
+
     @Parameterized.Parameters
-    public static Collection<Object[]> data() {
+    public static Collection<Object[]> data() throws Exception{
         return Arrays.asList(new Object[][]{
-              /*  {null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"All Null",true},
-                {null,null,"testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only Username",true},
-                {null,"Last","admin",null,null,null,null,null,null,null,null,null,null,null,null,"Only ,ln UserName",true},
+             //   {null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"All Null",true},
+                {null,null,"","a@b.com",null,null,null,null,null,null,null,null,"",null,null,"Only Username",false},
+             /*   {null,"Last","admin",null,null,null,null,null,null,null,null,null,null,null,null,"Only ,ln UserName",true},
                 {null,"Last","testUser1",null,null,null,null,null,null,null,null,null,null,null,null,"Only ln,Username",true},
                 {null,"Last","testuser1","ituser@dchq.io",null,null,null,null,null,null,null,null,null,null,null,"Only ln,Username,emailid,",true},
-               {null,"Last","testuser1","ituser@dchq.io",null,null,null,getProfile("BASIC"),null,null,null,null,"aaaaaaaa",null,null,"All Mandatory Fields ln,Username,emailid,Profile,password",false},
+               {null,"","testuser1","ituser",null,null,null,getProfile("BASIC"),null,null,null,null,"aaaaaaaa",null,null,"All Mandatory Fields ln,Username,emailid,Profile,password",false},
                 {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,null,null,"aaaaaaaa",null,null,"Non Mandatory Fields ",false},
-              */  {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),"ff808181545040790154514a03b9013d",null,null,null,"aaaaaaaa",null,null,"Non Mandatory Fields ",false},
-
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),"ff808181545040790154514a03b9013d",null,null,null,"aaaaaaaa",null,null,"Non Mandatory Fields ",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,null,null,"aaaaaaaa",null,null,"Non Mandatory Fields ",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,null,null,"aaaaaaaa",searchDataCenter("ClusterMain"),null,"Non Mandatory Fields ",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,null,null,"aaaaaaaa",searchDataCenter("ClusterMain1"),null,"Non Mandatory Fields ",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,new HashSet<String>(Arrays.asList(new String[]{"ff808181545fce5f01545fdfa72c0034","ff808181545fce5f01545fdfa72c0034"})) ,null,"aaaaaaaa",searchDataCenter("ClusterMain1"),null,"Non Mandatory Fields ",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,new HashSet<String>(Arrays.asList(new String[]{"ff808181545fce5f01545fdfa72c0034","ff808181545fce5f01545fdfa72c0034"})) ,null,"aaaaaaaa",searchDataCenter("ClusterMain1"),null,"Non Mandatory Fields ",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,new HashSet<String>(Arrays.asList(new String[]{"ff808181545fce5f01545fdfa72c0034","ff808181545fce5f01545fdfa72c0034"})) ,new ArrayList<String>(Arrays.asList(new String[]{"ROLE_USER"})),"aaaaaaaa",searchDataCenter("ClusterMain1"),null,"Non Mandatory Fields ",false},
+                {null,"Last","testuser1","ituser@dchq.io","Company 1","Bkb","8019059425",getProfile("BASIC"),null,null,new HashSet<String>(Arrays.asList(new String[]{"ff808181545fce5f01545fdfa72c0034","ff808181545fce5f01545fdfa72c0034"})) ,null,"aaaaaaaa",searchDataCenter("ClusterMain1"),null,"Non Mandatory Fields ",false},
+*/
 
               //  {null,"Last","testuser1","ituser@dchq.io",null,null,null,getProfile("BASIC"),"202881834d9ee4d1014d9ee5d73f0010",null,null,null,null,null,null,"Only fn,ln",false},
                // {"fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false},
@@ -176,15 +198,43 @@ return null;
 
             assertEquals(users.getFirstname(), userCreated.getFirstname());
             assertEquals(users.getLastname() , userCreated.getLastname());
-            assertEquals(users.getUsername() , userCreated.getUsername());
+//            assertEquals(users.getUsername() , userCreated.getUsername());
             assertEquals(users.getEmail()    , userCreated.getEmail());
             assertEquals(users.getCompany()    , userCreated.getCompany());
             assertEquals(users.getJobTitle()    , userCreated.getJobTitle());
+            assertEquals(users.getProfile()    , userCreated.getProfile());
             assertEquals(users.getPhoneNumber()    , userCreated.getPhoneNumber());
+            assertEquals(users.getPhoneNumber()    , userCreated.getPhoneNumber());
+            assertEquals(users.getPhoneNumber()    , userCreated.getPhoneNumber());
+            assertEquals(users.getPhoneNumber()    , userCreated.getPhoneNumber());
+            assertEquals(users.getPhoneNumber()    , userCreated.getPhoneNumber());
+            assertEquals(users.getPhoneNumber()    , userCreated.getPhoneNumber());
+//            assertEquals(("ORG_ZERO"),userCreated.getOrganization().getName());
+            assertEquals(users.getUserGroupIds()    , userCreated.getUserGroupIds());
+            assertEquals(users.getAuthorities()    , userCreated.getAuthorities());
+
+            if(isNullOrEmpty(users.getUserGroupIds()) && users.getUserGroups()==null)
+                assertNull(userCreated.getUserGroups());
+
+            if(!isNullOrEmpty(users.getUserGroupIds())) {
+                assertNotNull(userCreated.getUserGroups());
+            }
+
+            if(!isNullOrEmpty(users.getUserGroups())) {
+                assertNotNull(userCreated.getUserGroups());
+            }
+
+
+            if(!isNullOrEmpty(users.getPreferredDataCenter()))
+            assertEquals(users.getPreferredDataCenter().getId()    ,userCreated.getPreferredDataCenter().getId());
+            else
+            assertNull(userCreated.getPreferredDataCenter());
+
 
             if(isNullOrEmpty(users.getTenantPk()))
             assertNotNull(userCreated.getTenantPk());
-            else assertEquals(users.getTenantPk()    , userCreated.getTenantPk());
+            else
+                assertEquals(users.getTenantPk()    , userCreated.getTenantPk());
 
 
             // Password should always be empty

@@ -19,6 +19,8 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import java.text.NumberFormat;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,10 +67,24 @@ public class TestRunner {
           System.out.println(" {\"\", true}");*/
 
   // }
-  public static void main(String[] args) {
+  public  static boolean isInteger(String s) {
+      int radix=10;
+      if(s.isEmpty()) return false;
+      for(int i = 0; i < s.length(); i++) {
+          if(i == 0 && s.charAt(i) == '-') {
+              if(s.length() == 1) return false;
+              else continue;
+          }
+          if(Character.digit(s.charAt(i),radix) < 0) return false;
+      }
+      return true;
+  }
+  public static void main(String[] args) throws Exception{
 
-      String email1 = "aaaaaaa";//"user@domain.com";
-      System.out.println(email1 +":is e-mail  "+isValidRegularExpression(email1, "(.{8,255})"));
+      String s = "123cas1wer.123";
+      String pre=s.substring(0,s.lastIndexOf('.')+1).trim();
+      String post = s.substring(s.lastIndexOf('.') + 1).trim();
+      System.out.println("<>:"+post+" || "+isInteger(post));
 
   }
     public static boolean isValidRegularExpression(String email,String expression) {
