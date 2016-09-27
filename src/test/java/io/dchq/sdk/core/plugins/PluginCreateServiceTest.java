@@ -93,11 +93,6 @@ public class PluginCreateServiceTest extends AbstractServiceTest {
                 // Positive Test-Cases
                 // Script-Lang
 
-                {"Tplugin2", null, null, "script", null, "", null, null, true, userId2, null, null, null, null, false}, //Creating a Plugin by providing Name, Script & Timeout
-                {"TestPlugin", null, null, "script", null, "", null, null, true, userId2, null, null, true, "General Input", false},
-                {"Test1", null, null, "script4", null, "", null, null, true, userId2, null, null, null, null, false},
-                {"Plugin3331", null, null, "script4", "SHELL5", "null6", null, EntitlementType.OWNER, true, userId2, null, null, true, "Error Input", false},
-
                 {"TestPlugin11", "1.0", "Description", "Dummy Script", "SHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
                 {"TestPlugin11", "1.3", "Description", "Dummy Script", "PERL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
                 {"TestPlugin11", "1.3", "Description", "Dummy Script", "POWERSHELL", "Apache License 2.0", 30, EntitlementType.CUSTOM, true, userId2, null, new HashSet<>(Arrays.asList(new Env().withProp("prop1").withVal("val1"))), true, "General Input", false},
