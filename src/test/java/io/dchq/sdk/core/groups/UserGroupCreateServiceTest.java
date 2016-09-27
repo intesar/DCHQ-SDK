@@ -22,7 +22,7 @@ import com.dchq.schema.beans.one.security.UserGroup;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.UserGroupService;
-import io.dchq.sdk.core.util.StringGenenerator;
+//import io.dchq.sdk.core.util.StringGenenerator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
