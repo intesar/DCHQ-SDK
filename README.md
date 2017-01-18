@@ -15,7 +15,7 @@ You can interact with live REST API here:
 https://dchq.readme.io/
 ```
 
-# build SDK (requires JDK7+, Gradle)
+# build SDK (requires JDK7+, Gradle 2.14.1)
 gradle build
 
 # build without test
