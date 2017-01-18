@@ -16,23 +16,22 @@
 
 package io.dchq.sdk.core;
 
-import com.dchq.schema.beans.base.*;
-import com.dchq.schema.beans.one.build.BuildTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.Serializable;
+import javax.net.ssl.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * Abstracts low level rest calls.
@@ -462,12 +461,13 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
 
         return res.getBody();
     }
+
     @Override
-    public RO delete(String id,boolean force) {
+    public RO delete(String id, boolean force) {
 
         String url = baseURI + endpoint + id;
-        if(force)
-            url+="?force=true";
+        if (force)
+            url += "?force=true";
 
         URI uri = getUri(url);
 
@@ -522,5 +522,42 @@ abstract class GenericServiceImpl<E, RL, RO> implements GenericService<E, RL, RO
         return "Basic " + new String(encodedAuth);
     }
 
+
+    static {
+        turnOffSslChecking();
+    }
+
+    public static void turnOffSslChecking() {
+        // Install the all-trusting trust manager
+        try {
+            System.out.println("Turning off ssl cert validation....");
+            final SSLContext sslContext = SSLContext.getInstance("TLS");
+
+            sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+                @Override
+                public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                }
+
+                @Override
+                public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+            }}, null);
+
+            HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
