@@ -31,22 +31,22 @@ import java.util.Date;
 public abstract class AbstractServiceTest {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected String rootUrl2 = "http://40.112.248.96:8080/api/1.0/";
-    protected String userId = "402881834d9ee4d1014d9ee5d73f0014";
+    protected String rootUrl2 = "https://23.99.48.48:443/api/1.0/";
+    protected String userId = "2c918086597e5d5f0159b00478420056";
 
 
-    protected String rootUrl = "https://www.dchq.io/api/1.0/";
-    protected String username = "Hqy2lNx77E2XApebRGOz";
-    protected String password = "JWCIfcFpcTor0hJj7K3UZwxFtXOKrbPyRYpN5A09";
+    protected String rootUrl = "https://23.99.48.48:443/api/1.0/";
+    protected String username = "iWQpNhAN8V3eskxohoYM";   // access-key for user1
+    protected String password = "A3FYox0MlhnJd6BmKHExVHKzpMlXWGAJn2xZevJA";  // secret-key for user1
 
     // Create another user for entitlement check
     //protected String rootUrl2 = "http://40.112.248.96:8080/api/1.0/";
-    protected static String userId2 = "2c9180ff4f33df5f014f33eec5ae0000";
-    protected String username2 = "F9MM2rzkWlmGkRyWwQsx";// accesskey
-    protected String password2 = "6O4YYEbJVMXckLd4p5yAgZZwHKPD02MkOIq9JriI";//secret key
+    protected static String userId2 = "2c918086597e5d5f0159b005070e0057";
+    protected String username2 = "4QAcORxMse3d4yrKfmoV";// accesskey
+    protected String password2 = "anNkl5qSFupdUThrkJw473EUmFIFNl4Z1Bt6YCU7";//secret key
 
     // UserGroup with userId2 entitled user
-    protected static String USER_GROUP = "ff808181542bf58901542cc8344a00b3";
+    protected static String USER_GROUP = "2c918086597e5d5f0159b00555450058";
 
     protected int waitTime = 0, maxWaitTime = 0;
 
