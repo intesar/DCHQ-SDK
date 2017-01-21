@@ -73,47 +73,44 @@ public abstract class AbstractServiceTest {
         } catch (Exception e) {
             logger.warn("Error @ Wait [{}] ", e.getMessage());
         }
-
         waitTime += milliSeconds;
         logger.info("Time Wait during Provisioning [{}] Hours:Minutes:Seconds ", formatMillis(waitTime));
         return 1;
     }
 
-    public String formatMillis(long val) {
-        StringBuilder buf = new StringBuilder(20);
-        String sgn = "";
+	public String formatMillis(long val) {
+		StringBuilder buf = new StringBuilder(20);
+		String sgn = "";
+		if (val < 0) {
+			sgn = "-";
+			val = Math.abs(val);
+		}
+		append(buf, sgn, 0, (val / 3600000));
+		append(buf, ":", 2, ((val % 3600000) / 60000));
+		append(buf, ":", 2, ((val % 60000) / 1000));
+		// append(buf,".",3,( val %1000));
+		return buf.toString();
+	}
 
-        if (val < 0) {
-            sgn = "-";
-            val = Math.abs(val);
-        }
+	private void append(StringBuilder tgt, String pfx, int dgt, long val) {
+		tgt.append(pfx);
+		if (dgt > 1) {
+			int pad = (dgt - 1);
+			for (long xa = val; xa > 9 && pad > 0; xa /= 10) {
+				pad--;
+			}
+			for (int xa = 0; xa < pad; xa++) {
+				tgt.append('0');
+			}
+		}
+		tgt.append(val);
+	}
 
-        append(buf, sgn, 0, (val / 3600000));
-        append(buf, ":", 2, ((val % 3600000) / 60000));
-        append(buf, ":", 2, ((val % 60000) / 1000));
-        //append(buf,".",3,( val                %1000));
-        return buf.toString();
-    }
-
-    private void append(StringBuilder tgt, String pfx, int dgt, long val) {
-        tgt.append(pfx);
-        if (dgt > 1) {
-            int pad = (dgt - 1);
-            for (long xa = val; xa > 9 && pad > 0; xa /= 10) {
-                pad--;
-            }
-            for (int xa = 0; xa < pad; xa++) {
-                tgt.append('0');
-            }
-        }
-        tgt.append(val);
-    }
-
-    public String getDateSuffix(String format) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy_hh_mm");
-        if (format != null) sdf = new SimpleDateFormat(format);
-        String date = sdf.format(new Date());
-        return date;
-    }
+	public String getDateSuffix(String format) {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd_MM_yyyy_hh_mm");
+		if (format != null)
+			sdf = new SimpleDateFormat(format);
+		String date = sdf.format(new Date());
+		return date;
+	}
 }
