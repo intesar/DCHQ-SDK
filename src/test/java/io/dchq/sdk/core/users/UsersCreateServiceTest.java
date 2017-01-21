@@ -52,9 +52,8 @@ import io.dchq.sdk.core.clusters.DataCenterSearchServiceTest;
  *
  * @author Intesar Mohammed
  * @since 1.0
- * <p/>
- * Users:
- * Create (annonymous & ENABLED, ROLE_TENANT_ADMIN)
+ *        <p/>
+ *        Users: Create (annonymous & ENABLED, ROLE_TENANT_ADMIN)
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -118,25 +117,8 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
 				,{ "fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true }
 				,{ "", "", "ituser2", "ituser4@dchq.io", "", false }
 				 */
-			{
-				"fname",
-				"lname",
-				"lnameuser6",
-				"lnameuser6@dchq.io",
-				"ABC",
-				"Engg",
-				"123-1231-121",
-				getProfile("BASIC"),
-				null,
-				null,
-				null,
-				null,
-				"pass1234",
-				null,
-				null,
-				"comments",
-				false
-			}				
+				{ "fname", "lname", "lnameuser6", "lnameuser6@dchq.io", "ABC", "Engg", "123-1231-121",
+						getProfile("BASIC"), null, null, null, null, "pass1234", null, null, "comments", false }				
 		});
 	}
 

@@ -45,7 +45,7 @@ import io.dchq.sdk.core.UserService;
  * @author Intesar Mohammed
  * @since 1.0
  *        <p/>
- *        Users: Search (ROLE_USER for sharing)
+ *        Update (SELF, ROLE_TENANT_ADMIN)
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
