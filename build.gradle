@@ -97,6 +97,7 @@ dependencies {
     compile("io.dchq:DCHQ-dto-one:3.0-SNAPSHOT") {
         exclude module: 'DTOResponseBase'
     }
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     //compile("commons-codec:commons-codec:1.9")
     //compile("commons-collections:commons-collections:3.2.1")
 
