@@ -40,9 +40,11 @@ import static org.hamcrest.core.Is.is;
 
 /**
  * Abstracts class for holding test credentials.
+ * Make Sure User has rights to create groups
  *
  * @author Abedeen.
  * @since 1.0
+ * @updater SaurabhB.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
@@ -63,11 +65,11 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestGroup 1", false, false},
+                {"TestGroup1212", false, false},
                 // Passing " as group Name
-                {"1\"My Group\"", true, false},
+               {"1\"My Group1\"", true, false},
                 // Group Names with  Max Short Text :255 Charcters Passed
-                {"FwqkRRVOH2tuh8iigqZWTngTgLYzpcaqVahyLQqAXvzUhPpbN4qFz2TeeZASJUtC4x1nsFzP9cOkNAcFuHEGysRR6VafWArGW1jkWiWXD6CUfpkhwPoGNhIkcWLOqRrO7aqDifoZ8EGWKNHY49vTCKZ1jOI2JbZVToQeQGAERFJSlby4o2vc131o2wTFqMnp4KIwhjVQ97PBFjOxJhfnd9a5PAxNHLYBvnzTcCK45uGBiZhu3ubWOr6yM1s28pY", false, false},
+           /*     {"FwqkRRVOH2tuh8iigqZWTngTgLYzpcaqVahyLQqAXvzUhPpbN4qFz2TeeZASJUtC4x1nsFzP9cOkNAcFuHEGysRR6VafWArGW1jkWiWXD6CUfpkhwPoGNhIkcWLOqRrO7aqDifoZ8EGWKNHY49vTCKZ1jOI2JbZVToQeQGAERFJSlby4o2vc131o2wTFqMnp4KIwhjVQ97PBFjOxJhfnd9a5PAxNHLYBvnzTcCK45uGBiZhu3ubWOr6yM1s28pY", false, false},
                 {"  TestGroup   1", false, false},
                 {"_TestGroup   1", false, false},
                 {"1", false, false},
@@ -78,13 +80,15 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
                 // Group Name Length 256.
                 {"tQ9ukuIEBiYsSGkM1cRfES7DctIaE1W3GJ3K4WCQQxwYcNPy6NArpf2RFCEUXfmmmRkMVsvkh3TDQwWdxcyuWbbzX8xgxcfX6XwvCqVkbLE7rQ348EInhBNkIupRSvsMKaR51KFrVS7cNMi1WmJsNxWA3vEaKczJ2EHSauHx7Rs3Ln8UiEcjazU2qluzdaoQCTNBayw4VFJAAPVFHLG3wNV9OPjRUj39mNjCZBsZQJI1g2NYw6gQ1qkhqNOcWeFw", false, true},
                 // checking Empty group names
-                {"", false, true}
+                {"", false, true} */
         });
     }
 
     private UserGroup userGroup;
     private boolean error;
     private UserGroup userGroupCreated;
+    private UserGroup userGroupDeleted;
+    private String messageText;
 
     public UserGroupCreateServiceTest(String gname, boolean isInActive, boolean success) {
         this.userGroup = new UserGroup().withName(gname).withInactive(isInActive);
@@ -95,28 +99,40 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
 
         logger.info("Create Group with Group Name [{}]", userGroup.getName());
         ResponseEntity<UserGroup> response = userGroupService.create(userGroup);
-        for (Message m : response.getMessages())
-            logger.warn("[{}]", m.getMessageText());
+
         if (response.getResults() != null)
             userGroupCreated = response.getResults();
+
         assertNotNull(response);
         assertNotNull(response.isErrors());
-        Assert.assertEquals(error, response.isErrors());
+        for (Message m : response.getMessages()){
+            logger.warn("[{}]", m.getMessageText());
+            messageText = m.getMessageText();}
 
-        if (!error) {
+        Assert.assertEquals(messageText ,error, response.isErrors());
+
+
+        if (!response.isErrors()) {
             assertNotNull("Response is null ", response.getResults());
             assertNotNull("Group Id is null", response.getResults().getId());
             Assert.assertEquals("Group Name does not match input value", userGroup.getName(), userGroupCreated.getName());
             Assert.assertEquals("User group Active/Inactive status does not match input Value", userGroup.getInactive(), userGroupCreated.getInactive());
-            // TODO: Duplicate Group Name Test
+
         }
     }
-    @After
+   @After
     public void cleanUp() {
         logger.info("cleaning up...");
 
         if (userGroupCreated != null) {
-            userGroupService.delete(userGroupCreated.getId());
+            ResponseEntity<UserGroup> deleteResponse  =  userGroupService.delete(userGroupCreated.getId());
+            if (deleteResponse.getResults() != null)
+                userGroupDeleted = deleteResponse.getResults();
+            for (Message m : deleteResponse.getMessages()){
+                logger.warn("[{}]", m.getMessageText());
+                 messageText = m.getMessageText();}
+                 Assert.assertFalse(messageText ,deleteResponse.isErrors());
+    //        Assert.assertEquals(messageText ,error, deleteResponse.isErrors());
         }
     }
 }

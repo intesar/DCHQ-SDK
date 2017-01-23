@@ -44,7 +44,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Abstracts class for holding test credentials.
  *
- * @author Abedeen.
+ * @updater SaurabhB.
  * @since 1.0
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -63,63 +63,72 @@ public class UserGroupUpdateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"Tahsin Group", " Tahsin Group Updated", false},
-                // checking Empty group names
-                {"Test for Updating with Empty", "", true}
+                //positive case
+               {"My Group12", " Group Updated12", false},
+                //Updating with Special chars
+                {"Test for SpecialChars", "@#$%^", true},
+                // Updating with Empty group names
+     //           {"Test for Updating with Empty", "", true}
+
         });
     }
 
     private UserGroup userGroup;
-    private boolean success;
+    private boolean error;
     private UserGroup userGroupCreated;
-    private String updatedGourpName;
+    private UserGroup userGroupDeleted;
+    private String updatedGroupName;
+    private String messageText;
 
-    public UserGroupUpdateServiceTest(String gname, String updatedGourpName, boolean success) {
+    public UserGroupUpdateServiceTest(String gname, String updatedGourpName, boolean error) {
         this.userGroup = new UserGroup().withName(gname);
-        this.updatedGourpName = updatedGourpName;
-        this.success = success;
+        this.updatedGroupName = updatedGourpName;
+        this.error = error;
 
     }
 
     @org.junit.Test
     public void testUpdate() throws Exception {
 
+        //Creating new user Group
         logger.info("Create Group with Group Name [{}]", userGroup.getName());
         ResponseEntity<UserGroup> response = userGroupService.create(userGroup);
 
-        for (Message message : response.getMessages())
+        for (Message message : response.getMessages()){
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
-
-        assertNotNull(response);
-        assertNotNull(response.isErrors());
-        Assert.assertNotNull(((Boolean) false).toString(), ((Boolean) response.isErrors()).toString());
+        messageText = message.getMessageText();}
+           assertNotNull(response);
+           assertNotNull(response.isErrors());
+           Assert.assertNotNull(((Boolean) false).toString(), ((Boolean) response.isErrors()).toString());
+        Assert.assertFalse(messageText , response.isErrors());
 
         if (!response.isErrors() && response.getResults() != null) {
             userGroupCreated = response.getResults();
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
 
-
             Assert.assertNotNull(userGroup.getName(), userGroupCreated.getName());
-            userGroupCreated.setName(this.updatedGourpName);
+            userGroupCreated.setName(this.updatedGroupName);
 
+            //Updating User Group
             logger.info("Update Request for Group with Group Name [{}]", userGroup.getName());
             response = userGroupService.update(userGroupCreated);
 
-            for (Message message : response.getMessages())
+            for (Message message : response.getMessages()){
                 logger.warn("Error while Update request  [{}] ", message.getMessageText());
-            Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
-            assertNotNull(response);
-            assertNotNull(response.isErrors());
-
-            if (!response.isErrors()) {
-                Assert.assertNotNull(response.getResults());
-                Assert.assertNotNull(response.getResults().getName(), updatedGourpName);
+            messageText = message.getMessageText();
             }
-
-
+       //     Assert.assertNotNull(((Boolean) error).toString(), ((Boolean) response.isErrors()).toString());
+            assertNotNull(response);
+          //  assertNotNull(response.isErrors());
+            if (response.isErrors()){
+                Assert.fail(messageText);
+            }
+            else {
+                Assert.assertNotNull(response.getResults());
+                Assert.assertNotNull(response.getResults().getName(), updatedGroupName);
+            }
         }
-
     }
 
     @After
@@ -127,7 +136,13 @@ public class UserGroupUpdateServiceTest extends AbstractServiceTest {
         logger.info("cleaning up...");
 
         if (userGroupCreated != null) {
-            userGroupService.delete(userGroupCreated.getId());
+            ResponseEntity<UserGroup> deleteResponse =  userGroupService.delete(userGroupCreated.getId());
+            if (deleteResponse.getResults() != null)
+                userGroupDeleted = deleteResponse.getResults();
+            for (Message m : deleteResponse.getMessages()){
+                logger.warn("[{}]", m.getMessageText());
+                messageText = m.getMessageText();}
+            Assert.assertFalse(messageText ,deleteResponse.isErrors());
         }
     }
 }
