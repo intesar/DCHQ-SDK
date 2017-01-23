@@ -66,8 +66,9 @@ public class UsersSearchServiceTest extends AbstractServiceTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
+    	int userId = getRandomUserId();
         return Arrays.asList(new Object[][]{
-                {"fn", "ln", "ituser01", "ituser01@dchq.io", "pass1234", "", false},
+                {"fn", "ln","user"+userId , "user"+userId+"@dchq.io", "pass1234", "", false},
         });
     }
 

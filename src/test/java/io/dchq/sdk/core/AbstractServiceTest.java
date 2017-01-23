@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Abstracts class for holding test credentials.
@@ -49,6 +50,9 @@ public abstract class AbstractServiceTest {
     protected static String USER_GROUP = "2c918086597e5d5f0159b00555450058";
 
     protected int waitTime = 0, maxWaitTime = 0;
+    
+    private static final int MIN_RANDOM_NUMBER=1;
+    private static final int MAX_RANDOM_NUMBER=1000;
 
     public boolean isNullOrEmpty(Object inObj) {
         if (inObj == null) {
@@ -112,5 +116,12 @@ public abstract class AbstractServiceTest {
 			sdf = new SimpleDateFormat(format);
 		String date = sdf.format(new Date());
 		return date;
+	}
+	
+	public static int getRandomUserId() {
+		int randomNum = 0;
+		Random random = new Random();
+		randomNum = random.nextInt(MAX_RANDOM_NUMBER - MIN_RANDOM_NUMBER) + MIN_RANDOM_NUMBER;
+		return randomNum;
 	}
 }

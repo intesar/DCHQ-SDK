@@ -94,7 +94,9 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
 
 	@Parameterized.Parameters
 	public static Collection<Object[]> data() throws Exception {
+		int userId = getRandomUserId();
 		return Arrays.asList(new Object[][] {
+			   
 				/* { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "All Null", true }
 				,{ null, null, "", "a@b.com", null, null, null, null, null, null, null, null, "", null, null, "Only Username", false }
 				,{ null, "Last", "admin", null, null, null, null, null, null, null, null, null, null, null, null, "Only ,ln UserName", true }
@@ -117,7 +119,7 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
 				,{ "fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true }
 				,{ "", "", "ituser2", "ituser4@dchq.io", "", false }
 				 */
-				{ "fname", "lname", "lnameuser6", "lnameuser6@dchq.io", "ABC", "Engg", "123-1231-121",
+				{ "fname", "lname", "user"+userId ,  "user"+userId+"@dchq.io" , "ABC", "Engg", "123-1231-121",
 						getProfile("BASIC"), null, null, null, null, "pass1234", null, null, "comments", false }				
 		});
 	}
