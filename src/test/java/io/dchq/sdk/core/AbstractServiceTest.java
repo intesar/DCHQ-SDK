@@ -51,7 +51,7 @@ public abstract class AbstractServiceTest {
 
     protected int waitTime = 0, maxWaitTime = 0;
     
-    private static final int MIN_RANDOM_NUMBER=1;
+    private static final int MIN_RANDOM_NUMBER=50;
     private static final int MAX_RANDOM_NUMBER=1000;
 
     public boolean isNullOrEmpty(Object inObj) {
