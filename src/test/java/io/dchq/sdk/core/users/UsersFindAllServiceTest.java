@@ -95,7 +95,7 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
     }
 
 	public int testGetUserFromFindAll(String id) {
-		ResponseEntity<List<Users>> response = service.findAll();
+		ResponseEntity<List<Users>> response = service.findAll(0, 5000);
 		String errors = "";
 		for (Message message : response.getMessages()) {
 			errors += ("Error while Find request  " + message.getMessageText() + "\n");
@@ -145,9 +145,8 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
             assertThat("", is(response.getResults().getPassword()));
             logger.info("FindAll User by Id [{}]", userCreated.getId());
             this.countAfterCreate = testGetUserFromFindAll(userCreated.getId());
-            assertEquals("Count of Find all user between before and after create does not have diffrence of 1 for UserId :"+userCreated.getId(),countBeforeCreate, countAfterCreate-1);
+            assertEquals("Count of Find all user between before and after create does not have diffrence of 1 for UserId :"+userCreated.getId(), countBeforeCreate + 1, countAfterCreate);
         }
-
     }
 
     @After
@@ -155,6 +154,9 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
 		if (userCreated != null) {
 			logger.info("cleaning up...");
 			ResponseEntity<?> response = service.delete(userCreated.getId());
+			for (Message message : response.getMessages()) {
+				logger.warn("Error user deletion: [{}] ", message.getMessageText());
+			}
 			logger.info("Find All Users After Delete User by Id {}",userCreated.getId());
 			countAfterDelete=testGetUserFromFindAll(null);
 			assertEquals("Count of Find all user between before and after delete are not same for UserId :"+userCreated.getId(),countBeforeCreate, countAfterDelete);
