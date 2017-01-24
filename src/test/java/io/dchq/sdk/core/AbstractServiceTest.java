@@ -40,6 +40,9 @@ public abstract class AbstractServiceTest {
     protected String username = "iWQpNhAN8V3eskxohoYM";   // access-key for user1
     protected String password = "A3FYox0MlhnJd6BmKHExVHKzpMlXWGAJn2xZevJA";  // secret-key for user1
 
+    protected String cloudadminusername = "3xQSbjstbt72dMxkchzS";   //access key of admin
+    protected String cloudadminpassword = "HepknaLVDicAFwhcczoIdqkMCJzhIkgck7TPiiNo"; //secret-key for admin
+
     // Create another user for entitlement check
     //protected String rootUrl2 = "http://40.112.248.96:8080/api/1.0/";
     protected static String userId2 = "2c918086597e5d5f0159b005070e0057";
