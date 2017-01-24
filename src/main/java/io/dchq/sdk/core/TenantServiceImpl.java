@@ -37,7 +37,7 @@ public class TenantServiceImpl extends GenericServiceImpl<Tenant, ResponseEntity
     public static final ParameterizedTypeReference<ResponseEntity<Tenant>> singleTypeReference = new ParameterizedTypeReference<ResponseEntity<Tenant>>() {
     };
 
-    public static final String ENDPOINT = "tenant/";
+    public static final String ENDPOINT = "tenants/";
 
     /**
      * @param baseURI  - e.g. https://dchq.io/api/1.0/
