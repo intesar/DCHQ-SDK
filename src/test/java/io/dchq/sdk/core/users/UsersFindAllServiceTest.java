@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -96,6 +97,7 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
 
 	public int testGetUserFromFindAll(String id) {
 		ResponseEntity<List<Users>> response = service.findAll(0, 5000);
+		Assert.assertNotNull(response.getTotalElements());
 		String errors = "";
 		for (Message message : response.getMessages()) {
 			errors += ("Error while Find request  " + message.getMessageText() + "\n");
