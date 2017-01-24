@@ -91,6 +91,7 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
         this.userGroup = new UserGroup().withName(gname).withInactive(isInActive);
         this.error = success;
     }
+
     @org.junit.Test
     public void testCreate() throws Exception {
 
@@ -118,6 +119,7 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
 
         }
     }
+
    @After
     public void cleanUp() {
         logger.info("cleaning up...");

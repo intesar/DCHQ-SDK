@@ -29,4 +29,5 @@ import java.util.List;
  */
 public interface TenantService extends GenericService<Tenant, ResponseEntity<List<Tenant>>, ResponseEntity<Tenant>> {
 
+    ResponseEntity<List<Tenant>> get();
 }

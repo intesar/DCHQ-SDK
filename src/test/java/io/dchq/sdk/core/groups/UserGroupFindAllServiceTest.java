@@ -134,7 +134,7 @@ public class UserGroupFindAllServiceTest extends AbstractServiceTest {
             assertNotNull(response.getResults().getId());
             this.userGroupCreated = response.getResults();
             logger.info("Create request successfully completed for user Group Name [{}]",userGroupCreated.getName());
-            assertEquals(userGroupCreated.getName(), userGroupCreated.getName());
+            assertEquals(userGroup.getName(), userGroupCreated.getName());
 
             logger.info("FindAll User Group by Id [{}]", userGroupCreated.getId());
             this.countAfterCreate = testGroupPosition(userGroupCreated.getId());

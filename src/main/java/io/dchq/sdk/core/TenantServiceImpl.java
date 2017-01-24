@@ -53,4 +53,8 @@ public class TenantServiceImpl extends GenericServiceImpl<Tenant, ResponseEntity
         );
     }
 
+    @Override
+    public ResponseEntity<List<Tenant>> get() {
+        return findAll();
+    }
 }

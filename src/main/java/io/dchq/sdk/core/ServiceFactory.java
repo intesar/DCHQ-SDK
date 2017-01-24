@@ -20,6 +20,7 @@ package io.dchq.sdk.core;
  * Factory class
  *
  * @author Intesar Mohammed
+ * @updater SaurabhB.
  * @since 1.0
  */
 public class ServiceFactory {
@@ -64,5 +65,9 @@ public class ServiceFactory {
 
     public static final UserService buildUserService(String baseURI, String username, String password) {
         return new UserServiceImpl(baseURI, username, password);
+    }
+
+    public static final TenantService buildTenantService(String baseURI, String username, String password) {
+        return new TenantServiceImpl(baseURI, username, password);
     }
 }
