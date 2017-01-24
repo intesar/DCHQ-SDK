@@ -117,11 +117,5 @@ public abstract class AbstractServiceTest {
 		String date = sdf.format(new Date());
 		return date;
 	}
-	
-	public static int getRandomUserId() {
-		int randomNum = 0;
-		Random random = new Random();
-		randomNum = random.nextInt(MAX_RANDOM_NUMBER - MIN_RANDOM_NUMBER) + MIN_RANDOM_NUMBER;
-		return randomNum;
-	}
+
 }

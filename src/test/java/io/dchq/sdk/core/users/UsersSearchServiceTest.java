@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -66,13 +67,30 @@ public class UsersSearchServiceTest extends AbstractServiceTest {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-    	int userId = getRandomUserId();
         return Arrays.asList(new Object[][]{
-                {"fn", "ln","user"+userId , "user"+userId+"@dchq.io", "pass1234", "", false},
+                {"fn", "ln", "user", "user" + "@dchq.io", "pass1234", "", false},
         });
     }
 
-    public UsersSearchServiceTest(String fn, String ln, String username, String email, String pass, String errorMessage, boolean success) {
+    public UsersSearchServiceTest(
+    		String fn, 
+    		String ln, 
+    		String username, 
+    		String email, 
+    		String pass, 
+    		String errorMessage, 
+    		boolean success
+    		) 
+    {
+        // random username
+        String prefix = RandomStringUtils.randomAlphabetic(3);
+        username = prefix + "-" + username;
+        email = prefix + "-" + email;
+
+        // lowercase
+        username = org.apache.commons.lang3.StringUtils.lowerCase(username);
+        email = org.apache.commons.lang3.StringUtils.lowerCase(email);
+        
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
         this.users.setInactive(false);
         this.createError = success;

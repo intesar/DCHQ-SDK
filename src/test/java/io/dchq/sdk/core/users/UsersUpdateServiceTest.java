@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -66,10 +67,9 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
 
 	@Parameterized.Parameters
 	public static Collection<Object[]> data() {
-		int userId = getRandomUserId();
 		return Arrays.asList(
 				new Object[][] { 
-						{ "fn", "ln", "user"+userId , "user"+userId+"@dchq.io", "pass1234", "fn1", "fn2", false }, 
+						{ "fn", "ln", "user", "user" + "@dchq.io", "pass1234", "fn1", "fn2", false }, 
 					}
 				);
 	}
@@ -84,6 +84,15 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
 			String ln1, 
 			boolean success) 
 	{
+        // random username
+        String prefix = RandomStringUtils.randomAlphabetic(3);
+        username = prefix + "-" + username;
+        email = prefix + "-" + email;
+
+        // lowercase
+        username = org.apache.commons.lang3.StringUtils.lowerCase(username);
+        email = org.apache.commons.lang3.StringUtils.lowerCase(email);
+        
 		this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
 		this.success = success;
 		this.modifiedFirstName = fn1;
@@ -141,10 +150,13 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
 
 	@After
 	public void cleanUp() {
-		logger.info("cleaning up...");
 		if (userCreated != null) {
-			service.delete(userCreated.getId());
-		};
+			logger.info("cleaning up...");
+			ResponseEntity<?> response = service.delete(userCreated.getId());
+			for (Message message : response.getMessages()) {
+				logger.warn("Error user deletion: [{}] ", message.getMessageText());
+			}
+		}
 	}
 
 }
