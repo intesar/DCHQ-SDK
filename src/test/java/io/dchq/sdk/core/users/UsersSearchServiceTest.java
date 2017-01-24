@@ -145,10 +145,12 @@ public class UsersSearchServiceTest extends AbstractServiceTest {
 
     @After
     public void cleanUp() {
-		logger.info("cleaning up...");
 		if (userCreated != null) {
-			service.delete(userCreated.getId());
-			logger.info("Deleted Object Successfully by Id {}", userCreated.getId());
+			logger.info("cleaning up...");
+			ResponseEntity<?> response = service.delete(userCreated.getId());
+			for (Message message : response.getMessages()) {
+				logger.warn("Error user deletion: [{}] ", message.getMessageText());
+			}
 		}
     }
 

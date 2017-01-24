@@ -16,17 +16,16 @@
 
 package io.dchq.sdk.core.users;
 
-import com.dchq.schema.beans.base.Message;
-import com.dchq.schema.beans.base.ResponseEntity;
-import com.dchq.schema.beans.one.base.PkEntityBase;
-import com.dchq.schema.beans.one.security.Organization;
-import com.dchq.schema.beans.one.security.Profile;
-import com.dchq.schema.beans.one.security.Users;
-import io.dchq.sdk.core.AbstractServiceTest;
-import io.dchq.sdk.core.ProfileSearchServiceTest;
-import io.dchq.sdk.core.ServiceFactory;
-import io.dchq.sdk.core.UserService;
-import io.dchq.sdk.core.clusters.DataCenterSearchServiceTest;
+import static junit.framework.TestCase.assertNotNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.FixMethodOrder;
@@ -34,17 +33,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
-import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import com.dchq.schema.beans.base.Message;
+import com.dchq.schema.beans.base.ResponseEntity;
+import com.dchq.schema.beans.one.base.PkEntityBase;
+import com.dchq.schema.beans.one.security.Organization;
+import com.dchq.schema.beans.one.security.Profile;
+import com.dchq.schema.beans.one.security.Users;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
+import io.dchq.sdk.core.AbstractServiceTest;
+import io.dchq.sdk.core.ProfileSearchServiceTest;
+import io.dchq.sdk.core.ServiceFactory;
+import io.dchq.sdk.core.UserService;
+import io.dchq.sdk.core.clusters.DataCenterSearchServiceTest;
 
 /**
  * <code>UsersService</code> Integration Tests.
@@ -166,9 +167,7 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
         this.errorMessage = message;
         this.error = success;
     }
-
-    ;
-
+    
     @Test
     public void testCreate() {
         logger.info("Create user fn [{}] ln [{}] username [{}]", users.getFirstname(), users.getLastname(), users.getUsername());
@@ -200,8 +199,7 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
             assertEquals(users.getProfile(), userCreated.getProfile());
             assertEquals(users.getPhoneNumber(), userCreated.getPhoneNumber());
             assertEquals(users.getAuthorities(), userCreated.getAuthorities());
-
-
+            
             if (isNullOrEmpty(users.getTenantPk()))
                 assertNotNull(userCreated.getTenantPk());
             else
@@ -211,8 +209,6 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
             assertThat("", is(response.getResults().getPassword()));
         }
     }
-
-    ;
 
     @After
     public void cleanUp() {
