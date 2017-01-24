@@ -17,12 +17,10 @@ package io.dchq.sdk.core.groups;
 
 import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
-import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.security.UserGroup;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.UserGroupService;
-//import io.dchq.sdk.core.util.StringGenenerator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -32,11 +30,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+
 
 /**
  * Abstracts class for holding test credentials.
@@ -53,6 +49,7 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
 
     private UserGroupService userGroupService;
 
+
     @org.junit.Before
     public void setUp() throws Exception {
         userGroupService = ServiceFactory.builduserGroupService(rootUrl, username, password);
@@ -65,9 +62,9 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestGroup1212", false, false},
+                {"TestGr111", false, false},
                 // Passing " as group Name
-               {"1\"My Group1\"", true, false},
+                {"1\"My Group1\"", true, false},
                 // Group Names with  Max Short Text :255 Charcters Passed
            /*     {"FwqkRRVOH2tuh8iigqZWTngTgLYzpcaqVahyLQqAXvzUhPpbN4qFz2TeeZASJUtC4x1nsFzP9cOkNAcFuHEGysRR6VafWArGW1jkWiWXD6CUfpkhwPoGNhIkcWLOqRrO7aqDifoZ8EGWKNHY49vTCKZ1jOI2JbZVToQeQGAERFJSlby4o2vc131o2wTFqMnp4KIwhjVQ97PBFjOxJhfnd9a5PAxNHLYBvnzTcCK45uGBiZhu3ubWOr6yM1s28pY", false, false},
                 {"  TestGroup   1", false, false},
@@ -105,9 +102,10 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
-        for (Message m : response.getMessages()){
+        for (Message m : response.getMessages()) {
             logger.warn("[{}]", m.getMessageText());
-            messageText = m.getMessageText();}
+            messageText = m.getMessageText();
+        }
 
         Assert.assertEquals(messageText ,error, response.isErrors());
 
