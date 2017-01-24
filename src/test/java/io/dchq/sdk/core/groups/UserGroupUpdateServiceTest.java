@@ -17,7 +17,6 @@ package io.dchq.sdk.core.groups;
 
 import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
-import com.dchq.schema.beans.one.blueprint.Blueprint;
 import com.dchq.schema.beans.one.security.UserGroup;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
@@ -31,11 +30,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+
 
 /**
  * Created by Abedeen on 04/05/16.

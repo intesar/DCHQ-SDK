@@ -15,6 +15,7 @@
  */
 package io.dchq.sdk.core.groups;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.security.UserGroup;
 import io.dchq.sdk.core.AbstractServiceTest;
@@ -31,12 +32,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.error;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 
 /**
  * @author Intesar Mohammed
+ * @updater SaurabhB
  * @since 1.0
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -45,6 +48,7 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
 
 
     private UserGroupService userGroupService;
+    private  String   messageText;
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -54,7 +58,7 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestGroup2", false}
+                {"TestGroupSearchService", false}
         });
     }
 
@@ -65,7 +69,6 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
     public UserGroupSearchServiceTest(String gname, boolean errors) {
         this.userGroup = new UserGroup().withName(gname);
         this.errors = errors;
-
     }
 
     @org.junit.Test
@@ -74,13 +77,15 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
         logger.info("Creating Group with Group Name [{}]", userGroup.getName());
         ResponseEntity<UserGroup> response = userGroupService.create(userGroup);
 
-        if (response.isErrors())
+        if (response.isErrors()) {
             logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
+            Assert.assertEquals(response.getMessages().get(0).getMessageText() ,error, response.isErrors());
+        }
 
         assertNotNull(response);
         assertNotNull(response.isErrors());
-
         Assert.assertNotNull(((Boolean) errors).toString(), ((Boolean) response.isErrors()).toString());
+
         if (!response.isErrors() && response.getResults() != null) {
             userGroupCreated = response.getResults();
             assertNotNull(response.getResults());
@@ -100,8 +105,6 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
         UserGroup searchedEntity = userGroupsResponseEntity.getResults().get(0);
         assertEquals(userGroupCreated.getId(), searchedEntity.getId());
         assertEquals(userGroupCreated.getName(), searchedEntity.getName());
-
-
     }
 
     @After
@@ -110,9 +113,15 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
 
         if (!errors) {
             userGroupService.delete(userGroupCreated.getId());
+            if (userGroupCreated != null) {
+                ResponseEntity<UserGroup> deleteResponse = userGroupService.delete(userGroupCreated.getId());
+                for (Message m : deleteResponse.getMessages()){
+                    logger.warn("[{}]", m.getMessageText());
+                    messageText = m.getMessageText();}
+                    Assert.assertFalse(messageText , deleteResponse.isErrors());
+            }
         }
-    }
-}
+    }}
 
 
 
