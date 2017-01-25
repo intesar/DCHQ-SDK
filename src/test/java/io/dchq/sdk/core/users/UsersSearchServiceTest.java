@@ -45,9 +45,11 @@ import io.dchq.sdk.core.UserService;
  * <code>UsersService</code> Integration Tests.
  *
  * @author Intesar Mohammed
+ * @updater Jagdeep Jain
  * @since 1.0
- *        <p/>
- *        Users: Search (ROLE_USER for sharing)
+ */
+/**
+ * Users: Search
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -56,13 +58,14 @@ public class UsersSearchServiceTest extends AbstractServiceTest {
 
     private UserService service;
     private Users users;
-    private boolean createError;
+    private boolean success;
     private Users userCreated;
     private String errorMessage;
 
     @org.junit.Before
     public void setUp() throws Exception {
-        service = ServiceFactory.buildUserService(rootUrl, username, password);
+    	// TODO - use specified user permissions instead of cloud admin user
+        service = ServiceFactory.buildUserService(rootUrl, cloudadminusername, cloudadminpassword);
     }
 
     @Parameterized.Parameters
@@ -86,14 +89,12 @@ public class UsersSearchServiceTest extends AbstractServiceTest {
         String prefix = RandomStringUtils.randomAlphabetic(3);
         username = prefix + "-" + username;
         email = prefix + "-" + email;
-
         // lowercase
         username = org.apache.commons.lang3.StringUtils.lowerCase(username);
         email = org.apache.commons.lang3.StringUtils.lowerCase(email);
-        
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
         this.users.setInactive(false);
-        this.createError = success;
+        this.success = success;
         this.errorMessage = errorMessage;
     }
 
@@ -109,21 +110,23 @@ public class UsersSearchServiceTest extends AbstractServiceTest {
             this.userCreated = response.getResults();
             logger.info("Created Object Successfully with id  [{}] ",userCreated.getId());
         }
-        // check response is not null
-        // check response has no errors
-        // check response has user entity with ID
-        // check all data send
+        /* check response:
+         * 1. is not null
+         * 2. has no errors
+         * 3. has user entity with ID
+         * 4. all data sent
+         */
         assertNotNull(response);
         assertNotNull(response.isErrors());
-        assertEquals(errorMessage, createError, response.isErrors());
-        if (!createError) {
+        assertEquals(errorMessage, success, response.isErrors());
+        if (!success) {
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
             assertEquals(users.getFirstname(), response.getResults().getFirstname());
             assertEquals(users.getLastname(), response.getResults().getLastname());
             assertEquals(users.getUsername(), response.getResults().getUsername());
             assertEquals(users.getEmail(), response.getResults().getEmail());
-            // Password should always be empty
+            // password should always be empty
             assertThat("", is(response.getResults().getPassword()));
         }
         logger.warn("Search Object wth username  [{}] ",userCreated.getUsername());

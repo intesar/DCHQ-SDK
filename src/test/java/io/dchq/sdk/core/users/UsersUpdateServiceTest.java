@@ -44,9 +44,11 @@ import io.dchq.sdk.core.UserService;
  * <code>UsersService</code> Integration Tests.
  *
  * @author Intesar Mohammed
+ * @updater Jagdeep Jain
  * @since 1.0
- *        <p/>
- *        Update (SELF, ROLE_TENANT_ADMIN)
+ **/
+/**
+ * Users: Update
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -62,12 +64,14 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
 
 	@org.junit.Before
 	public void setUp() throws Exception {
-		service = ServiceFactory.buildUserService(rootUrl, username, password);
+		// TODO - use specified user permissions instead of cloud admin user
+		service = ServiceFactory.buildUserService(rootUrl, cloudadminusername, cloudadminpassword);
 	}
 
 	@Parameterized.Parameters
 	public static Collection<Object[]> data() {
 		return Arrays.asList(
+				// TODO: Add more test data for all sorts of validations and modification
 				new Object[][] { { "fn", "ln", "user", "user" + "@dchq.io", "pass1234", "fn1", "fn2", false }, });
 	}
 
@@ -85,11 +89,9 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
         String prefix = RandomStringUtils.randomAlphabetic(3);
         username = prefix + "-" + username;
         email = prefix + "-" + email;
-
         // lowercase
         username = org.apache.commons.lang3.StringUtils.lowerCase(username);
         email = org.apache.commons.lang3.StringUtils.lowerCase(email);
-        
 		this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
 		this.success = success;
 		this.modifiedFirstName = fn1;
@@ -103,10 +105,12 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
 		for (Message message : response.getMessages()) {
 			logger.warn("Error while Create request  [{}] ", message.getMessageText());
 		}
-		// check response is not null
-		// check response has no errors
-		// check response has user entity with ID
-		// check all data send
+        /* check response:
+         * 1. is not null
+         * 2. has no errors
+         * 3. has user entity with ID
+         * 4. all data sent
+         */
 		assertNotNull(response);
 		assertNotNull(response.isErrors());
 		assertThat(success, is(equals(response.isErrors())));
@@ -119,11 +123,11 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
 			assertEquals(users.getLastname(), response.getResults().getLastname());
 			assertEquals(users.getUsername(), response.getResults().getUsername());
 			assertEquals(users.getEmail(), response.getResults().getEmail());
-			// Password should always be empty
+			// password should always be empty
 			assertThat("", is(response.getResults().getPassword()));
 			// Modifying User Attributes.
 			userCreated.setFirstname(modifiedFirstName);
-			// userCreated.setLastname(modifiedLastName);
+			userCreated.setLastname(modifiedLastName);
 			logger.info("Update user fn [{}] ln [{}] username [{}]", userCreated.getFirstname(), userCreated.getLastname(), userCreated.getUsername());
 			response = service.update(userCreated);
 			String errors = "";

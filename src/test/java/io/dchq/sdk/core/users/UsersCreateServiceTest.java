@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
@@ -51,9 +50,12 @@ import io.dchq.sdk.core.clusters.DataCenterSearchServiceTest;
  * <code>UsersService</code> Integration Tests.
  *
  * @author Intesar Mohammed
- * @since 1.0
- * <p/>
- * Users: Create (annonymous & ENABLED, ROLE_TENANT_ADMIN)
+ * @updater Jagdeep Jain
+ * @since 1.0 
+ */
+
+/**
+ * Users: Create
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -63,13 +65,14 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
 
     private UserService service;
     private Users users;
-    private boolean error;
+    private boolean success;
     private Users userCreated;
     private String errorMessage;
 
     @org.junit.Before
     public void setUp() throws Exception {
-        service = ServiceFactory.buildUserService(rootUrl, username, password);
+    	// TODO - use specified user permissions instead of cloud admin user
+        service = ServiceFactory.buildUserService(rootUrl, cloudadminusername, cloudadminpassword);
     }
 
     public static PkEntityBase searchDataCenter(String term) throws Exception {
@@ -95,84 +98,50 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() throws Exception {
         return Arrays.asList(new Object[][]{
-
-				/* { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "All Null", true }
-                ,{ null, null, "", "a@b.com", null, null, null, null, null, null, null, null, "", null, null, "Only Username", false }
-				,{ null, "Last", "admin", null, null, null, null, null, null, null, null, null, null, null, null, "Only ,ln UserName", true }
-				,{ null, "Last", "testUser1", null, null, null, null, null, null, null, null, null, null, null, null, "Only ln,Username", true }
-				,{ null, "Last", "testuser1", "it-user@dchq.io", null, null, null, null, null, null, null, null, null, null, null, "Only ln,Username,emailid,", true } 
-				,{ null, "", "testuser1", "ituser", null, null, null, getProfile("BASIC"), null, null, null, null, "aaaaaaaa", null, null, "All Mandatory Fields ln,Username,emailid,Profile,password", false }
-			    ,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, null, null, "aaaaaaaa", null, null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), "ff808181545040790154514a03b9013d", null, null, null, "aaaaaaaa", null, null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, null, null, "aaaaaaaa", null, null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, null, null, "aaaaaaaa", searchDataCenter("ClusterMain"), null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, null, null, "aaaaaaaa", searchDataCenter("ClusterMain1"), null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, new HashSet<String>(Arrays.asList(new String[] { "ff808181545fce5f01545fdfa72c0034", "ff808181545fce5f01545fdfa72c0034" })), null, "aaaaaaaa", searchDataCenter("ClusterMain1"), null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, new HashSet<String>(Arrays.asList(new String[] { "ff808181545fce5f01545fdfa72c0034", "ff808181545fce5f01545fdfa72c0034" })), null, "aaaaaaaa", searchDataCenter("ClusterMain1"), null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, new HashSet<String>(Arrays.asList(new String[] { "ff808181545fce5f01545fdfa72c0034", "ff808181545fce5f01545fdfa72c0034" })), new ArrayList<String>(Arrays.asList(new String[] { "ROLE_USER" })), "aaaaaaaa", searchDataCenter("ClusterMain1"), null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", "Company 1", "Bkb", "8019059425", getProfile("BASIC"), null, null, new HashSet<String>(Arrays.asList(new String[] { "ff808181545fce5f01545fdfa72c0034", "ff808181545fce5f01545fdfa72c0034" })), null, "aaaaaaaa", searchDataCenter("ClusterMain1"), null, "Non Mandatory Fields ", false }
-				,{ null, "Last", "testuser1", "ituser@dchq.io", null, null, null, getProfile("BASIC"), "202881834d9ee4d1014d9ee5d73f0010", null, null, null, null, null, null, "Only fn,ln", false }
-				,{ "fn", "ln", "ituser1", "ituser1@dchq.io", "pass1234", "", false }
-				,{ "fn", "ln", "ituser2", "ituser2@dchq.io", "pass1234", false }
-				// TODO: validate password
-				,{ "fn", "ln", "ituser1", "ituser3@dchq.io", "", "System Creating User with Empty Password,\n SDK Malfunction :Creating user with Empty Password", true }
-				,{ "", "", "ituser2", "ituser4@dchq.io", "", false }
-				 */
-                {"fname", "lname", "user", "user" + "@dchq.io", "ABC", "Engg", "123-1231-121",
-                        getProfile("BASIC"), null, null, null, null, "pass1234", null, null, "comments", false}
-        });
-    }
+				// TODO: add more test data for all sorts of validations
+				{ "fname", "lname", "user", "user" + "@dchq.io", "pass1234", "ABC", "Engg", "123-1231-121", null, false,
+						null, true, "comments", false } });
+	   }
 
     public UsersCreateServiceTest(
             String fn,
             String ln,
             String username,
             String email,
+            String pass,
             String company,
             String title,
             String phoneNumber,
-            Profile profile,
             String tenant,
-            Organization organization,
-            Set<String> userGroupId,
+            boolean inactive,
             List<String> authorities,
-            String pass,
-            PkEntityBase cluster,
             Boolean isActive,
             String message,
             boolean success
     ) {
-
         // random username
         String prefix = RandomStringUtils.randomAlphabetic(3);
         username = prefix + "-" + username;
         email = prefix + "-" + email;
-
         // lowercase
         username = org.apache.commons.lang3.StringUtils.lowerCase(username);
         email = org.apache.commons.lang3.StringUtils.lowerCase(email);
-
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
         this.users.setCompany(company);
         this.users.setJobTitle(title);
         this.users.setPhoneNumber(phoneNumber);
-        //this.users.setProfile(profile);
         this.users.setTenantPk(tenant);
         this.users.setInactive(false);
-        //this.users.setOrganization(organization);
-        //this.users.setUserGroupIds(userGroupId);
         this.users.setAuthorities(authorities);
-        //this.users.setPreferredDataCenter(cluster);
         this.users.setInactive(isActive);
         this.errorMessage = message;
-        this.error = success;
+        this.success = success;
     }
     
     @Test
     public void testCreate() {
         logger.info("Create user fn [{}] ln [{}] username [{}]", users.getFirstname(), users.getLastname(), users.getUsername());
         ResponseEntity<Users> response = service.create(users);
-
         for (Message message : response.getMessages()) {
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
         }
@@ -180,33 +149,34 @@ public class UsersCreateServiceTest extends AbstractServiceTest {
             this.userCreated = response.getResults();
             logger.info("Create user Successful..");
         }
-        // check response is not null
-        // check response has no errors50zc
-        // check response has user entity with ID
-        // check all data send
+        /* check response:
+         * 1. is not null
+         * 2. has no errors
+         * 3. has user entity with ID
+         * 4. all data sent
+         */
         assertNotNull(response);
         assertNotNull(response.isErrors());
-        // assertEquals("Expected :\n" + errorMessage, error, response.isErrors());
-        if (!error) {
+        assertEquals("Expected :\n" + errorMessage, success, response.isErrors());
+        if (!success) {
             assertNotNull(response.getResults());
             assertNotNull(response.getResults().getId());
             assertEquals(users.getFirstname(), userCreated.getFirstname());
             assertEquals(users.getLastname(), userCreated.getLastname());
             assertEquals(users.getUsername(), userCreated.getUsername());
             assertEquals(users.getEmail(), userCreated.getEmail());
+            // password should always be empty
+            assertThat("", is(response.getResults().getPassword()));
             assertEquals(users.getCompany(), userCreated.getCompany());
             assertEquals(users.getJobTitle(), userCreated.getJobTitle());
-            assertEquals(users.getProfile(), userCreated.getProfile());
             assertEquals(users.getPhoneNumber(), userCreated.getPhoneNumber());
-            assertEquals(users.getAuthorities(), userCreated.getAuthorities());
-            
-            if (isNullOrEmpty(users.getTenantPk()))
+            if (isNullOrEmpty(users.getTenantPk())) {
                 assertNotNull(userCreated.getTenantPk());
-            else
+            } else {
                 assertEquals(users.getTenantPk(), userCreated.getTenantPk());
-
-            // Password should always be empty
-            assertThat("", is(response.getResults().getPassword()));
+            }
+            assertEquals(users.getAuthorities(), userCreated.getAuthorities());
+            assertEquals(users.isEnabled(), userCreated.isEnabled());
         }
     }
 

@@ -46,25 +46,27 @@ import io.dchq.sdk.core.UserService;
  * <code>UsersService</code> Integration Tests.
  *
  * @author Intesar Mohammed
+ * @updater Jagdeep Jain
  * @since 1.0
- * <p/>
- * Users:
- * FindAll
+ */
+/**
+ * Users: FindAll
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
 public class UsersFindAllServiceTest extends AbstractServiceTest {
 
-    private UserService service;
-    private Users users;
-    private boolean success;
-    private Users userCreated;
-    private int countBeforeCreate=0,countAfterCreate=0,countAfterDelete=0;
+	private UserService service;
+	private Users users;
+	private boolean success;
+	private Users userCreated;
+	private int countBeforeCreate = 0, countAfterCreate = 0, countAfterDelete = 0;
 
     @org.junit.Before
     public void setUp() throws Exception {
-        service = ServiceFactory.buildUserService(rootUrl, username, password);
+    	// TODO - use specified user permissions instead of cloud admin user
+        service = ServiceFactory.buildUserService(rootUrl, cloudadminusername, cloudadminpassword);
     }
 
     @Parameterized.Parameters
@@ -90,7 +92,6 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
         // lowercase
         username = org.apache.commons.lang3.StringUtils.lowerCase(username);
         email = org.apache.commons.lang3.StringUtils.lowerCase(email);
-        
         this.users = new Users().withFirstname(fn).withLastname(ln).withUsername(username).withEmail(email).withPassword(pass);
         this.success = success;
     }
@@ -127,10 +128,12 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
         for (Message message : response.getMessages()) {
             logger.warn("Error while Create request  [{}] ", message.getMessageText());
         }
-        // check response is not null
-        // check response has no errors
-        // check response has user entity with ID
-        // check all data send
+        /* check response:
+         * 1. is not null
+         * 2. has no errors
+         * 3. has user entity with ID
+         * 4. all data sent
+         */
         assertNotNull(response);
         assertNotNull(response.isErrors());
         assertThat(success, is(equals(response.isErrors())));
@@ -143,7 +146,7 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
             assertEquals(users.getLastname(), response.getResults().getLastname());
             assertEquals(users.getUsername(), response.getResults().getUsername());
             assertEquals(users.getEmail(), response.getResults().getEmail());
-            // Password should always be empty
+            // password should always be empty
             assertThat("", is(response.getResults().getPassword()));
             logger.info("FindAll User by Id [{}]", userCreated.getId());
             this.countAfterCreate = testGetUserFromFindAll(userCreated.getId());
