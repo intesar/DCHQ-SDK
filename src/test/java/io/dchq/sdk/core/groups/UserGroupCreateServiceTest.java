@@ -52,7 +52,8 @@ public class UserGroupCreateServiceTest extends AbstractServiceTest {
 
     @org.junit.Before
     public void setUp() throws Exception {
-        userGroupService = ServiceFactory.builduserGroupService(rootUrl, username, password);
+        // TODO - use TENANT_ADMIN USERS
+        userGroupService = ServiceFactory.builduserGroupService(rootUrl, cloudadminusername, cloudadminpassword);
     }
 
     /*
