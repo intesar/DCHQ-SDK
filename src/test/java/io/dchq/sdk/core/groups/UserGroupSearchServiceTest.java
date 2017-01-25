@@ -79,7 +79,7 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
 
         if (response.isErrors()) {
             logger.warn("Message from Server... {}", response.getMessages().get(0).getMessageText());
-            Assert.assertEquals(response.getMessages().get(0).getMessageText() ,error, response.isErrors());
+            Assert.assertEquals(response.getMessages().get(0).getMessageText() ,true, response.isErrors());
         }
 
         assertNotNull(response);

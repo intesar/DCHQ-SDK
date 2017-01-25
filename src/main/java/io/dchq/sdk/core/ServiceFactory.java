@@ -20,7 +20,7 @@ package io.dchq.sdk.core;
  * Factory class
  *
  * @author Intesar Mohammed
- * @updater SaurabhB.
+ * //@contributor Saurabh Bhatia
  * @since 1.0
  */
 public class ServiceFactory {
