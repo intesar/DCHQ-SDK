@@ -59,7 +59,7 @@ public class UsersFindServiceTest extends AbstractServiceTest {
     private Users users;
     private boolean success;
     private Users userCreated;
-    private Users userUpdated;
+    private Users userFind;
     
     @org.junit.Before
     public void setUp() throws Exception {
@@ -135,11 +135,11 @@ public class UsersFindServiceTest extends AbstractServiceTest {
             if (!response.isErrors()) {
                 assertNotNull(response.getResults());
                 assertNotNull(response.getResults().getId());
-                this.userUpdated = response.getResults();
+                this.userFind = response.getResults();
                 logger.info("Find by ID user fn [{}] ln [{}] username [{}]", userCreated.getFirstname(), userCreated.getLastname(), userCreated.getUsername());
-                assertEquals(userCreated.getFirstname(), userUpdated.getFirstname());
+                assertEquals(userCreated.getFirstname(), userFind.getFirstname());
                 // password should always be empty
-                assertThat("", is(userUpdated.getPassword()));
+                assertThat("", is(userFind.getPassword()));
             }
         }
     }

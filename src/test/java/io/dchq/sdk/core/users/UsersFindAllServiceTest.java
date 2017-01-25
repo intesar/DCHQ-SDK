@@ -142,10 +142,10 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
             assertNotNull(response.getResults().getId());
             this.userCreated = response.getResults();
             logger.info("Create request successfully completed for user fn [{}] ln [{}] username [{}]", userCreated.getFirstname(), userCreated.getLastname(), userCreated.getUsername());
-            assertEquals(users.getFirstname(), response.getResults().getFirstname());
-            assertEquals(users.getLastname(), response.getResults().getLastname());
-            assertEquals(users.getUsername(), response.getResults().getUsername());
-            assertEquals(users.getEmail(), response.getResults().getEmail());
+            assertEquals(users.getFirstname(), userCreated.getFirstname());
+            assertEquals(users.getLastname(), userCreated.getLastname());
+            assertEquals(users.getUsername(), userCreated.getUsername());
+            assertEquals(users.getEmail(), userCreated.getEmail());
             // password should always be empty
             assertThat("", is(response.getResults().getPassword()));
             logger.info("FindAll User by Id [{}]", userCreated.getId());

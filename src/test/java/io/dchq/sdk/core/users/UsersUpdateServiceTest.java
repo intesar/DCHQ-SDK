@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +63,7 @@ public class UsersUpdateServiceTest extends AbstractServiceTest {
 	private Users userUpdated;
 	private String modifiedFirstName, modifiedLastName;
 
-	@org.junit.Before
+	@Before
 	public void setUp() throws Exception {
 		// TODO - use specified user permissions instead of cloud admin user
 		service = ServiceFactory.buildUserService(rootUrl, cloudadminusername, cloudadminpassword);
