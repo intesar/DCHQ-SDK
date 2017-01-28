@@ -20,7 +20,6 @@ import static junit.framework.TestCase.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -30,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.base.Visibility;
 import com.dchq.schema.beans.one.blueprint.Blueprint;
@@ -42,8 +42,16 @@ import io.dchq.sdk.core.ServiceFactory;
 /**
  *
  * @author Abedeen.
+ * @updater Jagdeep Jain
  * @since 1.0
  */
+
+/**
+ * Blueprint: Update
+ * App & Machine Blueprint
+ *
+ */
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(Parameterized.class)
 public class BlueprintUpdateServiceTest extends AbstractServiceTest {
@@ -53,24 +61,18 @@ public class BlueprintUpdateServiceTest extends AbstractServiceTest {
     private boolean success;
     private Blueprint bluePrintCreated;
     private Blueprint bluePrintUpdated;
-    private String bluePrintName;
-    private String modifiedBluePrint;
-    
-    @org.junit.Before
-    public void setUp() throws Exception {
-        blueprintService = ServiceFactory.buildBlueprintService(rootUrl, username, password);
-    }
+    private String modifiedBlueprintName;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-				{ "Blueprintx_update_null", BlueprintType.DOCKER_COMPOSE, "2.0", "LB:\n image: nginx:latest\n",
+				{ "Blueprint_Original", BlueprintType.DOCKER_COMPOSE, "2.0", "LB:\n image: nginx:latest\n",
 						Visibility.EDITABLE, "", true }       
 				});
     }
 
     public BlueprintUpdateServiceTest(
-    		String gname, 
+    		String blueprintName, 
     		BlueprintType blueprintType, 
     		String version, 
     		String yaml, 
@@ -79,15 +81,25 @@ public class BlueprintUpdateServiceTest extends AbstractServiceTest {
     		boolean success
     		) 
     {
-        this.bluePrint = new Blueprint().withName(gname).withBlueprintType(blueprintType).withVersion(version).withVisibility(visible).withUserName(username);
+        this.bluePrint = new Blueprint().withName(blueprintName).withBlueprintType(blueprintType).withVersion(version).withVisibility(visible).withUserName(username);
         this.bluePrint.setYml(yaml);
-        this.modifiedBluePrint = this.bluePrintName + "_new";
         this.success = success;
+    }
+    
+    @org.junit.Before
+    public void setUp() throws Exception {
+        blueprintService = ServiceFactory.buildBlueprintService(rootUrl, username2, password2);
     }
 
     @Test
     public void testUpdate() throws Exception {
-        logger.info("Create Bluepring [{}]", bluePrint.getName());
+    	logger.info("Create Blueprint [{}] having details as follows:\n [{}]\n [{}]\n [{}]\n [{}]\n", bluePrint.getName(),
+				bluePrint.getBlueprintType(), 
+				bluePrint.getVersion(), 
+				bluePrint.getYml(),
+				bluePrint.getVisibility()
+		);
+    	modifiedBlueprintName = bluePrint.getName().replace("Original", "Update");
         ResponseEntity<Blueprint> response = blueprintService.create(bluePrint);
         if (response.isErrors()) {
             logger.warn("Error Message from Server... {}", response.getMessages().get(0).getMessageText());
@@ -103,14 +115,23 @@ public class BlueprintUpdateServiceTest extends AbstractServiceTest {
             Assert.assertNotNull(bluePrint.getVersion(), bluePrintCreated.getVersion());
             Assert.assertNotNull(bluePrint.getVisibility().toString(), bluePrintCreated.getVisibility().toString());
             Assert.assertNotNull(bluePrint.getUserName(), bluePrintCreated.getUserName());
-            bluePrintCreated.setName(modifiedBluePrint);
+            
+            bluePrintCreated.setName(modifiedBlueprintName);
+			logger.info("Updated Blueprint name as [{}]", bluePrintCreated.getName());
+        	
             response = blueprintService.update(bluePrintCreated);
+            for (Message message : response.getMessages()) {
+                logger.warn("Error while Update request  [{}] ", message.getMessageText());
+            }
             Assert.assertNotNull(((Boolean) success).toString(), ((Boolean) response.isErrors()).toString());
+            
             if (response.isErrors()) {
                 logger.warn("Update : Error Message from Server... {}", response.getMessages().get(0).getMessageText());
             }
+            
             assertNotNull(response);
             assertNotNull(response.isErrors());
+            
             if (!response.isErrors() && response.getResults() != null) {
                 bluePrintUpdated = response.getResults();
                 assertNotNull(response.getResults());
@@ -118,14 +139,16 @@ public class BlueprintUpdateServiceTest extends AbstractServiceTest {
                 Assert.assertNotNull(bluePrintCreated.getName(), bluePrintUpdated.getName());
             }
         }
-
     }
 
     @After
     public void cleanUp() {
-        logger.info("cleaning up...");
         if (bluePrintCreated != null) {
-            blueprintService.delete(bluePrintCreated.getId());
+            logger.info("cleaning up...");
+            ResponseEntity<?> response = blueprintService.delete(bluePrintCreated.getId());
+            for (Message message : response.getMessages()) {
+                logger.warn("Error blueprint deletion: [{}] ", message.getMessageText());
+            }
         }
     }
 }
