@@ -99,9 +99,8 @@ public class UsersFindAllServiceTest extends AbstractServiceTest {
 	public int testGetUserFromFindAll(String id) {
 		ResponseEntity<List<Users>> response = service.findAll(0, 5000);
 		Assert.assertNotNull(response.getTotalElements());
-		String errors = "";
 		for (Message message : response.getMessages()) {
-			errors += ("Error while Find request  " + message.getMessageText() + "\n");
+			logger.warn("Error [{}]" + message.getMessageText());
 		}
 		assertNotNull(response);
 		assertNotNull(response.isErrors());
