@@ -6,6 +6,7 @@ import com.dchq.schema.beans.one.security.Tenant;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.TenantService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -49,6 +50,11 @@ public class CreateTenantServiceTest extends AbstractServiceTest{
 
     //Constructor
     public CreateTenantServiceTest(String tenantname, boolean error) {
+
+        // random tenantName
+        String prefix = RandomStringUtils.randomAlphabetic(3);
+        tenantname = prefix + "-" + tenantname;
+
         this.tenant = new Tenant().withName(tenantname);
         this.error = error;
     }

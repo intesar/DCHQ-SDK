@@ -15,6 +15,7 @@
  */
 package io.dchq.sdk.core.plugins;
 
+import com.dchq.schema.beans.base.Message;
 import com.dchq.schema.beans.base.ResponseEntity;
 import com.dchq.schema.beans.one.base.NameEntityBase;
 import com.dchq.schema.beans.one.base.UsernameEntityBase;
@@ -23,6 +24,7 @@ import com.dchq.schema.beans.one.security.EntitlementType;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.PluginService;
 import io.dchq.sdk.core.ServiceFactory;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -51,6 +53,7 @@ public class PluginEntitleServiceTest extends AbstractServiceTest {
 
     private PluginService pluginService;
     private PluginService pluginService2;
+    private String messageText;
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -61,20 +64,25 @@ public class PluginEntitleServiceTest extends AbstractServiceTest {
     private Plugin plugin;
     private boolean errors;
     private Plugin pluginCreated;
-    private String validityMessage;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestPlugin1111", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, true, userId2, "General Input", false},
-                {"TestPlugin11111", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, false, USER_GROUP, "General Input", false},
-                {"TestPlugin2", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, false, null, "General Input", false},
-                {"TestPlugin3", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, false, "", "General Input", false}
+                {"TestPlugin1111", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, true, userId2, false},
+         /**       {"TestPlugin11111", "1.1", "Dummy Script", "PERL", "Apache License 2.0", EntitlementType.CUSTOM, false, USER_GROUP, false},
+                {"TestPlugin2", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, false, null, false},
+                {"TestPlugin3", "1.1", "Dummy Script", "PERL", "EULA", EntitlementType.OWNER, false, "", false}
+         **/
         });
     }
 
     public PluginEntitleServiceTest(String pluginName, String version, String pluginScript, String scriptType, String license,
-                                    EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId, String validityMessage, boolean errors) {
+                                    EntitlementType entitlementType, boolean isEntitlementTypeUser, String entitledUserId, boolean errors) {
+
+        // random pluginname
+        String prefix = RandomStringUtils.randomAlphabetic(3);
+        pluginName = prefix + "-" + pluginName;
+
         this.plugin = new Plugin();
         this.plugin.setName(pluginName);
         this.plugin.setVersion(version);
@@ -98,7 +106,6 @@ public class PluginEntitleServiceTest extends AbstractServiceTest {
         }
 
         this.errors = errors;
-        this.validityMessage = validityMessage;
 
     }
 
@@ -116,7 +123,14 @@ public class PluginEntitleServiceTest extends AbstractServiceTest {
         assertNotNull(response);
         assertNotNull(response.isErrors());
 
-        Assert.assertThat(errors, is(equals(response.isErrors())));
+        if (response.isErrors()) {
+            for (Message m : response.getMessages()) {
+                logger.warn("[{}]", m.getMessageText());
+                messageText = m.getMessageText();
+            }
+            //check for errors
+            Assert.assertEquals(messageText ,errors, response.isErrors());
+        }
 
         pluginCreated = response.getResults();
         assertNotNull(response.getResults());
@@ -150,8 +164,14 @@ public class PluginEntitleServiceTest extends AbstractServiceTest {
         logger.info("cleaning up...");
 
         if (pluginCreated != null) {
-            ResponseEntity<Plugin> deleteResponse = pluginService.delete(pluginCreated.getId());
-            logger.info("Delete errors {}", deleteResponse.isErrors());
+            ResponseEntity<Plugin> deleteResponse  =   pluginService.delete(pluginCreated.getId());
+
+            for (Message m : deleteResponse.getMessages()){
+                logger.warn("[{}]", m.getMessageText());
+                messageText = m.getMessageText();}
+
+            //check for errors
+            Assert.assertFalse(messageText ,deleteResponse.isErrors());
         }
     }
 }
