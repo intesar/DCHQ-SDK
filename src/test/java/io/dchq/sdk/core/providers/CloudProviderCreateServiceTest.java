@@ -61,18 +61,20 @@ public class CloudProviderCreateServiceTest extends AbstractServiceTest {
 
     public CloudProviderCreateServiceTest (
     		String name, 
+    		String testUsername,
+    		String apiKey,
+    		AccountType accountType,
+    		/*
     		String rackspaceName, 
     		Boolean isActive, 
-    		AccountType rackspaceType, 
     		String Password, 
     		String validationMssage, 
+    		*/
     		boolean success
     		) 
 	{
-		this.registryAccount = new RegistryAccount().withName(name).withUsername(rackspaceName).withInactive(isActive)
-				.withAccountType(rackspaceType).withPassword(Password);
+		this.registryAccount = new RegistryAccount().withName(name).withUsername(testUsername).withAccountType(accountType);
 		this.success = success;
-		this.validationMssage = validationMssage;
 	}
 
     @Parameterized.Parameters
@@ -83,8 +85,8 @@ public class CloudProviderCreateServiceTest extends AbstractServiceTest {
                 {"", "dchqinc3", Boolean.FALSE, AccountType.RACKSPACE, "7b1fa480664b4823b72abed54ebb9b0f", "Clould provider cannot be created with  Empty Name ", true},
                 {"Rackspace US with empty password ", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE, "", "Clould provider cannot be created with  Empty API Key ", true}
         		*/
-				{ "Rackspace US 1 testAccount", "dchqinc", Boolean.FALSE, AccountType.RACKSPACE,
-						"7b1fa480664b4823b72abed54ebb9b0f", "", false }
+				{ "Rackspace US 1 testAccount", "dchqinc", "7b1fa480664b4823b72abed54ebb9b0f", AccountType.RACKSPACE,
+						false }
         });
     }
     
@@ -118,7 +120,7 @@ public class CloudProviderCreateServiceTest extends AbstractServiceTest {
 			assertNotNull(response.getResults());
 			assertNotNull(response.getResults().getId());
 			assertEquals(registryAccount.getUsername(), registryAccountCreated.getUsername());
-			assertEquals(registryAccount.getInactive(), registryAccountCreated.getInactive());
+			// assertEquals(registryAccount.getInactive(), registryAccountCreated.getInactive());
 			assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
 			assertEquals(registryAccount.getAccountType(), registryAccountCreated.getAccountType());
 			// Password should always be empty
