@@ -21,6 +21,7 @@ import com.dchq.schema.beans.one.security.UserGroup;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.UserGroupService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -78,6 +79,10 @@ public class UserGroupUpdateServiceTest extends AbstractServiceTest {
     private String messageText;
 
     public UserGroupUpdateServiceTest(String gname, String updatedGourpName, boolean error) {
+        // random group Name
+        String prefix = RandomStringUtils.randomAlphabetic(3);
+        gname = prefix + gname;
+
         this.userGroup = new UserGroup().withName(gname);
         this.updatedGroupName = updatedGourpName;
         this.error = error;

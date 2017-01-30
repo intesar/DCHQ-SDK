@@ -53,7 +53,7 @@ public class CreateTenantServiceTest extends AbstractServiceTest{
 
         // random tenantName
         String prefix = RandomStringUtils.randomAlphabetic(3);
-        tenantname = prefix + "-" + tenantname;
+        tenantname = prefix + tenantname;
 
         this.tenant = new Tenant().withName(tenantname);
         this.error = error;

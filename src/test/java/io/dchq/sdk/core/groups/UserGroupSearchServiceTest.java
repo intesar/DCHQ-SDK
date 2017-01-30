@@ -21,6 +21,7 @@ import com.dchq.schema.beans.one.security.UserGroup;
 import io.dchq.sdk.core.AbstractServiceTest;
 import io.dchq.sdk.core.ServiceFactory;
 import io.dchq.sdk.core.UserGroupService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -52,13 +53,13 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
 
     @org.junit.Before
     public void setUp() throws Exception {
-        userGroupService = ServiceFactory.builduserGroupService(rootUrl, username, password);
+        userGroupService = ServiceFactory.builduserGroupService(rootUrl, cloudadminusername, cloudadminpassword);
     }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {"TestGroupSearchService", false}
+                {"TGSearch", false}
         });
     }
 
@@ -67,6 +68,12 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
     private UserGroup userGroupCreated;
 
     public UserGroupSearchServiceTest(String gname, boolean errors) {
+
+        // random pluginname
+        String prefix = RandomStringUtils.randomAlphabetic(3);
+        gname = prefix + gname;
+// lowercase
+        gname = org.apache.commons.lang3.StringUtils.lowerCase(gname);
         this.userGroup = new UserGroup().withName(gname);
         this.errors = errors;
     }
@@ -94,12 +101,18 @@ public class UserGroupSearchServiceTest extends AbstractServiceTest {
         }
 
         // let's search for the group
-        ResponseEntity<List<UserGroup>> userGroupsResponseEntity = userGroupService.search(userGroup.getName(), 0, 1);
+        ResponseEntity<List<UserGroup>> userGroupsResponseEntity = userGroupService.search(userGroupCreated.getName(), 0,1);
         assertNotNull(userGroupsResponseEntity);
         assertNotNull(userGroupsResponseEntity.isErrors());
-        assertFalse(userGroupsResponseEntity.isErrors());
 
+        for (Message message : userGroupsResponseEntity.getMessages()) {
+            logger.warn("Error while Create request  [{}] ", message.getMessageText());
+            messageText+=message.getMessageText()+"\n";
+        }
+
+        assertFalse("Test : " + messageText, userGroupsResponseEntity.isErrors());
         assertNotNull(userGroupsResponseEntity.getResults());
+        System.out.println("Page Size : " +userGroupsResponseEntity.getResults().size());
         assertEquals(1, userGroupsResponseEntity.getResults().size());
 
         UserGroup searchedEntity = userGroupsResponseEntity.getResults().get(0);
