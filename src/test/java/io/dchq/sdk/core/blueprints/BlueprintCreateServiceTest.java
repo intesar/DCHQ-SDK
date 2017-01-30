@@ -159,7 +159,9 @@ public class BlueprintCreateServiceTest extends AbstractServiceTest {
 
     @org.junit.Test
     public void testCreate() throws Exception {
-		logger.info("Create Blueprint [{}] having details as follows:\n [{}]\n [{}]\n [{}]\n [{}]\n [{}]\n [{}]\n [{}]", bluePrint.getName(),
+		logger.info("Create Blueprint [{}] "
+				+ "having details as follows:\n [{}]\n [{}]\n [{}]\n [{}]\n [{}]\n [{}]\n [{}]", 
+				bluePrint.getName(),
 				bluePrint.getBlueprintType(), 
 				bluePrint.getVersion(), 
 				bluePrint.getDescription(),
